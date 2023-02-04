@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Create a lobby</title>
+    </head>
+    <body>
+        <h1>Game Lobby Creation</h1>
+        <span>Lobby Name:</span>
+        <textarea id="name" name="name" rows="1"></textarea> <br>
+        <span>Game:</span>
+        <!--TODO: make this get the game list off a dynamic json-->
+        <select name="game" id="game">
+            <option>Seth-head</option>
+        </select><br>
+        <span>Visibility:</span>
+        <div>
+            <input type="radio" name="visibility" value="private" id="private" checked>
+            <label for="private">Private</label><br>
+            <input type="radio" name="visibility" value="public" id="public">
+            <label for="public">Public</label><br>
+        </div>
+        <span>Max Players:</span>
+        <input type="number" id="max_players" name="max_players" min="2" max="8" value="2" onkeyup="clampMaxPlayers(this)"><br>
+        <button onclick="onButtonClick()">Create Lobby</button>
+    </body>
+    <script>
+        function onButtonClick() {
+            if (document.getElementById("name").value.length === 0) {
+                alert("Name must not be empty!");
+                return;
+            }
+            const obj = {
+                name: document.getElementById("name").value,
+                game: document.getElementById("game").value,
+                is_private: document.getElementById("private").checked,
+                max_players: parseInt(document.getElementById("max_players").value)
+            };
+
+        }
+        //the user might manually input a number that's outside the range of the input, so clamp it if it is
+        function clampMaxPlayers(element) {
+            const val = parseInt(element.value);
+            console.log(typeof val);
+            if (val > parseInt(element.max)) {
+                element.value = element.max;
+            }
+            if (val < parseInt(element.min)) {
+                element.value = element.min;
+            }
+        }
+    </script>
+</html>
