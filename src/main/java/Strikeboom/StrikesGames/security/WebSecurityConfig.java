@@ -16,16 +16,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @Configuration
 @AllArgsConstructor
-public class WebSecurity {
+public class WebSecurityConfig {
     @Bean(BeanIds.AUTHENTICATION_MANAGER)
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.cors().and().csrf().disable();
         http
                 .authorizeHttpRequests()
-                .requestMatchers("/api/auth/**","/","/css/**","/error/**","/js/**","/login.html","/signup.html")
+                .requestMatchers("/api/auth/**","/api/lobby/**","/","/css/**","/error/**","/js/**","/login.html","/signup.html","/lobby/**")
                 .permitAll()
                 .anyRequest()
                 .permitAll();
