@@ -17,12 +17,14 @@ import java.util.UUID;
 @Builder
 public class Lobby {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long id;
     @NotBlank(message = "name must not be empty!")
     private String name;
     private String game;
     private boolean isPrivate;
     private int maxPlayers;
     private Instant created;
+    //separate from the uuid where this is used to make a quick join url by being only 7 characters long, used in the URL
+    private String joinCode;
 }

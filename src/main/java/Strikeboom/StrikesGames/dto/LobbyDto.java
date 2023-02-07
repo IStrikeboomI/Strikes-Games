@@ -14,4 +14,5 @@ public class LobbyDto {
     private boolean isPrivate;
     private int maxPlayers;
     private Instant created;
+    private String joinCode;
 }
