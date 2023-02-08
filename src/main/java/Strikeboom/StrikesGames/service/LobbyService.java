@@ -2,14 +2,18 @@ package Strikeboom.StrikesGames.service;
 
 import Strikeboom.StrikesGames.dto.LobbyDto;
 import Strikeboom.StrikesGames.entity.Lobby;
+import Strikeboom.StrikesGames.entity.User;
 import Strikeboom.StrikesGames.exception.LobbyNotFoundException;
+import Strikeboom.StrikesGames.exception.PlayerUnableToJoinException;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
+import jakarta.persistence.Lob;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
 
@@ -21,6 +25,17 @@ public class LobbyService {
     private final LobbyRepository lobbyRepository;
     public void createLobby(LobbyDto lobbyDto) {
         lobbyRepository.save(map(lobbyDto));
+    }
+    private void joinLobby(Lobby lobby, User user) {
+        if (lobby.getUsers().size() < lobby.getMaxPlayers()) {
+            if (!lobby.getUsers().contains(user)) {
+                lobby.getUsers().add(user);
+            } else {
+                throw new PlayerUnableToJoinException("User is already in lobby!");
+            }
+        } else {
+            throw new PlayerUnableToJoinException("Lobby is full!");
+        }
     }
     private LobbyDto getLobbyFromJoinCode(String joinCode) {
         return mapToDto(lobbyRepository.findLobbyFromJoinCode(joinCode).orElseThrow(() -> new LobbyNotFoundException(String.format("Lobby with join code: %s not found",joinCode))));
@@ -36,6 +51,8 @@ public class LobbyService {
                 .maxPlayers(lobby.getMaxPlayers())
                 .name(lobby.getName())
                 .joinCode(lobby.getJoinCode())
+                .users(lobby.getUsers())
+                .creator(lobby.getCreator())
                 .build();
     }
     //called only on creation of lobby
@@ -47,6 +64,8 @@ public class LobbyService {
                 .maxPlayers(lobby.getMaxPlayers())
                 .name(lobby.getName())
                 .joinCode(generateValidJoinCode())
+                .users(new ArrayList<>())
+                .creator(lobby.getCreator())
                 .build();
     }
     //characters allowed in the join code URL

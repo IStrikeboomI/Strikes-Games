@@ -1,8 +1,12 @@
 package Strikeboom.StrikesGames.dto;
 
+import Strikeboom.StrikesGames.entity.User;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -15,4 +19,6 @@ public class LobbyDto {
     private int maxPlayers;
     private Instant created;
     private String joinCode;
+    private List<User> users;
+    private User creator;
 }
