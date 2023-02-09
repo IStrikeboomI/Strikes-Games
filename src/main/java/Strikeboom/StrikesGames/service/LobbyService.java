@@ -23,8 +23,8 @@ import java.util.UUID;
 @Transactional
 public class LobbyService {
     private final LobbyRepository lobbyRepository;
-    public void createLobby(LobbyDto lobbyDto) {
-        lobbyRepository.save(map(lobbyDto));
+    public Lobby createLobby(LobbyDto lobbyDto) {
+        return lobbyRepository.save(map(lobbyDto));
     }
     private void joinLobby(Lobby lobby, User user) {
         if (lobby.getUsers().size() < lobby.getMaxPlayers()) {

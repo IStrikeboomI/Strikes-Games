@@ -3,7 +3,9 @@ package Strikeboom.StrikesGames.controller;
 import Strikeboom.StrikesGames.dto.LobbyDto;
 import Strikeboom.StrikesGames.entity.Lobby;
 import Strikeboom.StrikesGames.service.LobbyService;
+import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
+import org.hibernate.Session;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LobbyController {
     private final LobbyService lobbyService;
     @PostMapping("create")
-    public ResponseEntity<Void> create(@RequestBody LobbyDto lobby) {
+    public ResponseEntity<Void> create(@RequestBody LobbyDto lobby, HttpSession session) {
         lobbyService.createLobby(lobby);
         return new ResponseEntity<>(HttpStatus.OK);
     }

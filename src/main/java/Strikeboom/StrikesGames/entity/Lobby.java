@@ -33,5 +33,6 @@ public class Lobby {
     private String joinCode;
     @OneToMany(fetch = FetchType.LAZY)
     private List<User> users;
+    @OneToOne(fetch = FetchType.LAZY)
     private User creator;
 }
