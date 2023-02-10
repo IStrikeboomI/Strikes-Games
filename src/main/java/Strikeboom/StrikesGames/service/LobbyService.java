@@ -26,7 +26,7 @@ public class LobbyService {
     public Lobby createLobby(LobbyDto lobbyDto) {
         return lobbyRepository.save(map(lobbyDto));
     }
-    private void joinLobby(Lobby lobby, User user) {
+    public void joinLobby(Lobby lobby, User user) {
         if (lobby.getUsers().size() < lobby.getMaxPlayers()) {
             if (!lobby.getUsers().contains(user)) {
                 lobby.getUsers().add(user);
@@ -53,6 +53,7 @@ public class LobbyService {
                 .joinCode(lobby.getJoinCode())
                 .users(lobby.getUsers())
                 .creator(lobby.getCreator())
+                .gameStarted(lobby.isGameStarted())
                 .build();
     }
     //called only on creation of lobby
@@ -66,6 +67,7 @@ public class LobbyService {
                 .joinCode(generateValidJoinCode())
                 .users(new ArrayList<>())
                 .creator(lobby.getCreator())
+                .gameStarted(false)
                 .build();
     }
     //characters allowed in the join code URL

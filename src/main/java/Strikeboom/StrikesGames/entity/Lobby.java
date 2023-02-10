@@ -35,4 +35,5 @@ public class Lobby {
     private List<User> users;
     @OneToOne(fetch = FetchType.LAZY)
     private User creator;
+    private boolean gameStarted;
 }

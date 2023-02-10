@@ -1,6 +1,7 @@
 package Strikeboom.StrikesGames.entity;
 
 import jakarta.persistence.*;
+import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,4 +23,5 @@ public class User {
     private String name;
     @OneToOne(fetch = FetchType.LAZY)
     private Lobby lobby;
+    private HttpSession session;
 }

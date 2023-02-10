@@ -21,4 +21,5 @@ public class LobbyDto {
     private String joinCode;
     private List<User> users;
     private User creator;
+    private boolean gameStarted;
 }

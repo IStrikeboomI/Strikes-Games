@@ -2,6 +2,7 @@ package Strikeboom.StrikesGames.controller;
 
 import Strikeboom.StrikesGames.dto.LobbyDto;
 import Strikeboom.StrikesGames.entity.Lobby;
+import Strikeboom.StrikesGames.entity.User;
 import Strikeboom.StrikesGames.service.LobbyService;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,9 @@ public class LobbyController {
     private final LobbyService lobbyService;
     @PostMapping("create")
     public ResponseEntity<Void> create(@RequestBody LobbyDto lobby, HttpSession session) {
-        lobbyService.createLobby(lobby);
+        User creator = User.builder().session(session).name("Anonymous").build();
+        Lobby l = lobbyService.createLobby(lobby);
+        lobbyService.joinLobby(l,creator);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
