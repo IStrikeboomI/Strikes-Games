@@ -14,7 +14,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @Entity
 @Builder
-@Table(name = "user")
+@Table(name = "`user`")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -23,5 +23,4 @@ public class User {
     private String name;
     @OneToOne(fetch = FetchType.LAZY)
     private Lobby lobby;
-    private HttpSession session;
 }
