@@ -21,12 +21,13 @@ public class LobbyController {
     private final LobbyService lobbyService;
     private final UserRepository userRepository;
     @PostMapping("create")
-    public ResponseEntity<Void> create(@RequestBody LobbyDto lobby, HttpSession session) {
+    public ResponseEntity<LobbyDto> create(@RequestBody LobbyDto lobby, HttpSession session) {
         User creator = User.builder().name("Anonymous").build();
         Lobby l = lobbyService.createLobby(lobby);
+        l.setCreator(creator);
         userRepository.save(creator);
         lobbyService.joinLobby(l,creator);
         session.setAttribute("userId",creator.getId());
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(LobbyService.mapToDto(l), HttpStatus.OK);
     }
 }

@@ -37,13 +37,13 @@ public class LobbyService {
             throw new PlayerUnableToJoinException("Lobby is full!");
         }
     }
-    private LobbyDto getLobbyFromJoinCode(String joinCode) {
+    public LobbyDto getLobbyFromJoinCode(String joinCode) {
         return mapToDto(lobbyRepository.findLobbyFromJoinCode(joinCode).orElseThrow(() -> new LobbyNotFoundException(String.format("Lobby with join code: %s not found",joinCode))));
     }
-    private LobbyDto getLobbyFromId(long id) {
+    public LobbyDto getLobbyFromId(long id) {
         return mapToDto(lobbyRepository.findById(id).orElseThrow(() -> new LobbyNotFoundException(String.format("Lobby with id: %s not found",id))));
     }
-    private LobbyDto mapToDto(Lobby lobby) {
+    public static LobbyDto mapToDto(Lobby lobby) {
         return LobbyDto.builder()
                 .created(lobby.getCreated())
                 .game(lobby.getGame())
