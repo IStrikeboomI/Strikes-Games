@@ -37,6 +37,10 @@
                 maxPlayers: parseInt(document.getElementById("max_players").value)
             };
             let xhttp = new XMLHttpRequest();
+            xhttp.onload = (event) => {
+                let response = JSON.parse(xhttp.response);
+                window.location.replace(window.location.origin+"/join/"+response.joinCode);
+            }
             xhttp.open("POST","/api/lobby/create");
             //Send the proper header information along with the request
             xhttp.setRequestHeader('Content-type', 'application/json');
