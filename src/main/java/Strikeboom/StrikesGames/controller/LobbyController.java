@@ -1,33 +1,30 @@
 package Strikeboom.StrikesGames.controller;
 
 import Strikeboom.StrikesGames.dto.LobbyDto;
-import Strikeboom.StrikesGames.entity.Lobby;
-import Strikeboom.StrikesGames.entity.User;
-import Strikeboom.StrikesGames.repository.UserRepository;
 import Strikeboom.StrikesGames.service.LobbyService;
-import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
-@RestController
-@RequestMapping("/api/lobby/")
+@Controller
 @AllArgsConstructor
 public class LobbyController {
     private final LobbyService lobbyService;
-    private final UserRepository userRepository;
-    @PostMapping("create")
-    public ResponseEntity<LobbyDto> create(@RequestBody LobbyDto lobby, HttpSession session) {
-        User creator = User.builder().name("Anonymous").build();
-        Lobby l = lobbyService.createLobby(lobby);
-        l.setCreator(creator);
-        userRepository.save(creator);
-        lobbyService.joinLobby(l,creator);
-        session.setAttribute("userId",creator.getId());
-        return new ResponseEntity<>(LobbyService.mapToDto(l), HttpStatus.OK);
+
+    @GetMapping("/join/{joinCode}")
+    public ModelAndView joinGame(@PathVariable String joinCode) {
+       ModelAndView modelAndView = new ModelAndView();
+       if (!lobbyService.doesLobbyExist(joinCode)) {
+           modelAndView.setViewName("/lobby-not-found.html");
+           modelAndView.setStatus(HttpStatus.NOT_FOUND);
+           return modelAndView;
+       }
+       modelAndView.setViewName("/join.html");
+       LobbyDto lobby = lobbyService.getLobbyFromJoinCode(joinCode);
+       modelAndView.addObject("name",lobby.getName());
+       modelAndView.setStatus(HttpStatus.OK);
+       return modelAndView;
     }
 }

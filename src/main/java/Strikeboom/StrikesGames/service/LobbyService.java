@@ -37,6 +37,10 @@ public class LobbyService {
             throw new PlayerUnableToJoinException("Lobby is full!");
         }
     }
+    @Transactional(readOnly = true)
+    public boolean doesLobbyExist(String joinCode) {
+        return lobbyRepository.findLobbyFromJoinCode(joinCode).isPresent();
+    }
     public LobbyDto getLobbyFromJoinCode(String joinCode) {
         return mapToDto(lobbyRepository.findLobbyFromJoinCode(joinCode).orElseThrow(() -> new LobbyNotFoundException(String.format("Lobby with join code: %s not found",joinCode))));
     }
