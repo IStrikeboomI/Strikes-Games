@@ -2,6 +2,7 @@ package Strikeboom.StrikesGames.controller;
 
 import Strikeboom.StrikesGames.dto.LobbyDto;
 import Strikeboom.StrikesGames.service.LobbyService;
+import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -14,7 +15,7 @@ public class LobbyController {
     private final LobbyService lobbyService;
 
     @GetMapping("/join/{joinCode}")
-    public ModelAndView joinGame(@PathVariable String joinCode) {
+    public ModelAndView joinGame(@PathVariable String joinCode, HttpSession session) {
        ModelAndView modelAndView = new ModelAndView();
        if (!lobbyService.doesLobbyExist(joinCode)) {
            modelAndView.setViewName("/lobby-not-found.html");

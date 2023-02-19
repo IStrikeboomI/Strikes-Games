@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -17,8 +18,8 @@ import javax.validation.constraints.NotBlank;
 @Table(name = "`user`")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
     @NotBlank(message = "name must not be empty!")
     private String name;
     @OneToOne(fetch = FetchType.LAZY)
