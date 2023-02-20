@@ -36,7 +36,6 @@
                 private: document.getElementById("private").checked,
                 maxPlayers: parseInt(document.getElementById("max_players").value)
             };
-            console.log(JSON.stringify(obj));
             let xhttp = new XMLHttpRequest();
             xhttp.onload = (event) => {
                 let response = JSON.parse(xhttp.response);
