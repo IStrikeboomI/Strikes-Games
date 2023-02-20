@@ -33,9 +33,10 @@
             const obj = {
                 name: document.getElementById("name").value,
                 game: document.getElementById("game").value,
-                isPrivate: document.getElementById("private").checked,
+                private: document.getElementById("private").checked,
                 maxPlayers: parseInt(document.getElementById("max_players").value)
             };
+            console.log(JSON.stringify(obj));
             let xhttp = new XMLHttpRequest();
             xhttp.onload = (event) => {
                 let response = JSON.parse(xhttp.response);
@@ -45,6 +46,7 @@
             //Send the proper header information along with the request
             xhttp.setRequestHeader('Content-type', 'application/json');
             xhttp.send(JSON.stringify(obj));
+
         }
         //the user might manually input a number that's outside the range of the input, so clamp it if it is
         function clampMaxPlayers(element) {
