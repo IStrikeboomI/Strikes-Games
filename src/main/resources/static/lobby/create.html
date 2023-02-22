@@ -21,7 +21,7 @@
             <label for="public">Public</label><br>
         </div>
         <span>Max Players:</span>
-        <input type="number" id="max_players" name="max_players" min="2" max="8" value="2" onkeyup="clampMaxPlayers(this)"><br>
+        <input type="number" id="max_players" name="max_players" min="2" max="8" value="2" onkeydown="return false;"><br>
         <button onclick="onButtonClick()">Create Lobby</button>
     </body>
     <script>
@@ -46,17 +46,6 @@
             xhttp.setRequestHeader('Content-type', 'application/json');
             xhttp.send(JSON.stringify(obj));
 
-        }
-        //the user might manually input a number that's outside the range of the input, so clamp it if it is
-        function clampMaxPlayers(element) {
-            const val = parseInt(element.value);
-            console.log(typeof val);
-            if (val > parseInt(element.max)) {
-                element.value = element.max;
-            }
-            if (val < parseInt(element.min)) {
-                element.value = element.min;
-            }
         }
     </script>
 </html>
