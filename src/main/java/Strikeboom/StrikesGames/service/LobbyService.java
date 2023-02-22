@@ -6,7 +6,6 @@ import Strikeboom.StrikesGames.entity.User;
 import Strikeboom.StrikesGames.exception.LobbyNotFoundException;
 import Strikeboom.StrikesGames.exception.PlayerUnableToJoinException;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
-import jakarta.persistence.Lob;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -55,8 +53,7 @@ public class LobbyService {
                 .maxPlayers(lobby.getMaxPlayers())
                 .name(lobby.getName())
                 .joinCode(lobby.getJoinCode())
-                .users(lobby.getUsers())
-                .creator(lobby.getCreator())
+                .users(lobby.getUsers().stream().map(UserService::mapToDto).toList())
                 .gameStarted(lobby.isGameStarted())
                 .build();
     }
@@ -70,7 +67,6 @@ public class LobbyService {
                 .name(lobby.getName())
                 .joinCode(generateValidJoinCode())
                 .users(new ArrayList<>())
-                .creator(lobby.getCreator())
                 .gameStarted(false)
                 .build();
     }

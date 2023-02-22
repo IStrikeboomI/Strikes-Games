@@ -10,7 +10,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -33,7 +32,5 @@ public class Lobby {
     private String joinCode;
     @OneToMany(fetch = FetchType.LAZY)
     private List<User> users;
-    @OneToOne(fetch = FetchType.LAZY)
-    private User creator;
     private boolean gameStarted;
 }

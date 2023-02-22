@@ -27,8 +27,6 @@ public class WebSecurityConfig {
         http.csrf().disable();
         http
                 .authorizeHttpRequests()
-                .requestMatchers("/api/auth/**","/api/lobby/**","/","/css/**","/error/**","/js/**","/login.html","/signup.html","/lobby/**")
-                .permitAll()
                 .anyRequest()
                 .permitAll();
         return http.build();
