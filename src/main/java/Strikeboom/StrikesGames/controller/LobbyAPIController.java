@@ -8,6 +8,7 @@ import Strikeboom.StrikesGames.repository.UserRepository;
 import Strikeboom.StrikesGames.service.LobbyService;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,9 +33,11 @@ public class LobbyAPIController {
         return ResponseEntity.ok(LobbyService.mapToDto(l));
     }
     @GetMapping("public-games")
-    public List<LobbyDto> getPublicGames() {
-        List<Lobby> lobbies = lobbyRepository.findPublicLobbies();
-        System.out.println(lobbies.stream().map(LobbyService::mapToDto).toList());
-        return lobbies.stream().map(LobbyService::mapToDto).toList();
+    public ResponseEntity<List<LobbyDto>> getPublicGames(@RequestHeader(value = "Max-Lobbies",defaultValue = "50") int maxLobbies) {
+        if (maxLobbies >= 100) {
+            return ResponseEntity.status(413).build();
+        }
+        List<Lobby> lobbies = lobbyRepository.findPublicLobbies(PageRequest.of(0,maxLobbies));
+        return ResponseEntity.ok(lobbies.stream().map(LobbyService::mapToDto).toList());
     }
 }
