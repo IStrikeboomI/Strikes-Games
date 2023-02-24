@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Public Lobbies</title>
+    </head>
+    <body>
+        <h1>Public Lobbies</h1>
+        <div id="lobbies">
+
+        </div>
+    </body>
+    <script>
+        "use strict"
+        var lobbies;
+        let xhttp = new XMLHttpRequest();
+        xhttp.onload = (event) => {
+            lobbies = JSON.parse(xhttp.responseText);
+            for (let lobby of lobbies) {
+                let div = document.createElement("div");
+                div.innerHTML = lobby.name;
+                document.getElementById("lobbies").appendChild(div);
+            }
+        };
+        xhttp.open("GET","/api/lobby/public-lobbies");
+        xhttp.send();
+    </script>
+</html>

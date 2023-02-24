@@ -32,8 +32,8 @@ public class LobbyAPIController {
         session.setAttribute("userId",creator.getId());
         return ResponseEntity.ok(LobbyService.mapToDto(l));
     }
-    @GetMapping("public-games")
-    public ResponseEntity<List<LobbyDto>> getPublicGames(@RequestHeader(value = "Max-Lobbies",defaultValue = "50") int maxLobbies) {
+    @GetMapping("public-lobbies")
+    public ResponseEntity<List<LobbyDto>> getPublicLobbies(@RequestHeader(value = "Max-Lobbies",defaultValue = "50") int maxLobbies) {
         if (maxLobbies >= 100) {
             return ResponseEntity.status(413).build();
         }
