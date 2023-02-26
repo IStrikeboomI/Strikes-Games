@@ -3,6 +3,22 @@
     <head>
         <meta charset="UTF-8">
         <title>Public Lobbies</title>
+        <style>
+            #lobbies {
+                display: grid;
+                grid-template-columns: auto auto auto auto auto;
+                align:center;
+            }
+            .lobby {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                border: 1px solid rgba(0, 0, 0, 0.8);
+                padding: 20px;
+                width: 275px;
+                font-size: 30px;
+                text-align: center;
+            }
+        </style>
     </head>
     <body>
         <h1>Public Lobbies</h1>
@@ -18,7 +34,19 @@
             lobbies = JSON.parse(xhttp.responseText);
             for (let lobby of lobbies) {
                 let div = document.createElement("div");
-                div.innerHTML = lobby.name;
+                div.className = "lobby";
+
+                let name = document.createElement("p");
+                name.innerHTML = lobby.name;
+                div.appendChild(name);
+
+                let game = document.createElement("b");
+                game.innerHTML = lobby.game;
+                div.appendChild(game);
+
+                let players = document.createElement("p");
+                players.innerHTML = "Players: " + lobby.users.length + " of " + lobby.maxPlayers;
+                div.appendChild(players);
                 document.getElementById("lobbies").appendChild(div);
             }
         };
