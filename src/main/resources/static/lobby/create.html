@@ -30,6 +30,10 @@
                 alert("Name must not be empty!");
                 return;
             }
+            if (document.getElementById("name").value.length > 40) {
+                alert("Name Too Long!");
+                return;
+            }
             const obj = {
                 name: document.getElementById("name").value,
                 game: document.getElementById("game").value,
