@@ -9,5 +9,23 @@
     </head>
     <body id="body">
         <h1>Welcome to Lobby: <span th:text="${name}"></span></h1><br>
+        <div id="users"></div>
     </body>
+    <script>
+        "use strict"
+        var lobby;
+        let xhttp = new XMLHttpRequest();
+        xhttp.onload = (event) => {
+            lobby = JSON.parse(xhttp.responseText);
+            console.log(lobby);
+            for (let user of lobby.users) {
+                let div = document.createElement("div");
+                div.className = "user";
+                div.innerHTML = user.name + (user.creator ? " (Lobby Creator)" : "");
+                document.getElementById("users").appendChild(div);
+            }
+        };
+        xhttp.open("POST","/api/lobby/join/"+location.pathname.substr(location.pathname.indexOf("/join/")+6));
+        xhttp.send();
+    </script>
 </html>

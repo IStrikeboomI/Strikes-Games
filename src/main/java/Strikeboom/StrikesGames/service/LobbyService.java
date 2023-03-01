@@ -6,6 +6,8 @@ import Strikeboom.StrikesGames.entity.User;
 import Strikeboom.StrikesGames.exception.LobbyNotFoundException;
 import Strikeboom.StrikesGames.exception.PlayerUnableToJoinException;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
+import Strikeboom.StrikesGames.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,13 +23,16 @@ import java.util.Random;
 @Transactional
 public class LobbyService {
     private final LobbyRepository lobbyRepository;
+    private final UserRepository userRepository;
     public Lobby createLobby(LobbyDto lobbyDto) {
         return lobbyRepository.save(map(lobbyDto));
     }
-    public void joinLobby(Lobby lobby, User user) {
+    public void joinLobby(HttpSession session, Lobby lobby, User user) {
         if (lobby.getUsers().size() < lobby.getMaxPlayers()) {
-            if (!lobby.getUsers().contains(user)) {
+            if (!lobby.getUsers().contains(user) || !isUserInLobby(session,lobby)) {
+                user.setLobby(lobby);
                 lobby.getUsers().add(user);
+                userRepository.save(user);
             } else {
                 throw new PlayerUnableToJoinException("User is already in lobby!");
             }
@@ -86,5 +91,14 @@ public class LobbyService {
         String joinCode = generateJoinCode();
         while (lobbyRepository.findLobbyFromJoinCode(joinCode).isPresent()) {joinCode = generateJoinCode();}
         return joinCode;
+    }
+    public boolean isUserInLobby(HttpSession session, Lobby lobby) {
+        for (User user : lobby.getUsers()) {
+            Object sessionID = session.getAttribute("userId");
+            if (sessionID != null && sessionID.equals(user.getId().toString())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
