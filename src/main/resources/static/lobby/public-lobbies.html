@@ -18,6 +18,9 @@
                 font-size: 30px;
                 text-align: center;
             }
+            button {
+                align:center
+            }
         </style>
     </head>
     <body>
@@ -47,10 +50,18 @@
                 let players = document.createElement("p");
                 players.innerHTML = "Players: " + lobby.users.length + " of " + lobby.maxPlayers;
                 div.appendChild(players);
+
+                let join = document.createElement("button");
+                join.innerHTML = "Join";
+                join.onclick = () => window.location.replace(window.location.origin+"/join/"+lobby.joinCode);;
+                div.appendChild(join);
+
                 document.getElementById("lobbies").appendChild(div);
             }
         };
         xhttp.open("GET","/api/lobby/public-lobbies");
         xhttp.send();
+
+
     </script>
 </html>
