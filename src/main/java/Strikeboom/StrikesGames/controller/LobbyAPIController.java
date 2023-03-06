@@ -32,8 +32,7 @@ public class LobbyAPIController {
         Lobby lobby = lobbyOptional.get();
         //check if user is already in lobby
         User user = User.builder().name("Anonymous").build();
-        session.setAttribute("userId",user.getId());
-        if (lobbyService.isUserInLobby(session,lobby)) {
+        if (!lobbyService.isUserInLobby(session,lobby)) {
             lobbyService.joinLobby(session, lobby, user);
         }
         return ResponseEntity.ok(LobbyService.mapToDto(lobby));

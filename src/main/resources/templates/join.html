@@ -11,6 +11,8 @@
         <h1>Welcome to Lobby: <span th:text="${name}"></span></h1><br>
         <div id="users"></div>
     </body>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script>
         "use strict"
         var lobby;
@@ -24,8 +26,20 @@
                 div.innerHTML = user.name + (user.creator ? " (Lobby Creator)" : "");
                 document.getElementById("users").appendChild(div);
             }
+            connectAndSend();
         };
         xhttp.open("POST","/api/lobby/join/"+location.pathname.substr(location.pathname.indexOf("/join/")+6));
         xhttp.send();
+        function connectAndSend() {
+            var socket = new SockJS('/join-lobby');
+            var stompClient = Stomp.over(socket);
+            stompClient.connect({}, function(frame) {
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/broker', function(messageOutput) {
+                    console.log(messageOutput.body);
+                });
+            });
+            setTimeout(() => {stompClient.send("/lobby/change-name", {}, "test") },1000);
+        }
     </script>
 </html>

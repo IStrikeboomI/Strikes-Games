@@ -4,7 +4,7 @@ import Strikeboom.StrikesGames.dto.LobbyDto;
 import Strikeboom.StrikesGames.entity.Lobby;
 import Strikeboom.StrikesGames.entity.User;
 import Strikeboom.StrikesGames.exception.LobbyNotFoundException;
-import Strikeboom.StrikesGames.exception.PlayerUnableToJoinException;
+import Strikeboom.StrikesGames.exception.UserUnableToJoinException;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
@@ -30,14 +30,16 @@ public class LobbyService {
     public void joinLobby(HttpSession session, Lobby lobby, User user) {
         if (lobby.getUsers().size() < lobby.getMaxPlayers()) {
             if (!lobby.getUsers().contains(user) || !isUserInLobby(session,lobby)) {
+                userRepository.save(user);
+                session.setAttribute("userId",user.getId());
                 user.setLobby(lobby);
                 lobby.getUsers().add(user);
-                userRepository.save(user);
+                lobbyRepository.save(lobby);
             } else {
-                throw new PlayerUnableToJoinException("User is already in lobby!");
+                throw new UserUnableToJoinException("User is already in lobby!");
             }
         } else {
-            throw new PlayerUnableToJoinException("Lobby is full!");
+            throw new UserUnableToJoinException("Lobby is full!");
         }
     }
     @Transactional(readOnly = true)
