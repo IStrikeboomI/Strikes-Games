@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -96,8 +97,8 @@ public class LobbyService {
     }
     public boolean isUserInLobby(HttpSession session, Lobby lobby) {
         for (User user : lobby.getUsers()) {
-            Object sessionID = session.getAttribute("userId");
-            if (sessionID != null && sessionID.equals(user.getId().toString())) {
+            UUID sessionID = (UUID) session.getAttribute("userId");
+            if (sessionID != null && sessionID.equals(user.getId())) {
                 return true;
             }
         }
