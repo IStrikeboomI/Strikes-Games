@@ -46,11 +46,11 @@ public class LobbyAPIController {
         return ResponseEntity.ok(LobbyService.mapToDto(l));
     }
     @GetMapping("public-lobbies")
-    public ResponseEntity<List<LobbyDto>> getPublicLobbies(@RequestHeader(value = "Max-Lobbies",defaultValue = "50") int maxLobbies) {
+    public ResponseEntity<List<LobbyDto>> getNonFullPublicLobbies(@RequestHeader(value = "Max-Lobbies",defaultValue = "50") int maxLobbies) {
         if (maxLobbies >= 100) {
             return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).build();
         }
-        List<Lobby> lobbies = lobbyRepository.findPublicLobbies(PageRequest.of(0,maxLobbies));
+        List<Lobby> lobbies = lobbyRepository.findNonFullPublicLobbies(PageRequest.of(0,maxLobbies));
         return ResponseEntity.ok(lobbies.stream().map(LobbyService::mapToDto).toList());
     }
 }

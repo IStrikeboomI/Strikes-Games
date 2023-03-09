@@ -14,6 +14,6 @@ public interface LobbyRepository extends JpaRepository<Lobby, Long> {
     @Query("SELECT l FROM Lobby l WHERE joinCode=?1")
     Optional<Lobby> findLobbyFromJoinCode(String joinCode);
 
-    @Query(value = "SELECT l from Lobby l WHERE isPrivate=false")
-    List<Lobby> findPublicLobbies(Pageable p);
+    @Query(value = "SELECT l FROM Lobby l WHERE isPrivate=false AND size(l.users)<maxPlayers")
+    List<Lobby> findNonFullPublicLobbies(Pageable p);
 }
