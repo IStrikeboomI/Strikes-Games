@@ -26,8 +26,12 @@ public class LobbyController {
            modelAndView.setStatus(HttpStatus.NOT_FOUND);
            return modelAndView;
        }
-       modelAndView.setViewName("/join.html");
        LobbyDto lobby = lobbyService.getLobbyFromJoinCode(joinCode);
+       if (lobby.getUsers().size() < lobby.getMaxPlayers()) {
+           modelAndView.setViewName("/join.html");
+       } else {
+           modelAndView.setViewName("/lobby-is-full.html");
+       }
        modelAndView.addObject("name",lobby.getName());
        modelAndView.setStatus(HttpStatus.OK);
        return modelAndView;

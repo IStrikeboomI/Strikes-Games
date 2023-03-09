@@ -16,20 +16,28 @@
     <script>
         "use strict"
         var lobby;
+        var joined = false;
         let xhttp = new XMLHttpRequest();
         xhttp.onload = (event) => {
-            lobby = JSON.parse(xhttp.responseText);
-            console.log(lobby);
-            for (let user of lobby.users) {
-                let div = document.createElement("div");
-                div.className = "user";
-                div.innerHTML = user.name + (user.creator ? " (Lobby Creator)" : "");
-                document.getElementById("users").appendChild(div);
+            if (xhttp.status === 200) {
+                lobby = JSON.parse(xhttp.responseText);
+                for (let user of lobby.users) {
+                    let div = document.createElement("div");
+                    div.className = "user";
+                    div.innerHTML = user.name + (user.creator ? " (Lobby Creator)" : "");
+                    document.getElementById("users").appendChild(div);
+                }
+                connectAndSend();
+            } else {
+                alert("An error has occurred, more information in the console");
+                console.log(lobby);
+                console.log(event);
+                console.log(xhttp);
             }
-            connectAndSend();
         };
         xhttp.open("POST","/api/lobby/join/"+location.pathname.substr(location.pathname.indexOf("/join/")+6));
         xhttp.send();
+
         function connectAndSend() {
             var socket = new SockJS('/join-lobby');
             var stompClient = Stomp.over(socket);
