@@ -19,6 +19,8 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+    //sent to client to help it differentiate users, only used to send data, not receive
+    private UUID separationId = UUID.randomUUID();
     @NotBlank(message = "name must not be empty!")
     private String name;
     @OneToOne(fetch = FetchType.LAZY)

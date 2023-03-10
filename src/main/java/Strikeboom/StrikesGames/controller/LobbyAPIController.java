@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/lobby/")
@@ -31,7 +32,7 @@ public class LobbyAPIController {
         }
         Lobby lobby = lobbyOptional.get();
         //check if user is already in lobby
-        User user = User.builder().name("Anonymous").build();
+        User user = User.builder().separationId(UUID.randomUUID()).name("Anonymous").build();
         if (!lobbyService.isUserInLobby(session,lobby)) {
             lobbyService.joinLobby(session, lobby, user);
         }

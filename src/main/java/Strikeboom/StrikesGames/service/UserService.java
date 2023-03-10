@@ -16,6 +16,7 @@ public class UserService {
         return UserDto.builder()
                 .name(user.getName())
                 .isCreator(user.isCreator())
+                .separationId(user.getSeparationId())
                 .build();
     }
 }
