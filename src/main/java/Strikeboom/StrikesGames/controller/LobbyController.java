@@ -1,7 +1,9 @@
 package Strikeboom.StrikesGames.controller;
 
-import Strikeboom.StrikesGames.dto.LobbyDto;
+import Strikeboom.StrikesGames.entity.Lobby;
+import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.service.LobbyService;
+import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -16,18 +18,19 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 @AllArgsConstructor
 public class LobbyController {
+    private final LobbyRepository lobbyRepository;
     private final LobbyService lobbyService;
 
     @GetMapping("/join/{joinCode}")
-    public ModelAndView joinGame(@PathVariable String joinCode) {
+    public ModelAndView joinGame(@PathVariable String joinCode, HttpSession session) {
        ModelAndView modelAndView = new ModelAndView();
        if (!lobbyService.doesLobbyExist(joinCode)) {
            modelAndView.setViewName("/lobby-not-found.html");
            modelAndView.setStatus(HttpStatus.NOT_FOUND);
            return modelAndView;
        }
-       LobbyDto lobby = lobbyService.getLobbyFromJoinCode(joinCode);
-       if (lobby.getUsers().size() < lobby.getMaxPlayers()) {
+       Lobby lobby = lobbyRepository.findLobbyFromJoinCode(joinCode).get();
+       if (lobby.getUsers().size() < lobby.getMaxPlayers() || lobbyService.isUserInLobby(session,lobby)) {
            modelAndView.setViewName("/join.html");
        } else {
            modelAndView.setViewName("/lobby-is-full.html");
