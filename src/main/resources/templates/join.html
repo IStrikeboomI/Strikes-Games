@@ -10,11 +10,24 @@
     <body id="body">
         <h1>Welcome to Lobby: <span th:text="${name}"></span></h1><br>
         <div id="users"></div>
+        <div id="invite">
+            <p>Invite others using the link below!</p>
+            <input id="invite-link" class="copyable autoselect" spellcheck="false" readonly="readonly" size="37">
+            <button title="Copy URL" onclick="copyUrl()">Copy Url</button>
+        </div>
     </body>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script>
         "use strict"
+        document.getElementById("invite-link").value = location.href;
+        function copyUrl() {
+            let copyText = document.getElementById("invite-link");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value);
+            copyText
+        }
         var lobby;
         var joined = false;
         let xhttp = new XMLHttpRequest();
@@ -30,7 +43,6 @@
                 connectAndSend();
             } else {
                 alert("An error has occurred, more information in the console");
-                console.log(lobby);
                 console.log(event);
                 console.log(xhttp);
             }
