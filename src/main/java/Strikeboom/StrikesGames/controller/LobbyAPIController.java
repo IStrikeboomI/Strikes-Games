@@ -1,11 +1,13 @@
 package Strikeboom.StrikesGames.controller;
 
+import Strikeboom.StrikesGames.dto.LobbyAndUserDto;
 import Strikeboom.StrikesGames.dto.LobbyDto;
 import Strikeboom.StrikesGames.entity.Lobby;
 import Strikeboom.StrikesGames.entity.User;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
 import Strikeboom.StrikesGames.service.LobbyService;
+import Strikeboom.StrikesGames.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -23,9 +25,9 @@ import java.util.UUID;
 public class LobbyAPIController {
     private final LobbyService lobbyService;
     private final LobbyRepository lobbyRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     @PostMapping("join/{joinCode}")
-    public ResponseEntity<LobbyDto> join(@PathVariable String joinCode, HttpSession session) {
+    public ResponseEntity<LobbyAndUserDto> join(@PathVariable String joinCode,@RequestHeader(value = "User-Id",required = false) UUID userId) {
         Optional<Lobby> lobbyOptional = lobbyRepository.findLobbyFromJoinCode(joinCode);
         if (lobbyOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -33,10 +35,12 @@ public class LobbyAPIController {
         Lobby lobby = lobbyOptional.get();
         //check if user is already in lobby
         User user = User.builder().separationId(UUID.randomUUID()).name("Anonymous").build();
-        if (!lobbyService.isUserInLobby(session,lobby)) {
-            lobbyService.joinLobby(session, lobby, user);
+        if (!lobbyService.isUserInLobby(lobby)) {
+            lobbyService.joinLobby(lobby, user);
+        } else {
+            user = lobby.getUsers().get(lobby.getUsers());
         }
-        return ResponseEntity.ok(LobbyService.mapToDto(lobby));
+        return ResponseEntity.ok(new LobbyAndUserDto(LobbyService.mapToDto(lobby),user.getSeparationId(),user.getId()));
     }
     @PostMapping("create")
     public ResponseEntity<LobbyDto> create(@RequestBody LobbyDto lobby, HttpSession session) {

@@ -42,7 +42,7 @@ public class LobbyController {
 
     @MessageMapping("/change-name")
     @SendTo("/broker")
-    public String messages(String joinCode, @RequestBody String name, SimpMessageHeaderAccessor accessor) {
-        return "hello!!!!! " + accessor.getId();
+    public String messages(@RequestBody String name, SimpMessageHeaderAccessor accessor) {
+        return "hello!!!!! ";
     }
 }

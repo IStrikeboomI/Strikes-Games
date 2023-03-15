@@ -6,12 +6,19 @@
               content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Strike's Games</title>
+        <style>
+            #users {
+                padding-left:3%;
+            }
+        </style>
     </head>
     <body id="body">
         <h1>Welcome to Lobby: <span th:text="${name}"></span></h1><br>
-        <label for="username">Username:</label>
+        <label for="username">Username:</label><br>
         <input id="username" title="Change Your Name Here" value="Anonymous" onkeydown="checkForChangeUsername()" size="50" maxlength="50">
-        <div id="users"></div>
+        <p>Users:</p>
+        <div id="users">
+        </div>
         <div id="invite">
             <p>Invite others using the link below!</p>
             <input id="invite-link" class="copyable autoselect" spellcheck="false" readonly="readonly" size="37">
@@ -69,20 +76,22 @@
         xhttp.open("POST","/api/lobby/join/"+location.pathname.substr(location.pathname.indexOf("/join/")+6));
         xhttp.send();
 
+        var stompClient;
         function connectAndSend() {
             var socket = new SockJS('/join-lobby');
-            var stompClient = Stomp.over(socket);
+            stompClient = Stomp.over(socket);
             stompClient.connect({}, function(frame) {
                 console.log('Connected: ' + frame);
                 stompClient.subscribe('/broker', function(messageOutput) {
                     console.log(messageOutput.body);
                 });
             });
-            setTimeout(() => {stompClient.send("/lobby/change-name", {}, "test") },1000);
         }
         function changeUsername(name) {
-            if (name.length > 50) {
-               alert("Name too long! Max is 50 characters");
+            if (name.length < 50) {
+               stompClient.send("/lobby/change-name", {}, name);
+            } else {
+                alert("Name too long! Max is 50 characters");
             }
         }
     </script>
