@@ -95,4 +95,10 @@ public class LobbyService {
     public boolean isUserInLobby(User user, Lobby lobby) {
         return lobby.getUsers().contains(user);
     }
+    public void removeUserFromLobby(User user) {
+        user.getLobby().getUsers().remove(user);
+        lobbyRepository.save(user.getLobby());
+        user.setLobby(null);
+        userRepository.save(user);
+    }
 }

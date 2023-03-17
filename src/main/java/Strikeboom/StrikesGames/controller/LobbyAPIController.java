@@ -7,8 +7,6 @@ import Strikeboom.StrikesGames.entity.User;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
 import Strikeboom.StrikesGames.service.LobbyService;
-import Strikeboom.StrikesGames.service.UserService;
-import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -25,30 +23,36 @@ import java.util.UUID;
 public class LobbyAPIController {
     private final LobbyService lobbyService;
     private final LobbyRepository lobbyRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
     @PostMapping("join/{joinCode}")
-    public ResponseEntity<LobbyAndUserDto> join(@PathVariable String joinCode,@RequestHeader(value = "User-Id",required = false) UUID userId) {
+    public ResponseEntity<LobbyAndUserDto> join(@PathVariable String joinCode,@CookieValue(value = "userId",required = false) UUID userId) {
         Optional<Lobby> lobbyOptional = lobbyRepository.findLobbyFromJoinCode(joinCode);
         if (lobbyOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         Lobby lobby = lobbyOptional.get();
         //check if user is already in lobby
-        User user = User.builder().separationId(UUID.randomUUID()).name("Anonymous").build();
-        if (!lobbyService.isUserInLobby(lobby)) {
-            lobbyService.joinLobby(lobby, user);
+        User user;
+        Optional<User> userFromId = userRepository.findById(userId);
+        if (userFromId.isPresent()) {
+            user = userFromId.get();
+            if (!lobbyService.isUserInLobby(user,lobby)) {
+                lobbyService.removeUserFromLobby(user);
+                lobbyService.joinLobby(lobby, user);
+            }
         } else {
-            user = lobby.getUsers().get(lobby.getUsers());
+            user = User.builder().separationId(UUID.randomUUID()).name("Anonymous").build();
+            lobbyService.joinLobby(lobby, user);
         }
-        return ResponseEntity.ok(new LobbyAndUserDto(LobbyService.mapToDto(lobby),user.getSeparationId(),user.getId()));
+        return ResponseEntity.ok(new LobbyAndUserDto(LobbyService.mapToDto(lobby),user.getId(),user.getSeparationId()));
     }
     @PostMapping("create")
-    public ResponseEntity<LobbyDto> create(@RequestBody LobbyDto lobby, HttpSession session) {
-        User creator = User.builder().name("Anonymous").build();
+    public ResponseEntity<LobbyAndUserDto> create(@RequestBody LobbyDto lobby) {
+        User creator = User.builder().separationId(UUID.randomUUID()).name("Anonymous").build();
         creator.setCreator(true);
         Lobby l = lobbyService.createLobby(lobby);
-        lobbyService.joinLobby(session,l,creator);
-        return ResponseEntity.ok(LobbyService.mapToDto(l));
+        lobbyService.joinLobby(l,creator);
+        return ResponseEntity.ok(new LobbyAndUserDto(LobbyService.mapToDto(l),creator.getId(),creator.getSeparationId()));
     }
     @GetMapping("public-lobbies")
     public ResponseEntity<List<LobbyDto>> getNonFullPublicLobbies(@RequestHeader(value = "Max-Lobbies",defaultValue = "50") int maxLobbies) {

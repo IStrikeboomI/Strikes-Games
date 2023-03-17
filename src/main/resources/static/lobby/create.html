@@ -44,7 +44,10 @@
             let xhttp = new XMLHttpRequest();
             xhttp.onload = (event) => {
                 let response = JSON.parse(xhttp.response);
-                window.location.replace(window.location.origin+"/join/"+response.joinCode);
+                let tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                document.cookie = `userId=${response.userId}; separationId=${response.separationId}; expires={tomorrow.toGMTString()}; path=/`
+                window.location.replace(window.location.origin+"/join/"+response.lobby.joinCode);
             }
             xhttp.open("POST","/api/lobby/create");
             //Send the proper header information along with the request

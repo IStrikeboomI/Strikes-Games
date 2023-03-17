@@ -26,6 +26,6 @@ public class UserService {
     }
     @Transactional(readOnly = true)
     public User getUserInLobby(UUID id) {
-        return userRepository.findByUUID(id).orElseThrow(() -> new UserNotFoundException(String.format("User with ID: %s not found",id)));
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(String.format("User with ID: %s not found",id)));
     }
 }

@@ -59,7 +59,11 @@
         let xhttp = new XMLHttpRequest();
         xhttp.onload = (event) => {
             if (xhttp.status === 200) {
-                lobby = JSON.parse(xhttp.responseText);
+                let response = JSON.parse(xhttp.responseText);
+                lobby = response.lobby
+                let tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                document.cookie = `userId=${response.userId}; separationId=${response.separationId}; expires={tomorrow.toGMTString()}; path=/`
                 for (let user of lobby.users) {
                     let div = document.createElement("div");
                     div.className = "user";

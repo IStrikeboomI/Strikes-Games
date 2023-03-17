@@ -14,7 +14,7 @@ import java.util.UUID;
 @Builder
 @Validated
 public class LobbyAndUserDto {
-    LobbyDto lobbyDto;
+    LobbyDto lobby;
     UUID userId;
     UUID separationId;
 }
