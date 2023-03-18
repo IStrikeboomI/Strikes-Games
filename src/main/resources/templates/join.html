@@ -63,11 +63,12 @@
                 lobby = response.lobby
                 let tomorrow = new Date();
                 tomorrow.setDate(tomorrow.getDate() + 1);
-                document.cookie = `userId=${response.userId}; separationId=${response.separationId}; expires={tomorrow.toGMTString()}; path=/`
+                document.cookie = `userId=${response.userId}; expires={tomorrow.toGMTString()}; path=/`
+                localStorage.setItem("separationId",response.separationId);
                 for (let user of lobby.users) {
                     let div = document.createElement("div");
                     div.className = "user";
-                    div.innerHTML = user.name + (user.creator ? " (Lobby Creator)" : "");
+                    div.innerHTML = user.name + (user.creator ? " (Lobby Creator)" : "") + (user.separationId == localStorage.getItem("separationId") ? " (You!)" : "");
                     document.getElementById("users").appendChild(div);
                 }
                 connectAndSend();
