@@ -7,11 +7,10 @@ import Strikeboom.StrikesGames.repository.UserRepository;
 import Strikeboom.StrikesGames.service.LobbyService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.UUID;
@@ -19,6 +18,7 @@ import java.util.UUID;
 @Controller
 @AllArgsConstructor
 public class LobbyController {
+
     private final LobbyRepository lobbyRepository;
     private final LobbyService lobbyService;
     private final UserRepository userRepository;
@@ -40,11 +40,5 @@ public class LobbyController {
        modelAndView.addObject("name",lobby.getName());
        modelAndView.setStatus(HttpStatus.OK);
        return modelAndView;
-    }
-
-    @MessageMapping("/change-name")
-    @SendTo("/broker")
-    public String messages(@RequestBody String name, SimpMessageHeaderAccessor accessor) {
-        return "hello!!!!! ";
     }
 }

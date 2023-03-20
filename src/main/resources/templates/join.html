@@ -27,6 +27,7 @@
     </body>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="/js/web-socket-messages.js"></script>
     <script>
         "use strict"
         //When the user changes name using the change name box, only send request to change name if it's been 3 seconds since last change name
@@ -52,7 +53,6 @@
             copyText.select();
             copyText.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(copyText.value);
-            copyText
         }
         var lobby;
         var joined = false;
@@ -60,10 +60,7 @@
         xhttp.onload = (event) => {
             if (xhttp.status === 200) {
                 let response = JSON.parse(xhttp.responseText);
-                lobby = response.lobby
-                let tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                document.cookie = `userId=${response.userId}; expires={tomorrow.toGMTString()}; path=/`
+                lobby = response.lobby;
                 localStorage.setItem("separationId",response.separationId);
                 for (let user of lobby.users) {
                     let div = document.createElement("div");
@@ -87,17 +84,25 @@
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function(frame) {
                 console.log('Connected: ' + frame);
-                stompClient.subscribe('/broker', function(messageOutput) {
-                    console.log(messageOutput.body);
+                stompClient.subscribe('/broker/'+ location.pathname.substr(location.pathname.indexOf("/join/")+6), function(messageOutput) {
+                    handleWebSocketMessage(messageOutput.body);
                 });
             });
         }
         function changeUsername(name) {
-            if (name.length < 50) {
-               stompClient.send("/lobby/change-name", {}, name);
+            if (name && name !== "") {
+                if (name.length < 50) {
+                   stompClient.send("/lobby/change-name", {}, name);
+                } else {
+                    alert("Name too long! Max is 50 characters");
+                }
             } else {
-                alert("Name too long! Max is 50 characters");
+                alert("Name cannot be empty!");
             }
+        }
+        function handleWebSocketMessage(message) {
+            console.log(handlers);
+            handlers.find(h => h.name == message.messageName).handler(message);
         }
     </script>
 </html>

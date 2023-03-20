@@ -44,10 +44,6 @@
             let xhttp = new XMLHttpRequest();
             xhttp.onload = (event) => {
                 let response = JSON.parse(xhttp.response);
-                let tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                document.cookie = `userId=${response.userId}; expires={tomorrow.toGMTString()}; path=/`
-                localStorage.setItem("separationId",response.separationId);
                 window.location.replace(window.location.origin+"/join/"+response.lobby.joinCode);
             }
             xhttp.open("POST","/api/lobby/create");

@@ -16,7 +16,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/join-lobby").withSockJS();
+        registry.addEndpoint("/join-lobby").withSockJS().setInterceptors(new UserIdHandshakeInterceptor());
     }
 
 }
