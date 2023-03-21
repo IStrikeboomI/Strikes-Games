@@ -4,23 +4,31 @@ import Strikeboom.StrikesGames.dto.LobbyDto;
 import Strikeboom.StrikesGames.entity.Lobby;
 import Strikeboom.StrikesGames.entity.User;
 import Strikeboom.StrikesGames.exception.LobbyNotFoundException;
+import Strikeboom.StrikesGames.exception.UserNotFoundException;
 import Strikeboom.StrikesGames.exception.UserUnableToJoinException;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
+import Strikeboom.StrikesGames.websocket.message.UserChangedNameMessage;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 @Transactional
 public class LobbyService {
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
+
     private final LobbyRepository lobbyRepository;
     private final UserRepository userRepository;
     public Lobby createLobby(LobbyDto lobbyDto) {
@@ -100,5 +108,13 @@ public class LobbyService {
         lobbyRepository.save(user.getLobby());
         user.setLobby(null);
         userRepository.save(user);
+    }
+    //below is everything to be received by websockets
+    public void changeName(String name, UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
+        Lobby lobby = user.getLobby();
+        user.setName(name);
+        userRepository.save(user);
+        simpMessagingTemplate.convertAndSend(String.format("/broker/%s",lobby.getJoinCode()),new UserChangedNameMessage(user.getSeparationId(), name));
     }
 }
