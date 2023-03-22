@@ -65,6 +65,7 @@
                 for (let user of lobby.users) {
                     let div = document.createElement("div");
                     div.className = "user";
+                    div.setAttribute("separationId",user.separationId);
                     div.innerHTML = user.name + (user.creator ? " (Lobby Creator)" : "") + (user.separationId == localStorage.getItem("separationId") ? " (You!)" : "");
                     document.getElementById("users").appendChild(div);
                 }
@@ -84,8 +85,8 @@
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function(frame) {
                 console.log('Connected: ' + frame);
-                stompClient.subscribe('/broker/'+ location.pathname.substr(location.pathname.indexOf("/join/")+6), function(messageOutput) {
-                    handleWebSocketMessage(messageOutput.body);
+                stompClient.subscribe('/broker/'+ location.pathname.substr(location.pathname.indexOf("/join/")+6), function(message) {
+                    handleWebSocketMessage(JSON.parse(message.body));
                 });
             });
         }
@@ -101,8 +102,7 @@
             }
         }
         function handleWebSocketMessage(message) {
-            console.log(handlers);
-            handlers.find(h => h.name == message.messageName).handler(message);
+            handlers.find(h => h.name === message.messageName).handler(message);
         }
     </script>
 </html>

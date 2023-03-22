@@ -1,13 +1,16 @@
 package Strikeboom.StrikesGames.websocket.message;
 
 import Strikeboom.StrikesGames.dto.UserDto;
-import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class UserJoinedMessage extends LobbyMessage{
     UserDto user;
 
-    public UserJoinedMessage() {
+    public UserJoinedMessage(UserDto user) {
         super("userJoined");
+        this.user = user;
     }
 }
