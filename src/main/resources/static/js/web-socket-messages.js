@@ -9,7 +9,11 @@ function userChangedName(message) {
     let userId = message.separationId;
     for (let user of document.querySelectorAll('[separationId]')) {
         if (user.getAttribute("separationId") === userId) {
-            user.innerHTML = message.name;
+            for (let children of user.children) {
+                if (children.className === "username") {
+                    children.innerHTML = message.name;
+                }
+            }
         }
     }
 }
