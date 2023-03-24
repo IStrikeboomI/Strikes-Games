@@ -46,6 +46,10 @@ xhttp.onload = (event) => {
             userAttributes.className="userAttributes"
             userAttributes.innerHTML = " "+ (user.creator ? " (Lobby Creator)" : "") + (user.separationId == localStorage.getItem("separationId") ? " (You!)" : "");
 
+            if (user.separationId == localStorage.getItem("separationId")) {
+                document.getElementById("username").value = user.name;
+            }
+
             div.appendChild(username);
             div.appendChild(userAttributes);
             document.getElementById("users").appendChild(div);
