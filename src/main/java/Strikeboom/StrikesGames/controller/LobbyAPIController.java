@@ -67,11 +67,18 @@ public class LobbyAPIController {
         return ResponseEntity.ok(new LobbyAndUserDto(LobbyService.mapToDto(lobby),user.getId(),user.getSeparationId()));
     }
     @PostMapping("create")
-    public ResponseEntity<LobbyAndUserDto> create(@RequestBody LobbyDto lobby) {
+    public ResponseEntity<LobbyAndUserDto> create(@RequestBody LobbyDto lobby,HttpServletResponse response) {
         User creator = User.builder().separationId(UUID.randomUUID()).name("Anonymous").build();
         creator.setCreator(true);
         Lobby l = lobbyService.createLobby(lobby);
         lobbyService.joinLobby(l,creator);
+
+        Cookie cookie = new Cookie("userId",creator.getId().toString());
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(60 * 60 * 24); // last 1 day
+        response.addCookie(cookie);
+
         return ResponseEntity.ok(new LobbyAndUserDto(LobbyService.mapToDto(l),creator.getId(),creator.getSeparationId()));
     }
     @GetMapping("public-lobbies")
