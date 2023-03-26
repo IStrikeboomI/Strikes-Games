@@ -23,7 +23,11 @@ function copyUrl() {
     copyText.setSelectionRange(0, 99999);
     navigator.clipboard.writeText(copyText.value);
 }
+
+
 var lobby;
+//the user that's the browser is on
+var user;
 var joined = false;
 let xhttp = new XMLHttpRequest();
 xhttp.onload = (event) => {
@@ -48,10 +52,19 @@ xhttp.onload = (event) => {
 
             if (user.separationId == localStorage.getItem("separationId")) {
                 document.getElementById("username").value = user.name;
+                this.user = user;
             }
+
+            let hoverText = document.createElement("span");
+            hoverText.className = "hoverText";
+
+            div.onmouseenter = (e) => hoverOverUser(e);
+            div.onmouseleave = (e) => stopHoverOverUser(e);
+            div.onclick = (e) => clickOnUser(e);
 
             div.appendChild(username);
             div.appendChild(userAttributes);
+            div.appendChild(hoverText);
             document.getElementById("users").appendChild(div);
         }
         connectAndSend();
@@ -75,6 +88,9 @@ function connectAndSend() {
         });
     });
 }
+function handleWebSocketMessage(message) {
+     handlers.find(h => h.name === message.messageName).handler(message);
+ }
 function changeUsername(name) {
     if (name && name !== "") {
         if (name.length < 50) {
@@ -86,6 +102,34 @@ function changeUsername(name) {
         alert("Name cannot be empty!");
     }
 }
-function handleWebSocketMessage(message) {
-    handlers.find(h => h.name === message.messageName).handler(message);
+//Used for the red text and strikethrough when hovering over user to kick it
+function hoverOverUser(event) {
+    if (user.creator) {
+        let element = event.target;
+        element.style.color = "red";
+        element.style.textDecoration = "line-through";
+        element.style.cursor = "pointer";
+        let hoverText = element.getElementsByClassName("hoverText")[0];
+        hoverText.style.color = "gray";
+        hoverText.style.userSelect = "none";
+        hoverText.style.textDecoration = "none";
+        hoverText.style.display = "inline-block";
+        hoverText.style.padding = "5px";
+        hoverText.innerHTML = " Click to kick user";
+    }
+}
+function stopHoverOverUser(event) {
+    if (user.creator) {
+        let element = event.target;
+        element.style.color = "";
+        element.style.textDecoration = "";
+        let hoverText = element.getElementsByClassName("hoverText")[0];
+        hoverText.innerHTML = "";
+    }
+}
+//used for kicking user
+function clickOnUser(event) {
+    if (user.creator) {
+
+    }
 }

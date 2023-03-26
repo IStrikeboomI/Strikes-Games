@@ -18,4 +18,9 @@ public class LobbyWebSocketController {
         UUID userId = UUID.fromString(headerAccessor.getSessionAttributes().get("userId").toString());
         lobbyService.changeName(name,userId);
     }
+    @MessageMapping("/kick-user")
+    public void kickUser(@RequestBody UUID playerGettingKickedId, SimpMessageHeaderAccessor headerAccessor) {
+        UUID userId = UUID.fromString(headerAccessor.getSessionAttributes().get("userId").toString());
+        lobbyService.kickUser(playerGettingKickedId,userId);
+    }
 }

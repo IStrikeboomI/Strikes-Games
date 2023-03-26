@@ -4,11 +4,14 @@ import Strikeboom.StrikesGames.dto.LobbyDto;
 import Strikeboom.StrikesGames.entity.Lobby;
 import Strikeboom.StrikesGames.entity.User;
 import Strikeboom.StrikesGames.exception.LobbyNotFoundException;
+import Strikeboom.StrikesGames.exception.UserInsufficientPermissions;
 import Strikeboom.StrikesGames.exception.UserNotFoundException;
 import Strikeboom.StrikesGames.exception.UserUnableToJoinException;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
+import Strikeboom.StrikesGames.websocket.message.LobbyMessage;
 import Strikeboom.StrikesGames.websocket.message.UserChangedNameMessage;
+import Strikeboom.StrikesGames.websocket.message.UserKickedMessage;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,12 +112,41 @@ public class LobbyService {
         user.setLobby(null);
         userRepository.save(user);
     }
+    private void sendWebsocketMessage(String joinCode, LobbyMessage message) {
+        simpMessagingTemplate.convertAndSend(String.format("/broker/%s",joinCode),message);
+    }
     //below is everything to be received by websockets
+
+    /**
+     *
+     * @param name new name
+     * @param userId user that's changing the name
+     */
     public void changeName(String name, UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         Lobby lobby = user.getLobby();
         user.setName(name);
         userRepository.save(user);
-        simpMessagingTemplate.convertAndSend(String.format("/broker/%s",lobby.getJoinCode()),new UserChangedNameMessage(user.getSeparationId(), name));
+        sendWebsocketMessage(lobby.getJoinCode(),new UserChangedNameMessage(user.getSeparationId(), name));
+    }
+
+    /**
+     * Kicks specified user from lobby
+     * @param playerGettingKickedId separationId of the user getting kicked
+     * @param userId user that is doing the kicking, has to be creator
+     */
+    public void kickUser(UUID playerGettingKickedId, UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
+        if (user.isCreator()) {
+            Lobby lobby = user.getLobby();
+            User userGettingKicked = lobby.getUsers().stream().filter(user1 -> user1.getSeparationId().equals(playerGettingKickedId)).findFirst()
+                    .orElseThrow(() -> new UserNotFoundException(String.format("User with Id:%s Is In Different lobby!",playerGettingKickedId.toString())));
+            lobby.getUsers().remove(userGettingKicked);
+            userRepository.delete(userGettingKicked);
+            lobbyRepository.save(lobby);
+            sendWebsocketMessage(lobby.getJoinCode(),new UserKickedMessage(UserService.mapToDto(userGettingKicked)));
+        } else {
+            throw new UserInsufficientPermissions("Only Lobby Creators Can Kick Users!");
+        }
     }
 }

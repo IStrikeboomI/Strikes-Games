@@ -1,6 +1,7 @@
 const handlers = [
 {"name": "userJoined","handler":userJoined},
-{"name": "userChangedName","handler":userChangedName}
+{"name": "userChangedName","handler":userChangedName},
+{"name": "userKicked","handler":userKicked}
 ]
 function userJoined(message) {
     let div = document.createElement("div");
@@ -17,6 +18,9 @@ function userJoined(message) {
     userAttributes.className="userAttributes"
     userAttributes.innerHTML = " "+ (message.user.creator ? " (Lobby Creator)" : "");
 
+    div.onmouseover = (e) => hoverOverUser(e);
+    div.onclick = (e) => clickOnUser(e);
+
     div.appendChild(username);
     div.appendChild(userAttributes);
     document.getElementById("users").appendChild(div);
@@ -32,4 +36,7 @@ function userChangedName(message) {
             }
         }
     }
+}
+function userKicked(message) {
+    console.log(message);
 }
