@@ -130,6 +130,6 @@ function stopHoverOverUser(event) {
 //used for kicking user
 function clickOnUser(event) {
     if (user.creator) {
-
+        console.log(event);
     }
 }
