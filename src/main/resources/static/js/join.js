@@ -53,14 +53,14 @@ xhttp.onload = (event) => {
             if (user.separationId == localStorage.getItem("separationId")) {
                 document.getElementById("username").value = user.name;
                 this.user = user;
+            } else {
+                div.onmouseenter = (e) => hoverOverUser(e);
+                div.onmouseleave = (e) => stopHoverOverUser(e);
+                div.onclick = (e) => clickOnUser(e);
             }
 
             let hoverText = document.createElement("span");
             hoverText.className = "hoverText";
-
-            div.onmouseenter = (e) => hoverOverUser(e);
-            div.onmouseleave = (e) => stopHoverOverUser(e);
-            div.onclick = (e) => clickOnUser(e);
 
             div.appendChild(username);
             div.appendChild(userAttributes);
@@ -130,6 +130,7 @@ function stopHoverOverUser(event) {
 //used for kicking user
 function clickOnUser(event) {
     if (user.creator) {
-        console.log(event);
+        let playerGettingKickedId = event.currentTarget.getAttribute("separationId");
+        console.log(playerGettingKickedId);
     }
 }

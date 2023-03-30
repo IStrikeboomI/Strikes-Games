@@ -18,11 +18,16 @@ function userJoined(message) {
     userAttributes.className="userAttributes"
     userAttributes.innerHTML = " "+ (message.user.creator ? " (Lobby Creator)" : "");
 
-    div.onmouseover = (e) => hoverOverUser(e);
+    div.onmouseenter = (e) => hoverOverUser(e);
+    div.onmouseleave = (e) => stopHoverOverUser(e);
     div.onclick = (e) => clickOnUser(e);
+
+    let hoverText = document.createElement("span");
+    hoverText.className = "hoverText";
 
     div.appendChild(username);
     div.appendChild(userAttributes);
+    div.appendChild(hoverText);
     document.getElementById("users").appendChild(div);
 }
 function userChangedName(message) {
