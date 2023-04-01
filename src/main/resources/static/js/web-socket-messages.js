@@ -43,5 +43,14 @@ function userChangedName(message) {
     }
 }
 function userKicked(message) {
-    console.log(message);
+    let userId = message.user.separationId;
+    if (userId === user.separationId) {
+        window.location.replace(window.location.origin+"/kicked.html");
+    } else {
+        for (let user of document.querySelectorAll('[separationId]')) {
+            if (user.getAttribute("separationId") === userId) {
+                user.remove();
+            }
+        }
+    }
 }

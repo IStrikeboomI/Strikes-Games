@@ -19,8 +19,8 @@ public class LobbyWebSocketController {
         lobbyService.changeName(name,userId);
     }
     @MessageMapping("/kick-user")
-    public void kickUser(@RequestBody UUID playerGettingKickedId, SimpMessageHeaderAccessor headerAccessor) {
+    public void kickUser(@org.hibernate.validator.constraints.UUID String playerGettingKickedId, SimpMessageHeaderAccessor headerAccessor) {
         UUID userId = UUID.fromString(headerAccessor.getSessionAttributes().get("userId").toString());
-        lobbyService.kickUser(playerGettingKickedId,userId);
+        lobbyService.kickUser(UUID.fromString(playerGettingKickedId),userId);
     }
 }

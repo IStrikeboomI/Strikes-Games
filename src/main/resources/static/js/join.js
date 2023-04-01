@@ -132,5 +132,6 @@ function clickOnUser(event) {
     if (user.creator) {
         let playerGettingKickedId = event.currentTarget.getAttribute("separationId");
         console.log(playerGettingKickedId);
+        stompClient.send("/lobby/kick-user",{},playerGettingKickedId);
     }
 }
