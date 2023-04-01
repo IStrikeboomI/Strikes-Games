@@ -1,5 +1,5 @@
 "use strict"
-//When the user changes name using the change name box, only send request to change name if it's been 3 seconds since last change name
+//When the user changes name using the change name box, only send request to change name if it's been n seconds since last change name
 //used to limit amount of requests
 let secondsUntilNameChange = -1;
 setInterval(() => {
@@ -12,8 +12,8 @@ setInterval(() => {
     }
 },1000);
 function checkForChangeUsername() {
-    //start a timer for 3 seconds
-    secondsUntilNameChange = 3;
+    //start a timer for 2 seconds
+    secondsUntilNameChange = 2;
 }
 
 document.getElementById("invite-link").value = location.href;
