@@ -38,3 +38,5 @@ out/
 
 # Project exclude paths
 /gradle/
+
+/src/test/resources/application-test.properties

@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -114,6 +115,11 @@ public class LobbyService {
     }
     private void sendWebsocketMessage(String joinCode, LobbyMessage message) {
         simpMessagingTemplate.convertAndSend(String.format("/broker/%s",joinCode),message);
+    }
+    //check every hour for the expired lobbies (lobbies created 7 days ago) and delete
+    @Scheduled(fixedRate = 1000*60*60)
+    private void deleteExpiredLobbies() {
+
     }
     //below is everything to be received by websockets
 
