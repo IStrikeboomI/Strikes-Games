@@ -21,7 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -119,7 +121,8 @@ public class LobbyService {
     //check every hour for the expired lobbies (lobbies created 7 days ago) and delete
     @Scheduled(fixedRate = 1000*60*60)
     private void deleteExpiredLobbies() {
-
+        List<Lobby> expiredLobbies = lobbyRepository.findLobbiesMadeSince(Instant.now().minus(7, ChronoUnit.DAYS));
+        lobbyRepository.deleteAll(expiredLobbies);
     }
     //below is everything to be received by websockets
 
