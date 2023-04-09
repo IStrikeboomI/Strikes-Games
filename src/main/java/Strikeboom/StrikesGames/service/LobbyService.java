@@ -9,9 +9,7 @@ import Strikeboom.StrikesGames.exception.UserNotFoundException;
 import Strikeboom.StrikesGames.exception.UserUnableToJoinException;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
-import Strikeboom.StrikesGames.websocket.message.LobbyMessage;
-import Strikeboom.StrikesGames.websocket.message.UserChangedNameMessage;
-import Strikeboom.StrikesGames.websocket.message.UserKickedMessage;
+import Strikeboom.StrikesGames.websocket.message.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -157,5 +155,25 @@ public class LobbyService {
         } else {
             throw new UserInsufficientPermissions("Only Lobby Creators Can Kick Users!");
         }
+    }
+
+    /**
+     * Called when a user gets disconnected and gives the user a 60 second grace period to join back
+     * @param userId User that got disconnected
+     */
+    public void userDisconnected(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
+        user.setDisconnected(true);
+        userRepository.save(user);
+        sendWebsocketMessage(user.getLobby().getJoinCode(),new UserDisconnectedMessage(UserService.mapToDto(user)));
+    }
+    /**
+     * Called when a user gets reconnected
+     * @param user User that got reconnected
+     */
+    public void userReconnected(User user) {
+        user.setDisconnected(false);
+        userRepository.save(user);
+        sendWebsocketMessage(user.getLobby().getJoinCode(),new UserReconnectedMessage(UserService.mapToDto(user)));
     }
 }

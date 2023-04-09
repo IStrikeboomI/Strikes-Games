@@ -25,4 +25,6 @@ public class User {
     @ToString.Exclude
     private Lobby lobby;
     private boolean isCreator;
+    //when the user gets disconnected, give a 60 second grace period (grace period is stored in memory)
+    private boolean disconnected = false;
 }

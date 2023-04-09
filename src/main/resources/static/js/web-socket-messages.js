@@ -1,7 +1,9 @@
 const handlers = [
 {"name": "userJoined","handler":userJoined},
 {"name": "userChangedName","handler":userChangedName},
-{"name": "userKicked","handler":userKicked}
+{"name": "userKicked","handler":userKicked},
+{"name": "userDisconnected","handler":userDisconnected},
+{"name": "userReconnected","handler":userReconnected}
 ]
 function userJoined(message) {
     let div = document.createElement("div");
@@ -53,4 +55,38 @@ function userKicked(message) {
             }
         }
     }
+}
+function userDisconnected(message) {
+    let element;
+    for (let e of document.querySelectorAll('[separationId]')) {
+        if (e.getAttribute("separationId") === message.user.separationId) {
+            element = e;
+        }
+    }
+    element.style.color = "gray";
+    element.style.textDecoration = "line-through";
+    let hoverText = element.getElementsByClassName("hoverText")[0];
+    hoverText.style.color = "gray";
+    hoverText.style.userSelect = "none";
+    hoverText.style.textDecoration = "none";
+    hoverText.style.display = "inline-block";
+    hoverText.style.padding = "5px";
+    hoverText.innerHTML = " User has 60 seconds to reconnect";
+}
+function userReconnected(message) {
+    let element;
+        for (let e of document.querySelectorAll('[separationId]')) {
+            if (e.getAttribute("separationId") === message.user.separationId) {
+                element = e;
+            }
+        }
+        element.style.color = "";
+        element.style.textDecoration = "";
+        let hoverText = element.getElementsByClassName("hoverText")[0];
+        hoverText.style.color = "gray";
+        hoverText.style.userSelect = "none";
+        hoverText.style.textDecoration = "none";
+        hoverText.style.display = "inline-block";
+        hoverText.style.padding = "5px";
+        hoverText.innerHTML = "";
 }
