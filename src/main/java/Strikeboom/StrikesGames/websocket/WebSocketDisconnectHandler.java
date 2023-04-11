@@ -1,6 +1,6 @@
 package Strikeboom.StrikesGames.websocket;
 
-import Strikeboom.StrikesGames.service.LobbyService;
+import Strikeboom.StrikesGames.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -13,11 +13,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketDisconnectHandler {
     //used to detect when a client disconnects
     @Autowired
-    LobbyService lobbyService;
+    UserService userService;
     @EventListener
     private void handleDisconnect(SessionDisconnectEvent event) {
         ConcurrentHashMap<String,String> attributes = (ConcurrentHashMap<String, String>) event.getMessage().getHeaders().get("simpSessionAttributes");
         UUID userId = UUID.fromString(attributes.get("userId"));
-        lobbyService.userDisconnected(userId);
+        userService.userDisconnected(userId);
     }
 }

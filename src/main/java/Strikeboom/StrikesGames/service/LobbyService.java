@@ -35,6 +35,7 @@ public class LobbyService {
 
     private final LobbyRepository lobbyRepository;
     private final UserRepository userRepository;
+
     public Lobby createLobby(LobbyDto lobbyDto) {
         return lobbyRepository.save(map(lobbyDto));
     }
@@ -113,7 +114,7 @@ public class LobbyService {
         user.setLobby(null);
         userRepository.save(user);
     }
-    private void sendWebsocketMessage(String joinCode, LobbyMessage message) {
+    public void sendWebsocketMessage(String joinCode, LobbyMessage message) {
         simpMessagingTemplate.convertAndSend(String.format("/broker/%s",joinCode),message);
     }
     //check every hour for the expired lobbies (lobbies created 7 days ago) and delete
@@ -155,25 +156,5 @@ public class LobbyService {
         } else {
             throw new UserInsufficientPermissions("Only Lobby Creators Can Kick Users!");
         }
-    }
-
-    /**
-     * Called when a user gets disconnected and gives the user a 60 second grace period to join back
-     * @param userId User that got disconnected
-     */
-    public void userDisconnected(UUID userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
-        user.setDisconnected(true);
-        userRepository.save(user);
-        sendWebsocketMessage(user.getLobby().getJoinCode(),new UserDisconnectedMessage(UserService.mapToDto(user)));
-    }
-    /**
-     * Called when a user gets reconnected
-     * @param user User that got reconnected
-     */
-    public void userReconnected(User user) {
-        user.setDisconnected(false);
-        userRepository.save(user);
-        sendWebsocketMessage(user.getLobby().getJoinCode(),new UserReconnectedMessage(UserService.mapToDto(user)));
     }
 }

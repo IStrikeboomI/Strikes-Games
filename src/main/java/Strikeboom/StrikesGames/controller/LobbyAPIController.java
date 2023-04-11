@@ -31,6 +31,8 @@ public class LobbyAPIController {
     private SimpMessagingTemplate simpMessagingTemplate;
 
     private final LobbyService lobbyService;
+    private final UserService userService;
+
     private final LobbyRepository lobbyRepository;
     private final UserRepository userRepository;
     @PostMapping("join/{joinCode}")
@@ -51,7 +53,7 @@ public class LobbyAPIController {
                 userJoined = true;
                 lobbyService.joinLobby(lobby, user);
             } else {
-                lobbyService.userReconnected(user);
+                userService.userReconnected(user);
             }
         } else {
             user = User.builder().separationId(UUID.randomUUID()).disconnected(false).name("Anonymous").build();
