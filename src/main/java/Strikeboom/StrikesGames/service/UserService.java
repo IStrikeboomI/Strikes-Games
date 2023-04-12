@@ -63,6 +63,5 @@ public class UserService {
     public void reconnectUser(User user) {
         user.setDisconnected(false);
         userRepository.save(user);
-
     }
 }
