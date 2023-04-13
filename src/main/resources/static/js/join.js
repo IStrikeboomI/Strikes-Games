@@ -76,7 +76,6 @@ xhttp.onload = (event) => {
 };
 xhttp.open("POST","/api/lobby/join/"+location.pathname.substr(location.pathname.indexOf("/join/")+6));
 xhttp.send();
-
 var stompClient;
 function connectAndSend() {
     var socket = new SockJS('/join-lobby');

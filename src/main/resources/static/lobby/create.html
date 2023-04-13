@@ -9,10 +9,7 @@
         <span>Lobby Name:</span>
         <textarea id="name" name="name" rows="1"></textarea> <br>
         <span>Game:</span>
-        <!--TODO: make this get the game list off a dynamic json-->
-        <select name="game" id="game">
-            <option>Seth-head</option>
-        </select><br>
+        <select name="game" id="game" onchange="changeGame()"></select><br>
         <span>Visibility:</span>
         <div>
             <input type="radio" name="visibility" value="private" id="private" checked>
@@ -26,6 +23,19 @@
     </body>
     <script>
         "user strict"
+        var games;
+        let xhttp = new XMLHttpRequest();
+        xhttp.onload = (event) => {
+            games = JSON.parse(event.target.responseText);
+            console.log(games);
+            for (let game of games) {
+                let e = document.createElement("option");
+                e.innerHTML = game.name;
+                document.getElementById("game").appendChild(e);
+            }
+        }
+        xhttp.open("GET","/games.json");
+        xhttp.send();
         function onButtonClick() {
             if (document.getElementById("name").value.length === 0) {
                 alert("Name must not be empty!");
@@ -51,6 +61,14 @@
             xhttp.setRequestHeader('Content-type', 'application/json');
             xhttp.send(JSON.stringify(obj));
 
+        }
+        function changeGame() {
+            let game = document.getElementById("game").value;
+            let maxPlayersElement = document.getElementById("max_players");
+            maxPlayersElement.max = games.find(g => g.name === game).maxPlayers;
+            if (maxPlayersElement.value > maxPlayersElement.max) {
+                maxPlayersElement.value = maxPlayersElement.max;
+            }
         }
     </script>
 </html>
