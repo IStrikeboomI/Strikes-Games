@@ -56,7 +56,7 @@ public class LobbyAPIController {
                 userService.userReconnected(user);
             }
         } else {
-            user = User.builder().separationId(UUID.randomUUID()).disconnected(false).name("Anonymous").build();
+            user = User.builder().separationId(UUID.randomUUID()).name("Anonymous").build();
             userJoined = true;
             lobbyService.joinLobby(lobby, user);
         }
@@ -72,7 +72,7 @@ public class LobbyAPIController {
     }
     @PostMapping("create")
     public ResponseEntity<LobbyAndUserDto> create(@RequestBody LobbyDto lobby,HttpServletResponse response) {
-        User creator = User.builder().separationId(UUID.randomUUID()).disconnected(false).name("Anonymous").build();
+        User creator = User.builder().separationId(UUID.randomUUID()).name("Anonymous").build();
         creator.setCreator(true);
         Lobby l = lobbyService.createLobby(lobby);
         lobbyService.joinLobby(l,creator);

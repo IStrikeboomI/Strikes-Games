@@ -7,6 +7,8 @@ import Strikeboom.StrikesGames.exception.UserNotFoundException;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
 import Strikeboom.StrikesGames.websocket.message.UserDisconnectedMessage;
+import Strikeboom.StrikesGames.websocket.message.UserKickedMessage;
+import Strikeboom.StrikesGames.websocket.message.UserPromotedToCreator;
 import Strikeboom.StrikesGames.websocket.message.UserReconnectedMessage;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,10 +40,23 @@ public class UserService {
     public void deleteUser(User user) {
         Lobby lobby = user.getLobby();
         lobby.getUsers().remove(user);
-        lobbyRepository.save(lobby);
+        //if lobby becomes empty after user gets deleted, delete lobby too
+        if (lobby.getUsers().size() > 0) {
+            //if the user that's being deleted it the creator, make the next user in line the creator
+            if (user.isCreator()) {
+                User newCreator = lobby.getUsers().get(0);
+                newCreator.setCreator(true);
+                userRepository.save(newCreator);
+                lobbyService.sendWebsocketMessage(lobby.getJoinCode(),new UserPromotedToCreator(mapToDto(newCreator)));
+            }
+            lobbyRepository.save(lobby);
+        } else {
+            lobbyRepository.delete(lobby);
+        }
         userRepository.delete(user);
+
     }
-    HashMap<UUID, Timer> userDisconnectTimers = new HashMap<>();
+    HashMap<UUID, Timer> userDisconnectTimers;
     /**
      * Called when a user gets disconnected and gives the user a 60 second grace period to join back
      * @param userId User that got disconnected
@@ -52,10 +67,12 @@ public class UserService {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                System.out.println("user disconnect: " + userId);
+                User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
+                deleteUser(user);
+                lobbyService.sendWebsocketMessage(user.getLobby().getJoinCode(),new UserKickedMessage(UserService.mapToDto(user)));
             }
-        },1000 * 3);
-        userDisconnectTimers.put(user.getId(),timer);
+        },1000 * 60);
+        userDisconnectTimers.put(userId,timer);
         lobbyService.sendWebsocketMessage(user.getLobby().getJoinCode(),new UserDisconnectedMessage(UserService.mapToDto(user)));
     }
     /**
@@ -63,17 +80,8 @@ public class UserService {
      * @param user User that got reconnected
      */
     public void userReconnected(User user) {
-        reconnectUser(user);
-        userDisconnectTimers.get(user.getId()).cancel();
+        userDisconnectTimers.getOrDefault(user.getId(),new Timer()).cancel();
         userDisconnectTimers.remove(user.getId());
         lobbyService.sendWebsocketMessage(user.getLobby().getJoinCode(),new UserReconnectedMessage(UserService.mapToDto(user)));
-    }
-    public void disconnectUser(User user) {
-        user.setDisconnected(true);
-        userRepository.save(user);
-    }
-    public void reconnectUser(User user) {
-        user.setDisconnected(false);
-        userRepository.save(user);
     }
 }

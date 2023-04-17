@@ -20,11 +20,9 @@ public class User {
     private UUID separationId = UUID.randomUUID();
     @NotBlank(message = "name must not be empty!")
     private String name;
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     //exclude lobby from string to prevent a stackoverflow exception
     @ToString.Exclude
     private Lobby lobby;
     private boolean isCreator;
-    //when the user gets disconnected, give a 60 second grace period (grace period is stored in memory)
-    private boolean disconnected = false;
 }

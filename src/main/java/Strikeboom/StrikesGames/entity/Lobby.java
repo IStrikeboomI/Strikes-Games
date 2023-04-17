@@ -34,7 +34,7 @@ public class Lobby {
     private Instant created;
     //separate from the uuid where this is used to make a quick join url by being only 7 characters long, used in the URL
     private String joinCode;
-    @OneToMany(fetch = FetchType.LAZY,orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER,orphanRemoval = true)
     private List<User> users;
     private boolean gameStarted;
 }
