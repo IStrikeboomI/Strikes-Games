@@ -28,7 +28,6 @@
         let xhttp = new XMLHttpRequest();
         xhttp.onload = (event) => {
             games = JSON.parse(event.target.responseText);
-            console.log(games);
             for (let game of games) {
                 let e = document.createElement("option");
                 e.innerHTML = game.name;
