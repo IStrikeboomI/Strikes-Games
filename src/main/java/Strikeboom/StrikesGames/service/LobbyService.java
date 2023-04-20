@@ -157,4 +157,14 @@ public class LobbyService {
             throw new UserInsufficientPermissions("Only Lobby Creators Can Kick Users!");
         }
     }
+
+    /**
+     * Recives a chat message and relays it to rest of the lobby
+     * @param message chat message that gets sent by user
+     * @param userId user that sent message
+     */
+    public void sendMessage(String message, UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
+
+    }
 }
