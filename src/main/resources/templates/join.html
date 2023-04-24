@@ -11,6 +11,26 @@
             #users {
                 padding-left:3%;
             }
+            #chatbox {
+                overflow: hidden;
+                border: 5px solid rgba(0, 0, 0, 1);
+                border-radius: 40px;
+                height:400px;
+                width:25%;
+                margin-top:25px;
+                position: relative;
+            }
+            #send-message {
+                border-top: 1px solid gray;
+                padding-top: 10px;
+                width:100%;
+                position:absolute;
+                bottom:5px;
+                text-align:center;
+            }
+            #message-input {
+                width:50%;
+            }
         </style>
     </head>
     <body id="body">
@@ -24,6 +44,13 @@
             <p>Invite others using the link below!</p>
             <input id="invite-link" class="copyable autoselect" spellcheck="false" readonly="readonly" size="37">
             <button title="Copy URL" onclick="copyUrl()">Copy Url</button>
+        </div>
+        <div id="chatbox">
+            <div id="send-message">
+                <label for="send-message">Message: </label>
+                <input title="Send Message" id="message-input">
+                <button title="Send" onclick="sendMessage()">Send</button>
+            </div>
         </div>
     </body>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>

@@ -101,6 +101,9 @@ function changeUsername(name) {
         alert("Name cannot be empty!");
     }
 }
+function sendMessage() {
+    let message = document.getElementById("message-input").value;
+}
 //Used for the red text and strikethrough when hovering over user to kick it
 function hoverOverUser(event) {
     if (user.creator) {
