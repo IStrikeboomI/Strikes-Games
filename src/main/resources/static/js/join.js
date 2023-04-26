@@ -103,6 +103,9 @@ function changeUsername(name) {
 }
 function sendMessage() {
     let message = document.getElementById("message-input").value;
+    if (message && message.trim() !== "") {
+        stompClient.send("/lobby/send-message", {}, message);
+    }
 }
 //Used for the red text and strikethrough when hovering over user to kick it
 function hoverOverUser(event) {
