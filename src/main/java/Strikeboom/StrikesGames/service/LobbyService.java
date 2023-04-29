@@ -1,6 +1,7 @@
 package Strikeboom.StrikesGames.service;
 
 import Strikeboom.StrikesGames.dto.LobbyDto;
+import Strikeboom.StrikesGames.entity.ChatMessage;
 import Strikeboom.StrikesGames.entity.Lobby;
 import Strikeboom.StrikesGames.entity.User;
 import Strikeboom.StrikesGames.exception.LobbyNotFoundException;
@@ -35,6 +36,8 @@ public class LobbyService {
 
     private final LobbyRepository lobbyRepository;
     private final UserRepository userRepository;
+
+    private final ChatService chatService;
 
     public Lobby createLobby(LobbyDto lobbyDto) {
         return lobbyRepository.save(map(lobbyDto));
@@ -165,6 +168,14 @@ public class LobbyService {
      */
     public void sendMessage(String message, UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
-
+        Lobby lobby = user.getLobby();
+        ChatMessage chatMessage = ChatMessage.builder()
+                .created(Instant.now())
+                .lobby(lobby)
+                .user(user)
+                .text(message)
+                .build();
+        chatService.addMessage(chatMessage,lobby);
+        sendWebsocketMessage(lobby.getJoinCode(),new UserSentMessageMessage(ChatService.mapToDto(chatMessage)));
     }
 }

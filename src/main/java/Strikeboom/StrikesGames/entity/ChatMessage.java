@@ -22,7 +22,7 @@ public class ChatMessage {
     private String text;
     @ManyToOne(fetch = FetchType.LAZY)
     private Lobby lobby;
-    private Instant createdDate;
+    private Instant created;
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 }

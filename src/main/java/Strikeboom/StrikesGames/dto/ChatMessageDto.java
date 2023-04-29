@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.Instant;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,4 +16,5 @@ import org.springframework.validation.annotation.Validated;
 public class ChatMessageDto {
     String text;
     UserDto user;
+    Instant created;
 }

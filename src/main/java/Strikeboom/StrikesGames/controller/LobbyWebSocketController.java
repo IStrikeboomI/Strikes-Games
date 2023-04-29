@@ -26,6 +26,6 @@ public class LobbyWebSocketController {
     @MessageMapping("/send-message")
     public void sendMessage(@RequestBody String message, SimpMessageHeaderAccessor headerAccessor) {
         UUID userId = UUID.fromString(headerAccessor.getSessionAttributes().get("userId").toString());
-        System.out.println(userId + " " + message);
+        lobbyService.sendMessage(message,userId);
     }
 }
