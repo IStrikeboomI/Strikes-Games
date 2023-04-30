@@ -7,31 +7,7 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <link rel="icon" type="image/png" href="/image/logo.png">
         <title>Strike's Games</title>
-        <style>
-            #users {
-                padding-left:3%;
-            }
-            #chatbox {
-                overflow: hidden;
-                border: 5px solid rgba(0, 0, 0, 1);
-                border-radius: 40px;
-                height:400px;
-                width:25%;
-                margin-top:25px;
-                position: relative;
-            }
-            #send-message {
-                border-top: 1px solid gray;
-                padding-top: 10px;
-                width:100%;
-                position:absolute;
-                bottom:5px;
-                text-align:center;
-            }
-            #message-input {
-                width:50%;
-            }
-        </style>
+        <link rel="stylesheet" href="/css/join.css">
     </head>
     <body id="body">
         <h1>Welcome to Lobby: <span th:text="${name}"></span></h1><br>
@@ -46,9 +22,12 @@
             <button title="Copy URL" onclick="copyUrl()">Copy Url</button>
         </div>
         <div id="chatbox">
+            <div id="messages">
+
+            </div>
             <div id="send-message">
                 <label for="send-message">Message: </label>
-                <input title="Send Message" id="message-input">
+                <input title="Send Message" id="message-input" onkeydown="checkForEnter(event)">
                 <button title="Send" onclick="sendMessage()">Send</button>
             </div>
         </div>

@@ -30,4 +30,5 @@ public class LobbyDto {
     private String joinCode;
     private List<UserDto> users;
     private boolean gameStarted;
+    private List<ChatMessageDto> messages;
 }

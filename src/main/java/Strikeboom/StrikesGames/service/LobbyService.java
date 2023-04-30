@@ -75,6 +75,7 @@ public class LobbyService {
                 .name(lobby.getName())
                 .joinCode(lobby.getJoinCode())
                 .users(lobby.getUsers().stream().map(UserService::mapToDto).toList())
+                .messages(lobby.getMessages().stream().map(ChatService::mapToDto).toList())
                 .gameStarted(lobby.isGameStarted())
                 .build();
     }
@@ -88,6 +89,7 @@ public class LobbyService {
                 .name(lobby.getName())
                 .joinCode(generateValidJoinCode())
                 .users(new ArrayList<>())
+                .messages(new ArrayList<>())
                 .gameStarted(false)
                 .build();
     }

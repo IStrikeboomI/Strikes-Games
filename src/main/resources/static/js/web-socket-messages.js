@@ -3,7 +3,8 @@ const handlers = [
 {"name": "userChangedName","handler":userChangedName},
 {"name": "userKicked","handler":userKicked},
 {"name": "userDisconnected","handler":userDisconnected},
-{"name": "userReconnected","handler":userReconnected}
+{"name": "userReconnected","handler":userReconnected},
+{"name": "userSentMessage","handler":userSentMessage}
 ]
 function userJoined(message) {
     let div = document.createElement("div");
@@ -89,4 +90,7 @@ function userReconnected(message) {
         hoverText.style.display = "inline-block";
         hoverText.style.padding = "5px";
         hoverText.innerHTML = "";
+}
+function userSentMessage(message) {
+    addMessage(message.chatMessage);
 }

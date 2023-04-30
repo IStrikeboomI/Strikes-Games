@@ -1,0 +1,40 @@
+#users {
+    padding-left:3%;
+}
+#chatbox {
+    border: 5px solid rgba(0, 0, 0, 1);
+    border-radius: 40px;
+    height:400px;
+    width:25%;
+    margin-top:25px;
+    position: absolute;
+}
+#send-message {
+    border-top: 1px solid gray;
+    padding-top: 10px;
+    width:100%;
+    position:absolute;
+    bottom:5px;
+    text-align:center;
+}
+#message-input {
+    width:50%;
+}
+#messages {
+    height:90%;
+    left:3%;
+    width:97%;
+    position:absolute;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+#messages::-webkit-scrollbar {
+    display:none;
+}
+.message {
+    padding : 4px;
+}
+.messageCreated {
+    color: gray;
+}

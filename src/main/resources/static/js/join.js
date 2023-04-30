@@ -23,7 +23,37 @@ function copyUrl() {
     copyText.setSelectionRange(0, 99999);
     navigator.clipboard.writeText(copyText.value);
 }
+//called when adding a message to the chat box
+function addMessage(message) {
+    let text = message.text;
+    let user = message.user;
+    let created = message.created;
 
+    let messagesDiv = document.getElementById("messages");
+
+    let messageElement = document.createElement("div");
+    messageElement.className = "message";
+    messageElement.setAttribute("separationId",user.separationId);
+
+    let userElement = document.createElement("b");
+    userElement.className = "username";
+    userElement.innerHTML = user.name;
+
+    let textElement = document.createElement("span");
+    textElement.innerHTML = ": " +text + " ";
+
+    let formattedTime = new Date(created);
+    let createdElement = document.createElement("span");
+    createdElement.innerHTML = formattedTime.toLocaleTimeString();
+    createdElement.className = "messageCreated"
+
+    messageElement.appendChild(userElement);
+    messageElement.appendChild(textElement);
+    messageElement.appendChild(createdElement);
+    messagesDiv.appendChild(messageElement);
+
+    messagesDiv.scrollTop = messagesDiv.scrollTopMax;
+}
 
 var lobby;
 //the user that's the browser is on
@@ -67,6 +97,9 @@ xhttp.onload = (event) => {
             div.appendChild(hoverText);
             document.getElementById("users").appendChild(div);
         }
+        for (let message of lobby.messages) {
+            addMessage(message);
+        }
         connectAndSend();
     } else {
         //alert("An error has occurred, more information in the console");
@@ -101,10 +134,18 @@ function changeUsername(name) {
         alert("Name cannot be empty!");
     }
 }
+//called when the send message input box is selected and should send message when pressing enter
+function checkForEnter(event) {
+    if (event.key === "Enter") {
+        sendMessage();
+    }
+}
 function sendMessage() {
-    let message = document.getElementById("message-input").value;
+    let messageInput = document.getElementById("message-input");
+    let message = messageInput.value;
     if (message && message.trim() !== "") {
         stompClient.send("/lobby/send-message", {}, message);
+        messageInput.value = "";
     }
 }
 //Used for the red text and strikethrough when hovering over user to kick it

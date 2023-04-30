@@ -54,7 +54,6 @@ public class UserService {
             lobbyRepository.delete(lobby);
         }
         userRepository.delete(user);
-
     }
     HashMap<UUID, Timer> userDisconnectTimers;
     /**
