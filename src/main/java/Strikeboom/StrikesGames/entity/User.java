@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -25,4 +26,6 @@ public class User {
     @ToString.Exclude
     private Lobby lobby;
     private boolean isCreator;
+    @OneToMany(orphanRemoval = true)
+    private List<ChatMessage> messages;
 }

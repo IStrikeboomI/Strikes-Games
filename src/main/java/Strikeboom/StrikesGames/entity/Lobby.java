@@ -37,6 +37,6 @@ public class Lobby {
     @OneToMany(fetch = FetchType.EAGER,orphanRemoval = true)
     private List<User> users;
     private boolean gameStarted;
-    @OneToMany
+    @OneToMany(orphanRemoval = true)
     private List<ChatMessage> messages;
 }
