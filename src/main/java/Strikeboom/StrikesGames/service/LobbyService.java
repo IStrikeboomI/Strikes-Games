@@ -10,10 +10,12 @@ import Strikeboom.StrikesGames.exception.UserNotFoundException;
 import Strikeboom.StrikesGames.exception.UserUnableToJoinException;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
-import Strikeboom.StrikesGames.websocket.message.*;
+import Strikeboom.StrikesGames.websocket.message.LobbyMessage;
+import Strikeboom.StrikesGames.websocket.message.UserChangedNameMessage;
+import Strikeboom.StrikesGames.websocket.message.UserSentMessageMessage;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -31,13 +33,14 @@ import java.util.UUID;
 @Slf4j
 @Transactional
 public class LobbyService {
-    @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
     private final LobbyRepository lobbyRepository;
     private final UserRepository userRepository;
 
     private final ChatService chatService;
+    @Lazy //lazy initialization to prevent a cycle
+    private final UserService userService;
 
     public Lobby createLobby(LobbyDto lobbyDto) {
         return lobbyRepository.save(map(lobbyDto));
@@ -154,10 +157,7 @@ public class LobbyService {
             Lobby lobby = user.getLobby();
             User userGettingKicked = lobby.getUsers().stream().filter(user1 -> user1.getSeparationId().equals(playerGettingKickedId)).findFirst()
                     .orElseThrow(() -> new UserNotFoundException(String.format("User with Id:%s Is In Different lobby!",playerGettingKickedId.toString())));
-            lobby.getUsers().remove(userGettingKicked);
-            userRepository.delete(userGettingKicked);
-            lobbyRepository.save(lobby);
-            sendWebsocketMessage(lobby.getJoinCode(),new UserKickedMessage(UserService.mapToDto(userGettingKicked)));
+            userService.deleteUser(userGettingKicked);
         } else {
             throw new UserInsufficientPermissions("Only Lobby Creators Can Kick Users!");
         }

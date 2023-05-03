@@ -37,6 +37,12 @@ public class UserService {
                 .separationId(user.getSeparationId())
                 .build();
     }
+
+    /**
+     * Method that deletes a user from a lobby and the users messages
+     * if user was the only one in the lobby it will also delete the lobby
+     * @param user User to get deleted
+     */
     public void deleteUser(User user) {
         Lobby lobby = user.getLobby();
         lobby.getUsers().remove(user);
