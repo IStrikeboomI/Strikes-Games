@@ -2,7 +2,6 @@ package Strikeboom.StrikesGames.service;
 
 import Strikeboom.StrikesGames.dto.ChatMessageDto;
 import Strikeboom.StrikesGames.entity.ChatMessage;
-import Strikeboom.StrikesGames.entity.Lobby;
 import Strikeboom.StrikesGames.repository.ChatRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +21,9 @@ public class ChatService {
                 .created(chatMessage.getCreated())
                 .build();
     }
-    public void addMessage(ChatMessage message, Lobby lobby) {
-        lobby.getMessages().add(message);
+    public void addMessage(ChatMessage message) {
+        message.getLobby().getMessages().add(message);
+        message.getUser().getMessages().add(message);
         chatRepository.save(message);
     }
 }

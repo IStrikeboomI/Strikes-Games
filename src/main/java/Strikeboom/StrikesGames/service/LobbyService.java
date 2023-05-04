@@ -15,7 +15,6 @@ import Strikeboom.StrikesGames.websocket.message.UserChangedNameMessage;
 import Strikeboom.StrikesGames.websocket.message.UserSentMessageMessage;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -33,13 +32,12 @@ import java.util.UUID;
 @Slf4j
 @Transactional
 public class LobbyService {
-    private SimpMessagingTemplate simpMessagingTemplate;
+    private  SimpMessagingTemplate simpMessagingTemplate;
 
     private final LobbyRepository lobbyRepository;
     private final UserRepository userRepository;
 
     private final ChatService chatService;
-    @Lazy //lazy initialization to prevent a cycle
     private final UserService userService;
 
     public Lobby createLobby(LobbyDto lobbyDto) {
@@ -116,13 +114,19 @@ public class LobbyService {
     public boolean isUserInLobby(User user, Lobby lobby) {
         return lobby.getUsers().contains(user);
     }
+
+    /**
+     * Removes (not deletes) user from lobby
+     * Separate from the delete user method in UserService because that one deletes it from the repository
+     * @param user user to remove
+     */
     public void removeUserFromLobby(User user) {
         user.getLobby().getUsers().remove(user);
         lobbyRepository.save(user.getLobby());
         user.setLobby(null);
         userRepository.save(user);
     }
-    public void sendWebsocketMessage(String joinCode, LobbyMessage message) {
+    public  void sendWebsocketMessage(String joinCode, LobbyMessage message) {
         simpMessagingTemplate.convertAndSend(String.format("/broker/%s",joinCode),message);
     }
     //check every hour for the expired lobbies (lobbies created 7 days ago) and delete
@@ -132,7 +136,6 @@ public class LobbyService {
         lobbyRepository.deleteAll(expiredLobbies);
     }
     //below is everything to be received by websockets
-
     /**
      *
      * @param name new name
@@ -177,7 +180,7 @@ public class LobbyService {
                 .user(user)
                 .text(message)
                 .build();
-        chatService.addMessage(chatMessage,lobby);
+        chatService.addMessage(chatMessage);
         sendWebsocketMessage(lobby.getJoinCode(),new UserSentMessageMessage(ChatService.mapToDto(chatMessage)));
     }
 }
