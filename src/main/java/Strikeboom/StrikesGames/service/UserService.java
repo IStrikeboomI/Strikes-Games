@@ -73,18 +73,19 @@ public class UserService {
      * @param userId User that got disconnected
      */
     public void userDisconnected(UUID userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
-                deleteUser(user);
-                sendWebsocketMessage(user.getLobby().getJoinCode(),new UserKickedMessage(UserService.mapToDto(user)));
-            }
-        },1000 * 60);
-        userDisconnectTimers.put(userId,timer);
-        sendWebsocketMessage(user.getLobby().getJoinCode(),new UserDisconnectedMessage(UserService.mapToDto(user)));
+        userRepository.findById(userId).ifPresent(user -> {
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
+                    deleteUser(user);
+                    sendWebsocketMessage(user.getLobby().getJoinCode(),new UserKickedMessage(UserService.mapToDto(user)));
+                }
+            },1000 * 60);
+            userDisconnectTimers.put(userId,timer);
+            sendWebsocketMessage(user.getLobby().getJoinCode(),new UserDisconnectedMessage(UserService.mapToDto(user)));
+        });
     }
     /**
      * Called when a user gets reconnected

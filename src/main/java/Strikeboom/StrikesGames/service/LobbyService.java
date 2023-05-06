@@ -12,6 +12,7 @@ import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
 import Strikeboom.StrikesGames.websocket.message.LobbyMessage;
 import Strikeboom.StrikesGames.websocket.message.UserChangedNameMessage;
+import Strikeboom.StrikesGames.websocket.message.UserKickedMessage;
 import Strikeboom.StrikesGames.websocket.message.UserSentMessageMessage;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -161,6 +162,7 @@ public class LobbyService {
             User userGettingKicked = lobby.getUsers().stream().filter(user1 -> user1.getSeparationId().equals(playerGettingKickedId)).findFirst()
                     .orElseThrow(() -> new UserNotFoundException(String.format("User with Id:%s Is In Different lobby!",playerGettingKickedId.toString())));
             userService.deleteUser(userGettingKicked);
+            sendWebsocketMessage(lobby.getJoinCode(),new UserKickedMessage(UserService.mapToDto(userGettingKicked)));
         } else {
             throw new UserInsufficientPermissions("Only Lobby Creators Can Kick Users!");
         }
