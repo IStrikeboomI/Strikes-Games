@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Game {
-    SETH_HEAD("Seth-Head",8),
+    SETH_HEAD("Seth-Head",4),
     TIC_TAC_TOE("Tic-Tac-Toe",2);
 
     private String name;
