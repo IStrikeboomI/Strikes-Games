@@ -10,7 +10,7 @@
         <span>Lobby Name:</span>
         <textarea id="name" name="name" rows="1"></textarea> <br>
         <span>Game:</span>
-        <select name="game" id="game" onchange="changeGame()"></select><br>
+        <select name="game" id="game" onchange="changeGame(event)"></select><br>
         <span>Visibility:</span>
         <div>
             <input type="radio" name="visibility" value="private" id="private" checked>
@@ -19,7 +19,7 @@
             <label for="public">Public</label><br>
         </div>
         <span>Max Players:</span>
-        <input type="number" id="max_players" name="max_players" min="2" max="8" value="2" onkeydown="return false;"><br>
+        <input type="number" id="max_players" name="max_players" min="2" max="4" value="2" onkeydown="checkIfNumber(event)" onblur="checkValues()"><br>
         <button onclick="onButtonClick()">Create Lobby</button>
     </body>
     <script>
@@ -30,12 +30,36 @@
             games = JSON.parse(event.target.responseText);
             for (let game of games) {
                 let e = document.createElement("option");
-                e.innerHTML = game.name;
+                e.innerHTML = game.name + " (" + game.maxPlayers + " Max Players)";
+                e.setAttribute("name",game.name);
                 document.getElementById("game").appendChild(e);
             }
         }
         xhttp.open("GET","/games.json");
         xhttp.send();
+        //called every time key is down, checks if what got inputted was a number
+        function checkIfNumber(event) {
+            if (!(event.key >= '0' && event.key <= '9') && event.key!=="Backspace") {
+                event.preventDefault();
+            }
+        }
+        //called when focus on the max players is lost, checks if number is a valid max player amount
+        function checkValues() {
+            let maxPlayersElement = document.getElementById("max_players");
+            let maxPlayersAmount = parseInt(maxPlayersElement.value) || 0;
+            if (maxPlayersAmount > parseInt(maxPlayersElement.max)) {
+                maxPlayersElement.value = maxPlayersElement.max;
+            }
+            if (maxPlayersAmount < parseInt(maxPlayersElement.min)) {
+                maxPlayersElement.value = maxPlayersElement.min;
+            }
+        }
+        function changeGame(event) {
+            let game = event.target.options[event.target.selectedIndex].getAttribute("name");
+            let maxPlayersElement = document.getElementById("max_players");
+            maxPlayersElement.max = games.find(g => g.name === game).maxPlayers;
+            checkValues();
+        }
         function onButtonClick() {
             if (document.getElementById("name").value.length === 0) {
                 alert("Name must not be empty!");
@@ -47,7 +71,7 @@
             }
             const obj = {
                 name: document.getElementById("name").value,
-                game: document.getElementById("game").value,
+                game: document.getElementById("game").options[document.getElementById("game").selectedIndex].getAttribute("name"),
                 private: document.getElementById("private").checked,
                 maxPlayers: parseInt(document.getElementById("max_players").value)
             };
@@ -62,13 +86,6 @@
             xhttp.send(JSON.stringify(obj));
 
         }
-        function changeGame() {
-            let game = document.getElementById("game").value;
-            let maxPlayersElement = document.getElementById("max_players");
-            maxPlayersElement.max = games.find(g => g.name === game).maxPlayers;
-            if (maxPlayersElement.value > maxPlayersElement.max) {
-                maxPlayersElement.value = maxPlayersElement.max;
-            }
-        }
+
     </script>
 </html>
