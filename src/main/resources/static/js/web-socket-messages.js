@@ -32,6 +32,8 @@ function userJoined(message) {
     div.appendChild(userAttributes);
     div.appendChild(hoverText);
     document.getElementById("users").appendChild(div);
+
+    addLobbyMessage("User Joined","#75FC0F");
 }
 function userChangedName(message) {
     let userId = message.separationId;
@@ -92,5 +94,5 @@ function userReconnected(message) {
         hoverText.innerHTML = "";
 }
 function userSentMessage(message) {
-    addMessage(message.chatMessage);
+    addChatMessage(message.chatMessage);
 }

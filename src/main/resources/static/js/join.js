@@ -23,8 +23,22 @@ function copyUrl() {
     copyText.setSelectionRange(0, 99999);
     navigator.clipboard.writeText(copyText.value);
 }
+//called when adding a lobby message like user joined, user left, user changed name, etc.
+function addLobbyMessage(text, color) {
+    let messagesDiv = document.getElementById("messages");
+
+    let messageElement = document.createElement("div");
+    messageElement.className = "message";
+
+    let textElement = document.createElement("span");
+    textElement.innerHTML = text;
+    textElement.style = "color:"+color+";";
+
+    messageElement.appendChild(textElement);
+    messagesDiv.appendChild(messageElement);
+}
 //called when adding a message to the chat box
-function addMessage(message) {
+function addChatMessage(message) {
     let text = message.text;
     let user = message.user;
     let created = message.created;
@@ -98,7 +112,7 @@ xhttp.onload = (event) => {
             document.getElementById("users").appendChild(div);
         }
         for (let message of lobby.messages) {
-            addMessage(message);
+            addChatMessage(message);
         }
         connectAndSend();
     } else {
