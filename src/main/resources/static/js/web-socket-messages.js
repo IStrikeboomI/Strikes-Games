@@ -37,15 +37,18 @@ function userJoined(message) {
 }
 function userChangedName(message) {
     let userId = message.separationId;
+    let oldUserName;
     for (let user of document.querySelectorAll('[separationId]')) {
         if (user.getAttribute("separationId") === userId) {
             for (let children of user.children) {
                 if (children.className === "username") {
+                    oldUserName = children.innerHTML;
                     children.innerHTML = message.name;
                 }
             }
         }
     }
+    addLobbyMessage(`User ${oldUserName} Changed Name To ${message.name} `,"#1A1A1E80");
 }
 function userKicked(message) {
     let userId = message.user.separationId;
@@ -58,6 +61,7 @@ function userKicked(message) {
             }
         }
     }
+    addLobbyMessage(`User ${message.user.name} Kicked`,"#F72035");
 }
 function userDisconnected(message) {
     let element;
@@ -75,6 +79,8 @@ function userDisconnected(message) {
     hoverText.style.display = "inline-block";
     hoverText.style.padding = "5px";
     hoverText.innerHTML = " User has 60 seconds to reconnect";
+
+    addLobbyMessage(`User ${message.user.name} Disconnected`,"#F72035");
 }
 function userReconnected(message) {
     let element;
@@ -92,6 +98,8 @@ function userReconnected(message) {
         hoverText.style.display = "inline-block";
         hoverText.style.padding = "5px";
         hoverText.innerHTML = "";
+
+        addLobbyMessage(`User ${message.user.name} Reconnected`,"#75FC0F");
 }
 function userSentMessage(message) {
     addChatMessage(message.chatMessage);
