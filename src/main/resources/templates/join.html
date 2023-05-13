@@ -12,14 +12,14 @@
     <body id="body">
         <h1>Welcome to Lobby: <span th:text="${name}"></span></h1><br>
         <label for="username">Username:</label><br>
-        <input id="username" title="Change Your Name Here" value="Anonymous" onkeydown="checkForChangeUsername()" size="50" maxlength="50">
+        <input id="username" title="Change Your Name Here" value="Anonymous" size="50" maxlength="50">
         <p>Users:</p>
         <div id="users">
         </div>
         <div id="invite">
             <p>Invite others using the link below!</p>
             <input id="invite-link" class="copyable autoselect" spellcheck="false" readonly="readonly" size="37">
-            <button title="Copy URL" onclick="copyUrl()">Copy Url</button>
+            <button title="Copy URL" id="copy-url">Copy Url</button>
         </div>
         <div id="chatbox">
             <div id="messages">
@@ -27,8 +27,8 @@
             </div>
             <div id="send-message">
                 <label for="send-message">Message: </label>
-                <input title="Send Message" id="message-input" onkeydown="checkForEnter(event)">
-                <button title="Send" onclick="sendMessage()">Send</button>
+                <input title="Send Message" id="message-input">
+                <button title="Send" id="send-message-button">Send</button>
             </div>
         </div>
     </body>

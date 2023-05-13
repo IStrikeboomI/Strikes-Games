@@ -1,4 +1,10 @@
 "use strict"
+document.getElementById("username").addEventListener("keydown", (e) => checkForChangeUsername());
+document.getElementById("copy-url").addEventListener("click", (e) => copyUrl());
+document.getElementById("message-input").addEventListener("keydown", (e) => checkForEnter(e));
+document.getElementById("send-message-button").addEventListener("click", (e) => sendMessage());
+
+
 //When the user changes name using the change name box, only send request to change name if it's been n seconds since last change name
 //used to limit amount of requests
 let secondsUntilNameChange = -1;
