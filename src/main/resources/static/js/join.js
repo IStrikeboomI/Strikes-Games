@@ -1,26 +1,9 @@
 "use strict"
-document.getElementById("username").addEventListener("keydown", (e) => checkForChangeUsername());
+//only change name when losing focus on change username message box
+document.getElementById("username").addEventListener("blur", (e) => changeUsername(e.target.value));
 document.getElementById("copy-url").addEventListener("click", (e) => copyUrl());
 document.getElementById("message-input").addEventListener("keydown", (e) => checkForEnter(e));
 document.getElementById("send-message-button").addEventListener("click", (e) => sendMessage());
-
-
-//When the user changes name using the change name box, only send request to change name if it's been n seconds since last change name
-//used to limit amount of requests
-let secondsUntilNameChange = -1;
-setInterval(() => {
-    if (secondsUntilNameChange == 0) {
-        changeUsername(document.getElementById("username").value);
-        //stop the timer
-        secondsUntilNameChange = -1;
-    } else {
-        secondsUntilNameChange--;
-    }
-},1000);
-function checkForChangeUsername() {
-    //start a timer for 2 seconds
-    secondsUntilNameChange = 2;
-}
 
 document.getElementById("invite-link").value = location.href;
 function copyUrl() {
@@ -144,7 +127,7 @@ function handleWebSocketMessage(message) {
      handlers.find(h => h.name === message.messageName).handler(message);
  }
 function changeUsername(name) {
-    if (name && name !== "") {
+    if (name && name !== "" && name !== "Anonymous") {
         if (name.length < 50) {
            stompClient.send("/lobby/change-name", {}, name);
         } else {
