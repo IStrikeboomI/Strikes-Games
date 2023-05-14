@@ -10,10 +10,7 @@ import Strikeboom.StrikesGames.exception.UserNotFoundException;
 import Strikeboom.StrikesGames.exception.UserUnableToJoinException;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
-import Strikeboom.StrikesGames.websocket.message.LobbyMessage;
-import Strikeboom.StrikesGames.websocket.message.UserChangedNameMessage;
-import Strikeboom.StrikesGames.websocket.message.UserKickedMessage;
-import Strikeboom.StrikesGames.websocket.message.UserSentMessageMessage;
+import Strikeboom.StrikesGames.websocket.message.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -184,5 +181,20 @@ public class LobbyService {
                 .build();
         chatService.addMessage(chatMessage);
         sendWebsocketMessage(lobby.getJoinCode(),new UserSentMessageMessage(ChatService.mapToDto(chatMessage)));
+    }
+
+    /**
+     *  Starts off the game for the lobby, can only be sent by lobby creator
+     * @param userId user that sent message
+     */
+    public void start(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
+        if (user.isCreator()) {
+            Lobby lobby = user.getLobby();
+            lobby.setGameStarted(true);
+            sendWebsocketMessage(lobby.getJoinCode(),new GameStartedMessage());
+        } else {
+            throw new UserInsufficientPermissions("User must be creator to start game!");
+        }
     }
 }

@@ -4,6 +4,7 @@ document.getElementById("username").addEventListener("blur", (e) => changeUserna
 document.getElementById("copy-url").addEventListener("click", (e) => copyUrl());
 document.getElementById("message-input").addEventListener("keydown", (e) => checkForEnter(e));
 document.getElementById("send-message-button").addEventListener("click", (e) => sendMessage());
+document.getElementById("start").addEventListener("click", (e) => start());
 
 document.getElementById("invite-link").value = location.href;
 function copyUrl() {
@@ -180,7 +181,12 @@ function stopHoverOverUser(event) {
 function clickOnUser(event) {
     if (user.creator) {
         let playerGettingKickedId = event.currentTarget.getAttribute("separationId");
-        console.log(playerGettingKickedId);
         stompClient.send("/lobby/kick-user",{},playerGettingKickedId);
+    }
+}
+//send message to server to start the game
+function start() {
+    if (user.creator) {
+        stompClient.send("/lobby/start",{});
     }
 }

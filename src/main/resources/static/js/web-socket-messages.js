@@ -4,7 +4,8 @@ const handlers = [
 {"name": "userKicked","handler":userKicked},
 {"name": "userDisconnected","handler":userDisconnected},
 {"name": "userReconnected","handler":userReconnected},
-{"name": "userSentMessage","handler":userSentMessage}
+{"name": "userSentMessage","handler":userSentMessage},
+{"name": "gameStarted","handler":gameStarted}
 ]
 function userJoined(message) {
     let div = document.createElement("div");
@@ -103,4 +104,7 @@ function userReconnected(message) {
 }
 function userSentMessage(message) {
     addChatMessage(message.chatMessage);
+}
+function gameStarted(message) {
+    alert("game started!")
 }

@@ -15,17 +15,22 @@ public class LobbyWebSocketController {
     LobbyService lobbyService;
     @MessageMapping("/change-name")
     public void changeName(@RequestBody String name, SimpMessageHeaderAccessor headerAccessor) {
-        UUID userId = UUID.fromString(headerAccessor.getSessionAttributes().get("userId").toString());
-        lobbyService.changeName(name,userId);
+        lobbyService.changeName(name,getIdFromHeaders(headerAccessor));
     }
     @MessageMapping("/kick-user")
     public void kickUser(@org.hibernate.validator.constraints.UUID String playerGettingKickedId, SimpMessageHeaderAccessor headerAccessor) {
-        UUID userId = UUID.fromString(headerAccessor.getSessionAttributes().get("userId").toString());
-        lobbyService.kickUser(UUID.fromString(playerGettingKickedId),userId);
+        lobbyService.kickUser(UUID.fromString(playerGettingKickedId),getIdFromHeaders(headerAccessor));
     }
     @MessageMapping("/send-message")
     public void sendMessage(@RequestBody String message, SimpMessageHeaderAccessor headerAccessor) {
-        UUID userId = UUID.fromString(headerAccessor.getSessionAttributes().get("userId").toString());
-        lobbyService.sendMessage(message,userId);
+        lobbyService.sendMessage(message,getIdFromHeaders(headerAccessor));
+    }
+    @MessageMapping("/start")
+    public void start(SimpMessageHeaderAccessor headerAccessor) {
+        lobbyService.start(getIdFromHeaders(headerAccessor));
+    }
+    //Gets the UUID from the user that sent the message
+    private static UUID getIdFromHeaders(SimpMessageHeaderAccessor headerAccessor) {
+        return UUID.fromString(headerAccessor.getSessionAttributes().get("userId").toString());
     }
 }
