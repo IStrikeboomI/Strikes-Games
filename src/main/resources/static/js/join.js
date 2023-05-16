@@ -144,14 +144,33 @@ function checkForEnter(event) {
         sendMessage();
     }
 }
+//rate limit on the chat messages where you can only send 1 message every 5 seconds
+let sendMessageCooldown = 0;
 function sendMessage() {
     let messageInput = document.getElementById("message-input");
     let message = messageInput.value;
     if (message && message.trim() !== "") {
-        stompClient.send("/lobby/send-message", {}, message);
-        messageInput.value = "";
+        if (sendMessageCooldown == 0) {
+            stompClient.send("/lobby/send-message", {}, message);
+            messageInput.value = "";
+            sendMessageCooldown = 5;
+        }
     }
 }
+//increment down the send message cooldown and change the message input accordingly
+setInterval(() => {
+    let messageInput = document.getElementById("message-input");
+    if (sendMessageCooldown > 0) {
+        sendMessageCooldown--;
+        messageInput.readOnly = true;
+        messageInput.value = `Wait ${sendMessageCooldown} seconds before sending another message`;
+        if (sendMessageCooldown == 0) {
+          messageInput.readOnly = false;
+          messageInput.value = "";
+        }
+    }
+
+},1000);
 //Used for the red text and strikethrough when hovering over user to kick it
 function hoverOverUser(event) {
     if (user.creator) {
