@@ -23,6 +23,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Controller that handles actions with lobbies such as creating, joining, and seeing all public lobbies
+ * Does not interact with activities within lobby
+ */
 @RestController
 @RequestMapping("/api/lobby/")
 @AllArgsConstructor

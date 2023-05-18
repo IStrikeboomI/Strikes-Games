@@ -8,10 +8,9 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
+//used to detect when a client disconnects
 @Component
 public class WebSocketDisconnectHandler {
-    //used to detect when a client disconnects
     @Autowired
     UserService userService;
     @EventListener

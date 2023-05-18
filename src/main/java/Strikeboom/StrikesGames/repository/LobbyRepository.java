@@ -19,6 +19,11 @@ public interface LobbyRepository extends JpaRepository<Lobby, Long> {
     @Query("SELECT l FROM Lobby l WHERE isPrivate=false AND size(l.users)<maxPlayers")
     List<Lobby> findNonFullPublicLobbies(Pageable p);
 
+    /**
+     * Finds lobbies made after a certain time
+     * @param startDate Oldest a lobby can be
+     * @return List of lobbies made after the startDate
+     */
     @Query("SELECT l FROM Lobby l WHERE l.created <= :startDate")
     List<Lobby> findLobbiesMadeSince(@Param("startDate") Instant startDate);
 }

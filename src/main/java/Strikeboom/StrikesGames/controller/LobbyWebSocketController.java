@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+/**
+ * Controller that handles websocket messages for interactions within a lobby
+ */
 @RestController
 @AllArgsConstructor
 public class LobbyWebSocketController {

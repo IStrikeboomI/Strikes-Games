@@ -21,6 +21,11 @@ public class ChatService {
                 .created(chatMessage.getCreated())
                 .build();
     }
+
+    /**
+     * Adds message to lobby and saves it to both lobby and user
+     * @param message chat message entity
+     */
     public void addMessage(ChatMessage message) {
         message.getLobby().getMessages().add(message);
         message.getUser().getMessages().add(message);

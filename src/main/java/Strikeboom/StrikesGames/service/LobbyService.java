@@ -92,6 +92,11 @@ public class LobbyService {
                 .gameStarted(false)
                 .build();
     }
+
+    //The 2 functions below generate the join code for the lobby
+    //The join code is the section after /join/ in the url
+    //It's made up of 7 random characters that are the 26 lower case letters, 26 upper case letters, and 10 numbers
+
     //characters allowed in the join code URL
     private static final char[] VALID_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".toCharArray();
     private static String generateJoinCode() {
@@ -124,7 +129,14 @@ public class LobbyService {
         user.setLobby(null);
         userRepository.save(user);
     }
-    public  void sendWebsocketMessage(String joinCode, LobbyMessage message) {
+
+    /**
+     * Helper method to write less code
+     * Sends a websocket message to everyone in the lobby
+     * @param joinCode join code of the lobby
+     * @param message lobby message to send based off the abstract class {@link LobbyMessage}
+     */
+    public void sendWebsocketMessage(String joinCode, LobbyMessage message) {
         simpMessagingTemplate.convertAndSend(String.format("/broker/%s",joinCode),message);
     }
     //check every hour for the expired lobbies (lobbies created 7 days ago) and delete
@@ -133,7 +145,8 @@ public class LobbyService {
         List<Lobby> expiredLobbies = lobbyRepository.findLobbiesMadeSince(Instant.now().minus(7, ChronoUnit.DAYS));
         lobbyRepository.deleteAll(expiredLobbies);
     }
-    //below is everything to be received by websockets
+
+    //below is everything to be received by websockets by LobbyWebSocketController
     /**
      *
      * @param name new name

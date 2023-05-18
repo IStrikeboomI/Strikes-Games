@@ -23,6 +23,7 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable();
+        //Allow javascript for the site and websocket libraries
         http.headers().xssProtection().and().contentSecurityPolicy(
                 "script-src 'self' " +
                 "https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js " +

@@ -37,6 +37,13 @@ public class UserService {
                 .separationId(user.getSeparationId())
                 .build();
     }
+
+    /**
+     * Helper method to write less code
+     * Sends a websocket message to everyone in the lobby
+     * @param joinCode join code of the lobby
+     * @param message lobby message to send based off the abstract class {@link LobbyMessage}
+     */
     public void sendWebsocketMessage(String joinCode, LobbyMessage message) {
         simpMessagingTemplate.convertAndSend(String.format("/broker/%s",joinCode),message);
     }
@@ -67,6 +74,7 @@ public class UserService {
         userRepository.delete(user);
 
     }
+    //Stores the uuid of users and timers for user that have disconnect and need to join back
     HashMap<UUID, Timer> userDisconnectTimers;
     /**
      * Called when a user gets disconnected and gives the user a 60 second grace period to join back

@@ -15,6 +15,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.util.UUID;
 
+/**
+ * Controller that just handles the view for joining a lobby
+ */
 @Controller
 @AllArgsConstructor
 public class LobbyController {
