@@ -47,7 +47,6 @@ public class LobbyService {
                 userRepository.save(user);
                 user.setLobby(lobby);
                 lobby.getUsers().add(user);
-                lobbyRepository.save(lobby);
             } else {
                 throw new UserUnableToJoinException("User is already in lobby!");
             }
@@ -125,9 +124,7 @@ public class LobbyService {
      */
     public void removeUserFromLobby(User user) {
         user.getLobby().getUsers().remove(user);
-        lobbyRepository.save(user.getLobby());
         user.setLobby(null);
-        userRepository.save(user);
     }
 
     /**
@@ -156,7 +153,6 @@ public class LobbyService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         Lobby lobby = user.getLobby();
         user.setName(name);
-        userRepository.save(user);
         sendWebsocketMessage(lobby.getJoinCode(),new UserChangedNameMessage(user.getSeparationId(), name));
     }
 

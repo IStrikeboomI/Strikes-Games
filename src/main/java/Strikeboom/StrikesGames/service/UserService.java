@@ -64,10 +64,8 @@ public class UserService {
             if (user.isCreator()) {
                 User newCreator = lobby.getUsers().get(0);
                 newCreator.setCreator(true);
-                userRepository.save(newCreator);
                 sendWebsocketMessage(lobby.getJoinCode(),new UserPromotedToCreator(mapToDto(newCreator)));
             }
-            lobbyRepository.save(lobby);
         } else {
             lobbyRepository.delete(lobby);
         }
