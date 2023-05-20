@@ -4,7 +4,6 @@ document.getElementById("username").addEventListener("blur", (e) => changeUserna
 document.getElementById("copy-url").addEventListener("click", (e) => copyUrl());
 document.getElementById("message-input").addEventListener("keydown", (e) => checkForEnter(e));
 document.getElementById("send-message-button").addEventListener("click", (e) => sendMessage());
-document.getElementById("start").addEventListener("click", (e) => start());
 
 document.getElementById("invite-link").value = location.href;
 function copyUrl() {
@@ -87,6 +86,14 @@ xhttp.onload = (event) => {
             if (user.separationId == localStorage.getItem("separationId")) {
                 document.getElementById("username").value = user.name;
                 this.user = user;
+                if (user.creator) {
+                    let startButton = document.createElement("button");
+                    startButton.id = "start";
+                    startButton.title = "Start";
+                    startButton.innerHTML = "Start";
+                    startButton.addEventListener("click", (e) => start());
+                    document.getElementById("body").appendChild(startButton);
+                }
             } else {
                 div.onmouseenter = (e) => hoverOverUser(e);
                 div.onmouseleave = (e) => stopHoverOverUser(e);
