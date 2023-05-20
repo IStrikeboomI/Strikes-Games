@@ -203,7 +203,7 @@ public class LobbyService {
             lobby.setGameStarted(true);
             sendWebsocketMessage(lobby.getJoinCode(),new GameStartedMessage());
         } else {
-            throw new UserInsufficientPermissions("User must be creator to start game!");
+            throw new UserInsufficientPermissions("User must be the creator to start game!");
         }
     }
 }
