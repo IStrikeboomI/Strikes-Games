@@ -1,4 +1,4 @@
-package Strikeboom.StrikesGames.websocket.message;
+package Strikeboom.StrikesGames.websocket.message.lobby;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

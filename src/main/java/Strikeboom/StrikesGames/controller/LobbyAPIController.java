@@ -8,7 +8,7 @@ import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
 import Strikeboom.StrikesGames.service.LobbyService;
 import Strikeboom.StrikesGames.service.UserService;
-import Strikeboom.StrikesGames.websocket.message.UserJoinedMessage;
+import Strikeboom.StrikesGames.websocket.message.lobby.UserJoinedMessage;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;

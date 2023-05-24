@@ -7,7 +7,7 @@ import Strikeboom.StrikesGames.exception.UserNotFoundException;
 import Strikeboom.StrikesGames.repository.ChatRepository;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
-import Strikeboom.StrikesGames.websocket.message.*;
+import Strikeboom.StrikesGames.websocket.message.lobby.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
