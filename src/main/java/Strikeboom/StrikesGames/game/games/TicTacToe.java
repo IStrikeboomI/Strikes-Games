@@ -1,9 +1,10 @@
 package Strikeboom.StrikesGames.game.games;
 
 import Strikeboom.StrikesGames.game.Game;
+import Strikeboom.StrikesGames.game.GameInstance;
 
-public class TicTacToe extends Game {
+public class TicTacToe extends GameInstance {
     public TicTacToe() {
-        super("Tic-Tac-Toe",2,2);
+        super(Game.TIC_TAC_TOE);
     }
 }

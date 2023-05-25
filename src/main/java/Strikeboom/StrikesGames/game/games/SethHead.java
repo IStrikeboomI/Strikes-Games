@@ -1,9 +1,10 @@
 package Strikeboom.StrikesGames.game.games;
 
 import Strikeboom.StrikesGames.game.Game;
+import Strikeboom.StrikesGames.game.GameInstance;
 
-public class SethHead extends Game {
+public class SethHead extends GameInstance {
     public SethHead() {
-        super("Seth-Head",2,4);
+        super(Game.SETH_HEAD);
     }
 }

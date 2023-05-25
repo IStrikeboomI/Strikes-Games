@@ -1,34 +1,22 @@
 package Strikeboom.StrikesGames.game;
 
-import Strikeboom.StrikesGames.entity.Lobby;
-import Strikeboom.StrikesGames.exception.GameNotFoundException;
-import Strikeboom.StrikesGames.exception.TooManyPlayersException;
+import Strikeboom.StrikesGames.game.games.SethHead;
+import Strikeboom.StrikesGames.game.games.TicTacToe;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Getter
-public abstract class Game {
+public enum Game {
+    SETH_HEAD(SethHead.class,"Seth-Head",2,4),
+    TIC_TAC_TOE(TicTacToe.class,"Tic-Tac-Toe",2,2);
+
+    private final Class<? extends GameInstance> gameInstanceClass;
     private final String name;
     private final int minPlayers;
     private final int maxPlayers;
-    private List<Player> players;
-    public Game(String name, int minPlayers, int maxPlayers) {
+    Game(Class<? extends GameInstance> gameInstanceClass,String name, int minPlayers, int maxPlayers) {
         this.name = name;
         this.maxPlayers = maxPlayers;
         this.minPlayers = minPlayers;
-        this.players = new ArrayList<>();
-    }
-    public static Game newInstance(Lobby lobby) {
-        return Games.GAMES.stream().filter(game -> game.getName().equals(lobby.getGame())).findFirst()
-                .orElseThrow(() -> new GameNotFoundException(String.format("Game %s Not found!",lobby.getGame())));
-    }
-    public void addPlayer(Player player) {
-        if (players.size() < maxPlayers) {
-            players.add(player);
-        } else {
-            throw new TooManyPlayersException("Too many players in game!");
-        }
+        this.gameInstanceClass = gameInstanceClass;
     }
 }
