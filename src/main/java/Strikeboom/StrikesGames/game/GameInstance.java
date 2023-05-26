@@ -21,7 +21,7 @@ public abstract class GameInstance {
     public static GameInstance newInstance(Lobby lobby) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         Game g = Stream.of(Game.values()).filter(game1 -> game1.name().equals(lobby.getGame())).findFirst()
                 .orElseThrow(() -> new GameNotFoundException(String.format("Game %s not found!",lobby.getGame())));
-        return g.getGameInstanceClass().getConstructor(Game.class).newInstance(g);
+        return g.getGameInstanceClass().getConstructor().newInstance();
     }
     public void addPlayer(Player player) {
         if (players.size() < game.getMaxPlayers()) {
