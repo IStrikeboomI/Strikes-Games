@@ -4,6 +4,7 @@ import Strikeboom.StrikesGames.entity.Lobby;
 import Strikeboom.StrikesGames.entity.User;
 import Strikeboom.StrikesGames.game.Game;
 import Strikeboom.StrikesGames.game.GameInstance;
+import Strikeboom.StrikesGames.game.TurnBasedGame;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -42,8 +43,11 @@ class StrikesGamesApplicationTests {
 		User user1 = new User(UUID.randomUUID(),UUID.randomUUID(),"User 1",lobby,true,List.of());
 		User user2 = new User(UUID.randomUUID(),UUID.randomUUID(),"User 2",lobby,false,List.of());
 		lobby.setUsers(List.of(user1,user2));
-		GameInstance instance = GameInstance.newInstance(lobby);
-		System.out.println(instance);
+		TurnBasedGame instance = (TurnBasedGame) GameInstance.newInstance(lobby);
+		for (int i = 0;i < 100;i++) {
+			System.out.println(instance.getPlayerOnTurn());
+			instance.cycleTurn();
+		}
 	}
 
 }
