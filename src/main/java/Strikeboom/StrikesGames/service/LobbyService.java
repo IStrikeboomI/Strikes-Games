@@ -8,8 +8,10 @@ import Strikeboom.StrikesGames.exception.LobbyNotFoundException;
 import Strikeboom.StrikesGames.exception.UserInsufficientPermissions;
 import Strikeboom.StrikesGames.exception.UserNotFoundException;
 import Strikeboom.StrikesGames.exception.UserUnableToJoinException;
+import Strikeboom.StrikesGames.game.GameInstance;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
+import Strikeboom.StrikesGames.websocket.message.game.GameMessage;
 import Strikeboom.StrikesGames.websocket.message.lobby.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -196,14 +199,24 @@ public class LobbyService {
      *  Starts off the game for the lobby, can only be sent by lobby creator
      * @param userId user that sent message
      */
-    public void start(UUID userId) {
+    public void start(UUID userId) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         if (user.isCreator()) {
             Lobby lobby = user.getLobby();
             lobby.setGameStarted(true);
+            lobby.setGameInstance(GameInstance.newInstance(lobby));
             sendWebsocketMessage(lobby.getJoinCode(),new GameStartedMessage());
         } else {
             throw new UserInsufficientPermissions("User must be the creator to start game!");
+        }
+    }
+
+    public void receiveGameMessage(UUID userId, GameMessage message) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
+        Lobby lobby = user.getLobby();
+        GameInstance gameInstance = lobby.getGameInstance();
+        if (gameInstance.canMessageBeReceived(user,message)) {
+
         }
     }
 }
