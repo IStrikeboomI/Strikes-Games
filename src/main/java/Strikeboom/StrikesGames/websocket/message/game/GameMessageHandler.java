@@ -8,19 +8,13 @@ public abstract class GameMessageHandler<T extends GameInstance> extends GameMes
         super(game, messageName, data);
     }
     /**
-     * Checks if message data is valid in context to game <br>
-     * Ex. a player can't make a tic-tac-toe move inside a square that already has something marked
-     * @param game Instance of game
-     * @param player Player that sent message
-     * @return whether message can be handled
-     */
-    public abstract boolean canHandle(T game, Player player);
-    /**
      * Handles the message received
      * @param game Instance of game
      * @param player Player that sent message
+     * @return Whether method could be handled or not, Checks if message data is valid in context to game <br>
+     *      Ex. a player can't make a tic-tac-toe move inside a square that already has something marked
      */
-    public abstract void handle(T game, Player player);
+    public abstract boolean handle(T game, Player player);
 
     /**
      * Determines if the message should be sent out to the clients <br>

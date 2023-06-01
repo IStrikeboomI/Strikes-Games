@@ -32,11 +32,11 @@ public abstract class GameInstance {
     }
 
     /**
-     * Checks if a message can be received by the user sending it, and then dispatches it
-     * Does not check for if a message's content is a valid move, that's for the message dispatcher to handle
+     * Checks if a message can be received by the user sending it, and then dispatches it <br>
+     * Does not check for if a message's data is a valid move, that's for the message dispatcher to handle
      * @param user user sending the message
      * @param message message contents
-     * @return wheter or not the message can be received
+     * @return whether or not the message can be received
      */
     public boolean canMessageBeReceived(User user, GameMessage message) {
         return true;

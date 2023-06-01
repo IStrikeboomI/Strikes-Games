@@ -12,13 +12,8 @@ public class MakeMoveMessage extends GameMessageHandler<TicTacToe> {
     }
 
     @Override
-    public boolean canHandle(TicTacToe game, Player player) {
-        return false;
-    }
-
-    @Override
-    public void handle(TicTacToe game, Player player) {
-
+    public boolean handle(TicTacToe game, Player player) {
+        return true;
     }
 
     @Override

@@ -216,7 +216,7 @@ public class LobbyService {
         Lobby lobby = user.getLobby();
         GameInstance gameInstance = lobby.getGameInstance();
         if (gameInstance.canMessageBeReceived(user,message)) {
-
+            
         }
     }
 }
