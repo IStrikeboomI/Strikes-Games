@@ -12,6 +12,7 @@ import Strikeboom.StrikesGames.game.Game;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
 import Strikeboom.StrikesGames.websocket.message.game.GameMessage;
+import Strikeboom.StrikesGames.websocket.message.game.GameMessageHandler;
 import Strikeboom.StrikesGames.websocket.message.lobby.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -211,12 +212,15 @@ public class LobbyService {
         }
     }
 
-    public void receiveGameMessage(UUID userId, GameMessage message) {
+    public void receiveGameMessage(UUID userId, GameMessage message) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         Lobby lobby = user.getLobby();
         Game gameInstance = lobby.getGameInstance();
-        if (gameInstance.canMessageBeReceived(user,message)) {
-            
+        GameMessageHandler<Game> handler = (GameMessageHandler<Game>) gameInstance.getMessageHandler(message);
+        if (handler.handle(gameInstance,user)) {
+            if (handler.canDispatch(gameInstance,user)) {
+                simpMessagingTemplate.convertAndSend(String.format("/broker/%s",lobby.getJoinCode()),handler.dispatch(gameInstance,user));
+            }
         }
     }
 }

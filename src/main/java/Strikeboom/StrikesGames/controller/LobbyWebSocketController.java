@@ -36,7 +36,7 @@ public class LobbyWebSocketController {
     }
     //Used for receiving game messages from clients
     @MessageMapping("/game")
-    public void game(@RequestBody GameMessage message, SimpMessageHeaderAccessor headerAccessor) {
+    public void game(@RequestBody GameMessage message, SimpMessageHeaderAccessor headerAccessor) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         lobbyService.receiveGameMessage(getIdFromHeaders(headerAccessor),message);
     }
     //Gets the UUID from the user that sent the message
