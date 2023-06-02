@@ -8,7 +8,7 @@ import Strikeboom.StrikesGames.exception.LobbyNotFoundException;
 import Strikeboom.StrikesGames.exception.UserInsufficientPermissions;
 import Strikeboom.StrikesGames.exception.UserNotFoundException;
 import Strikeboom.StrikesGames.exception.UserUnableToJoinException;
-import Strikeboom.StrikesGames.game.GameInstance;
+import Strikeboom.StrikesGames.game.Game;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
 import Strikeboom.StrikesGames.websocket.message.game.GameMessage;
@@ -204,7 +204,7 @@ public class LobbyService {
         if (user.isCreator()) {
             Lobby lobby = user.getLobby();
             lobby.setGameStarted(true);
-            lobby.setGameInstance(GameInstance.newInstance(lobby));
+            lobby.setGameInstance(Game.newInstance(lobby));
             sendWebsocketMessage(lobby.getJoinCode(),new GameStartedMessage());
         } else {
             throw new UserInsufficientPermissions("User must be the creator to start game!");
@@ -214,7 +214,7 @@ public class LobbyService {
     public void receiveGameMessage(UUID userId, GameMessage message) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         Lobby lobby = user.getLobby();
-        GameInstance gameInstance = lobby.getGameInstance();
+        Game gameInstance = lobby.getGameInstance();
         if (gameInstance.canMessageBeReceived(user,message)) {
             
         }

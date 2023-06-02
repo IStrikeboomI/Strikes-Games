@@ -1,9 +1,9 @@
 package Strikeboom.StrikesGames.websocket.message.game;
 
-import Strikeboom.StrikesGames.game.GameInstance;
+import Strikeboom.StrikesGames.game.Game;
 import Strikeboom.StrikesGames.game.Player;
 
-public abstract class GameMessageHandler<T extends GameInstance> extends GameMessage{
+public abstract class GameMessageHandler<T extends Game> extends GameMessage{
     public GameMessageHandler(String game, String messageName, Object data) {
         super(game, messageName, data);
     }
@@ -26,11 +26,11 @@ public abstract class GameMessageHandler<T extends GameInstance> extends GameMes
     public abstract boolean canDispatch(T game, Player player);
 
     /**
-     * Game message to be sent to all the clients <br>
+     * GameInfo message to be sent to all the clients <br>
      * Does not actually sent, just prepares the message
      * @param game Instance of game
      * @param player Player that sent message
-     * @return Game message to be sent out
+     * @return GameInfo message to be sent out
      */
     public abstract GameMessage dispatch(T game, Player player);
 }

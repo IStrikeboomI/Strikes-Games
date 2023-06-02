@@ -2,8 +2,8 @@ package Strikeboom.StrikesGames;
 
 import Strikeboom.StrikesGames.entity.Lobby;
 import Strikeboom.StrikesGames.entity.User;
+import Strikeboom.StrikesGames.game.GameInfo;
 import Strikeboom.StrikesGames.game.Game;
-import Strikeboom.StrikesGames.game.GameInstance;
 import Strikeboom.StrikesGames.game.TurnBasedGame;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
@@ -38,12 +38,12 @@ class StrikesGamesApplicationTests {
 	}
 	@Test
 	void createGameInstanceTest() throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-		String game = Game.TIC_TAC_TOE.getName();
+		String game = GameInfo.TIC_TAC_TOE.getName();
 		Lobby lobby = new Lobby(10000,"test lobby",game,false,2,Instant.now(),"lolloll",List.of(),true,List.of());
 		User user1 = new User(UUID.randomUUID(),UUID.randomUUID(),"User 1",lobby,true,List.of());
 		User user2 = new User(UUID.randomUUID(),UUID.randomUUID(),"User 2",lobby,false,List.of());
 		lobby.setUsers(List.of(user1,user2));
-		TurnBasedGame instance = (TurnBasedGame) GameInstance.newInstance(lobby);
+		TurnBasedGame instance = (TurnBasedGame) Game.newInstance(lobby);
 		for (int i = 0;i < 100;i++) {
 			System.out.println(instance.getPlayerOnTurn());
 			instance.cycleTurn();

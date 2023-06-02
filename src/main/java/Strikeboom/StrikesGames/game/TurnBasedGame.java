@@ -6,10 +6,10 @@ import Strikeboom.StrikesGames.websocket.message.game.GameMessage;
 import lombok.Getter;
 
 @Getter
-public abstract class TurnBasedGame extends GameInstance{
+public abstract class TurnBasedGame extends Game {
     private Player playerOnTurn;
-    public TurnBasedGame(Game game, Lobby lobby) {
-        super(game, lobby);
+    public TurnBasedGame(Lobby lobby) {
+        super(lobby);
         playerOnTurn = getPlayers().get(0);
     }
     /**
