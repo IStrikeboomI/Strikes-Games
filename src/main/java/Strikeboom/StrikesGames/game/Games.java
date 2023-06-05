@@ -11,17 +11,17 @@ public class Games {
     public static final List<GameInfo> GAMES = new ArrayList<>();
 
     public static final GameInfo SETH_HEAD = addToList(GameInfo.builder()
-                                                .gameInstanceClass(SethHead.class)
-                                                .name("Seth-Head")
-                                                .minPlayers(2)
-                                                .maxPlayers(4)
+            .gameInstanceClass(SethHead.class)
+            .name("Seth-Head")
+            .minPlayers(2)
+            .maxPlayers(4)
             .messages(List.of())
             .build());
     public static final GameInfo TIC_TAC_TOE = addToList(GameInfo.builder()
-                                                .gameInstanceClass(TicTacToe.class)
-                                                .name("Tic-Tac-Toe")
-                                                .minPlayers(2)
-                                                .maxPlayers(2)
+             .gameInstanceClass(TicTacToe.class)
+             .name("Tic-Tac-Toe")
+             .minPlayers(2)
+             .maxPlayers(2)
             .messages(List.of(MakeMoveMessage.class))
             .build());
 

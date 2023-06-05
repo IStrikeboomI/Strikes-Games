@@ -106,5 +106,8 @@ function userSentMessage(message) {
     addChatMessage(message.chatMessage);
 }
 function gameStarted(message) {
-    alert("game started!")
+    document.body.innerHTML = "";
+    let script = document.createElement("script");
+    script.src = "/js/game/" + lobby.game.toLowerCase() + ".js";
+    document.body.appendChild(script);
 }
