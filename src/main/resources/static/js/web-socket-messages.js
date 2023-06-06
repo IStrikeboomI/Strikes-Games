@@ -120,4 +120,10 @@ function gameStarted(message) {
     for (let e of scripts) {
         document.body.appendChild(e);
     }
+
+    let css = document.createElement("link");
+    css.rel = "stylesheet";
+    css.href = "/css/game/" + lobby.game.toLowerCase() + ".css";
+
+    document.head.appendChild(css);
 }

@@ -1,1 +1,0 @@
-alert("tic tac toe");
