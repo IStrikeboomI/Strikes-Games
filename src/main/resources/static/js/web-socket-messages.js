@@ -106,8 +106,18 @@ function userSentMessage(message) {
     addChatMessage(message.chatMessage);
 }
 function gameStarted(message) {
+    let chatBox = document.getElementById("chatbox");
+    let scripts = [];
+    for (let e of document.getElementsByTagName("script")) {
+        scripts.push(e);
+    }
     document.body.innerHTML = "";
+    document.body.appendChild(chatBox);
+
     let script = document.createElement("script");
     script.src = "/js/game/" + lobby.game.toLowerCase() + ".js";
     document.body.appendChild(script);
+    for (let e of scripts) {
+        document.body.appendChild(e);
+    }
 }
