@@ -8,6 +8,8 @@ const handlers = [
 {"name": "gameStarted","handler":gameStarted}
 ]
 function userJoined(message) {
+    lobby.users.push(message.user);
+
     let div = document.createElement("div");
     div.className = "user";
     div.setAttribute("separationId",message.user.separationId);
@@ -38,6 +40,7 @@ function userJoined(message) {
 }
 function userChangedName(message) {
     let userId = message.separationId;
+    lobby.users.find(u => u.separationId === message.separationId).name = message.name;
     let oldUserName;
     for (let user of document.querySelectorAll('[separationId]')) {
         if (user.getAttribute("separationId") === userId) {
@@ -53,6 +56,7 @@ function userChangedName(message) {
 }
 function userKicked(message) {
     let userId = message.user.separationId;
+    lobby.users = lobby.users.filter(u => u.separationId !== userId);
     if (userId === user.separationId) {
         window.location.replace(window.location.origin+"/kicked.html");
     } else {
@@ -103,9 +107,11 @@ function userReconnected(message) {
         addLobbyMessage(`User ${message.user.name} Reconnected`,"#75FC0F");
 }
 function userSentMessage(message) {
+    lobby.messages.push(message.chatMessage);
     addChatMessage(message.chatMessage);
 }
 function gameStarted(message) {
+    lobby.gameStarted = true;
     let chatBox = document.getElementById("chatbox");
     let scripts = [];
     for (let e of document.getElementsByTagName("script")) {
