@@ -135,11 +135,15 @@ function handleWebSocketMessage(message) {
      handlers.find(h => h.name === message.messageName).handler(message);
  }
 function changeUsername(name) {
-    if (name && name !== "" && name !== "Anonymous") {
-        if (name.length < 50) {
-           stompClient.send("/lobby/change-name", {}, name);
-        } else {
-            alert("Name too long! Max is 50 characters");
+    //don't send message to change name if it's blank
+    if (name && name !== "") {
+        //don't send message to change name if name is the same
+        if (name !== user.name) {
+            if (name.length < 50) {
+               stompClient.send("/lobby/change-name", {}, name);
+            } else {
+                alert("Name too long! Max is 50 characters");
+            }
         }
     } else {
         alert("Name cannot be empty!");
