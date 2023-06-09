@@ -29,7 +29,7 @@ function addLobbyMessage(text, color) {
 //called when adding a message to the chat box
 function addChatMessage(message) {
     let text = message.text;
-    let user = message.user;
+    let user = lobby.users.filter(u => u.separationId === message.separationId)[0];
     let created = message.created;
 
     let messagesDiv = document.getElementById("messages");

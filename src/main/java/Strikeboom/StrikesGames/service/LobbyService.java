@@ -169,7 +169,7 @@ public class LobbyService {
             User userGettingKicked = lobby.getUsers().stream().filter(user1 -> user1.getSeparationId().equals(playerGettingKickedId)).findFirst()
                     .orElseThrow(() -> new UserNotFoundException(String.format("User with Id:%s Is In Different lobby!",playerGettingKickedId.toString())));
             userService.deleteUser(userGettingKicked);
-            sendWebsocketMessage(lobby.getJoinCode(),new UserKickedMessage(UserService.mapToDto(userGettingKicked)));
+            sendWebsocketMessage(lobby.getJoinCode(),new UserKickedMessage(userGettingKicked.getSeparationId()));
         } else {
             throw new UserInsufficientPermissions("Only Lobby Creators Can Kick Users!");
         }

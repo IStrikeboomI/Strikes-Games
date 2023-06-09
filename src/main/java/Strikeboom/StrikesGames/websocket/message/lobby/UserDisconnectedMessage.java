@@ -1,13 +1,14 @@
 package Strikeboom.StrikesGames.websocket.message.lobby;
 
-import Strikeboom.StrikesGames.dto.UserDto;
 import lombok.Data;
+
+import java.util.UUID;
 
 @Data
 public class UserDisconnectedMessage extends LobbyMessage{
-    UserDto user;
-    public UserDisconnectedMessage(UserDto user) {
+    UUID separationId;
+    public UserDisconnectedMessage(UUID separationId) {
         super("userDisconnected");
-        this.user = user;
+        this.separationId = separationId;
     }
 }

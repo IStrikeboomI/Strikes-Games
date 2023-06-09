@@ -17,7 +17,7 @@ public class ChatService {
     public static ChatMessageDto mapToDto(ChatMessage chatMessage) {
         return ChatMessageDto.builder()
                 .text(chatMessage.getText())
-                .user(UserService.mapToDto(chatMessage.getUser()))
+                .separationId(chatMessage.getUser().getSeparationId())
                 .created(chatMessage.getCreated())
                 .build();
     }

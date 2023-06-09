@@ -1,14 +1,15 @@
 package Strikeboom.StrikesGames.websocket.message.lobby;
 
-import Strikeboom.StrikesGames.dto.UserDto;
 import lombok.Data;
+
+import java.util.UUID;
 
 @Data
 public class UserPromotedToCreator extends LobbyMessage {
-    UserDto user;
+    UUID separationId;
 
-    public UserPromotedToCreator(UserDto user) {
+    public UserPromotedToCreator(UUID separationId) {
         super("userPromotedToCreator");
-        this.user = user;
+        this.separationId = separationId;
     }
 }

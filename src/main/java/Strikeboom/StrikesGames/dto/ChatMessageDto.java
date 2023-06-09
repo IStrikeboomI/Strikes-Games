@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -15,6 +16,6 @@ import java.time.Instant;
 @Validated
 public class ChatMessageDto {
     String text;
-    UserDto user;
+    UUID separationId;
     Instant created;
 }

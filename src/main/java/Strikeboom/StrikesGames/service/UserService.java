@@ -64,7 +64,7 @@ public class UserService {
             if (user.isCreator()) {
                 User newCreator = lobby.getUsers().get(0);
                 newCreator.setCreator(true);
-                sendWebsocketMessage(lobby.getJoinCode(),new UserPromotedToCreator(mapToDto(newCreator)));
+                sendWebsocketMessage(lobby.getJoinCode(),new UserPromotedToCreator(newCreator.getSeparationId()));
             }
         } else {
             lobbyRepository.delete(lobby);
@@ -86,11 +86,11 @@ public class UserService {
                 public void run() {
                     User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
                     deleteUser(user);
-                    sendWebsocketMessage(user.getLobby().getJoinCode(),new UserKickedMessage(UserService.mapToDto(user)));
+                    sendWebsocketMessage(user.getLobby().getJoinCode(),new UserKickedMessage(user.getSeparationId()));
                 }
             },1000 * 60);
             userDisconnectTimers.put(userId,timer);
-            sendWebsocketMessage(user.getLobby().getJoinCode(),new UserDisconnectedMessage(UserService.mapToDto(user)));
+            sendWebsocketMessage(user.getLobby().getJoinCode(),new UserDisconnectedMessage(user.getSeparationId()));
         });
     }
     /**
@@ -100,6 +100,6 @@ public class UserService {
     public void userReconnected(User user) {
         userDisconnectTimers.getOrDefault(user.getId(),new Timer()).cancel();
         userDisconnectTimers.remove(user.getId());
-        sendWebsocketMessage(user.getLobby().getJoinCode(),new UserReconnectedMessage(UserService.mapToDto(user)));
+        sendWebsocketMessage(user.getLobby().getJoinCode(),new UserReconnectedMessage(user.getSeparationId()));
     }
 }

@@ -55,7 +55,8 @@ function userChangedName(message) {
     addLobbyMessage(`User ${oldUserName} Changed Name To ${message.name} `,"#1A1A1E80");
 }
 function userKicked(message) {
-    let userId = message.user.separationId;
+    let userId = message.separationId;
+    let name = lobby.users.filter(u => u.separationId === userId)[0].name;
     lobby.users = lobby.users.filter(u => u.separationId !== userId);
     if (userId === user.separationId) {
         window.location.replace(window.location.origin+"/kicked.html");
@@ -66,12 +67,12 @@ function userKicked(message) {
             }
         }
     }
-    addLobbyMessage(`User ${message.user.name} Kicked`,"#F72035");
+    addLobbyMessage(`User ${name} Kicked`,"#F72035");
 }
 function userDisconnected(message) {
     let element;
     for (let e of document.querySelectorAll('[separationId]')) {
-        if (e.getAttribute("separationId") === message.user.separationId) {
+        if (e.getAttribute("separationId") === message.separationId) {
             element = e;
         }
     }
@@ -85,12 +86,13 @@ function userDisconnected(message) {
     hoverText.style.padding = "5px";
     hoverText.innerHTML = " User has 60 seconds to reconnect";
 
-    addLobbyMessage(`User ${message.user.name} Disconnected`,"#F72035");
+    let name = lobby.users.filter(u => u.separationId === message.separationId)[0].name;
+    addLobbyMessage(`User ${name} Disconnected`,"#F72035");
 }
 function userReconnected(message) {
     let element;
         for (let e of document.querySelectorAll('[separationId]')) {
-            if (e.getAttribute("separationId") === message.user.separationId) {
+            if (e.getAttribute("separationId") === message.separationId) {
                 element = e;
             }
         }
@@ -104,7 +106,8 @@ function userReconnected(message) {
         hoverText.style.padding = "5px";
         hoverText.innerHTML = "";
 
-        addLobbyMessage(`User ${message.user.name} Reconnected`,"#75FC0F");
+        let name = lobby.users.filter(u => u.separationId === message.separationId)[0].name;
+        addLobbyMessage(`User ${name} Reconnected`,"#75FC0F");
 }
 function userSentMessage(message) {
     lobby.messages.push(message.chatMessage);
