@@ -32,10 +32,10 @@ public abstract class Game {
     public GameMessageHandler<?> getMessageHandler(GameMessage message) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return getGameInfo().messages().stream().filter(aClass -> {
             try {
-                return aClass.getDeclaredField("messageName").get("").equals(message.getMessageName());
+                return aClass.getDeclaredField("messageName").get("").equals(message.getGameMessageName());
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
-        }).findFirst().orElseThrow(() -> new MessageNotFoundException(String.format("Message %s not found!",message.getMessageName()))).getConstructor(Object.class).newInstance(message.getData());
+        }).findFirst().orElseThrow(() -> new MessageNotFoundException(String.format("Message %s not found!",message.getGameMessageName()))).getConstructor(Object.class).newInstance(message.getData());
     }
 }

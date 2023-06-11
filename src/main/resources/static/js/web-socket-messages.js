@@ -1,4 +1,5 @@
 const handlers = [
+{"name": "gameMessage","handler":gameMessage},
 {"name": "userJoined","handler":userJoined},
 {"name": "userChangedName","handler":userChangedName},
 {"name": "userKicked","handler":userKicked},
@@ -7,6 +8,13 @@ const handlers = [
 {"name": "userSentMessage","handler":userSentMessage},
 {"name": "gameStarted","handler":gameStarted}
 ]
+function gameMessage(message) {
+    if (lobby.gameStarted) {
+        if (lobby.game === message.game) {
+            gameMessageHandlers.find(h => h.name === message.gameMessageName).handler(message);
+        }
+    }
+}
 function userJoined(message) {
     lobby.users.push(message.user);
 
@@ -126,6 +134,11 @@ function gameStarted(message) {
     let script = document.createElement("script");
     script.src = "/js/game/" + lobby.game.toLowerCase() + ".js";
     document.body.appendChild(script);
+
+    let messagesScript = document.createElement("script");
+    messagesScript.src = "/js/game/" + lobby.game.toLowerCase() + "-messages.js";
+    document.body.appendChild(messagesScript);
+
     for (let e of scripts) {
         document.body.appendChild(e);
     }
