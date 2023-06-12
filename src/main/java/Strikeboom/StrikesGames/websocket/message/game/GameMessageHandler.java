@@ -3,8 +3,10 @@ package Strikeboom.StrikesGames.websocket.message.game;
 import Strikeboom.StrikesGames.entity.User;
 import Strikeboom.StrikesGames.game.Game;
 
+import java.util.Map;
+
 public abstract class GameMessageHandler<T extends Game> extends GameMessage{
-    public GameMessageHandler(String game, String messageName, Object data) {
+    public GameMessageHandler(String game, String messageName, Map<String,Object> data) {
         super(game, messageName, data);
     }
     /**

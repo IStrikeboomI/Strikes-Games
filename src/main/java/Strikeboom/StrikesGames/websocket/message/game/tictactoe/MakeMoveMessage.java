@@ -6,8 +6,10 @@ import Strikeboom.StrikesGames.game.games.TicTacToe;
 import Strikeboom.StrikesGames.websocket.message.game.GameMessage;
 import Strikeboom.StrikesGames.websocket.message.game.GameMessageHandler;
 
+import java.util.Map;
+
 public class MakeMoveMessage extends GameMessageHandler<TicTacToe> {
-    public MakeMoveMessage(Object data) {
+    public MakeMoveMessage(Map<String,Object> data) {
         super(Games.TIC_TAC_TOE.name(), "makeMove", data);
     }
 
