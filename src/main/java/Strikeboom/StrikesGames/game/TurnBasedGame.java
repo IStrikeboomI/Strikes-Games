@@ -3,12 +3,13 @@ package Strikeboom.StrikesGames.game;
 import Strikeboom.StrikesGames.entity.Lobby;
 import Strikeboom.StrikesGames.entity.User;
 import lombok.Getter;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 @Getter
 public abstract class TurnBasedGame extends Game {
-    private User playerOnTurn;
-    public TurnBasedGame(Lobby lobby) {
-        super(lobby);
+    public User playerOnTurn;
+    public TurnBasedGame(Lobby lobby, SimpMessagingTemplate template) {
+        super(lobby,template);
         playerOnTurn = lobby.getUsers().get(0);
     }
     /**

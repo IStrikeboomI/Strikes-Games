@@ -5,6 +5,6 @@ const gameMessageHandlers = [
 function giveRoles(message) {
 
 }
-function giveRoles(makeMove) {
+function makeMove(makeMove) {
 
 }

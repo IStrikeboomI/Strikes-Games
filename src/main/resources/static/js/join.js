@@ -111,6 +111,13 @@ xhttp.onload = (event) => {
         for (let message of lobby.messages) {
             addChatMessage(message);
         }
+        let script = document.createElement("script");
+        script.src = "/js/game/" + lobby.game.toLowerCase() + ".js";
+        document.body.appendChild(script);
+
+        let messagesScript = document.createElement("script");
+        messagesScript.src = "/js/game/" + lobby.game.toLowerCase() + "-messages.js";
+        document.body.appendChild(messagesScript);
         connectAndSend();
     } else {
         //alert("An error has occurred, more information in the console");

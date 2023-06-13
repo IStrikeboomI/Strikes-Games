@@ -201,13 +201,13 @@ public class LobbyService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         if (user.isCreator()) {
             Lobby lobby = user.getLobby();
-            if (!lobby.isGameStarted()) {
+            //if (!lobby.isGameStarted()) {
                 lobby.setGameStarted(true);
-                lobby.setGameInstance(Game.newInstance(lobby));
                 sendWebsocketMessage(lobby.getJoinCode(), new GameStartedMessage());
-            } else {
-                throw new GameAlreadyStartedException("Game already started!");
-            }
+                lobby.setGameInstance(Game.newInstance(lobby,simpMessagingTemplate));
+            //} else {
+            //    throw new GameAlreadyStartedException("Game already started!");
+            //}
         } else {
             throw new UserInsufficientPermissions("User must be the creator to start game!");
         }

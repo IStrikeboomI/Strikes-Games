@@ -131,14 +131,6 @@ function gameStarted(message) {
     document.body.innerHTML = "";
     document.body.appendChild(chatBox);
 
-    let script = document.createElement("script");
-    script.src = "/js/game/" + lobby.game.toLowerCase() + ".js";
-    document.body.appendChild(script);
-
-    let messagesScript = document.createElement("script");
-    messagesScript.src = "/js/game/" + lobby.game.toLowerCase() + "-messages.js";
-    document.body.appendChild(messagesScript);
-
     for (let e of scripts) {
         document.body.appendChild(e);
     }
@@ -146,6 +138,8 @@ function gameStarted(message) {
     let css = document.createElement("link");
     css.rel = "stylesheet";
     css.href = "/css/game/" + lobby.game.toLowerCase() + ".css";
+
+    init();
 
     document.head.appendChild(css);
 }

@@ -4,10 +4,11 @@ import Strikeboom.StrikesGames.entity.Lobby;
 import Strikeboom.StrikesGames.game.GameInfo;
 import Strikeboom.StrikesGames.game.Games;
 import Strikeboom.StrikesGames.game.TurnBasedGame;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 public class SethHead extends TurnBasedGame {
-    public SethHead(Lobby lobby) {
-        super(lobby);
+    public SethHead(Lobby lobby, SimpMessagingTemplate template) {
+        super(lobby,template);
     }
 
     @Override

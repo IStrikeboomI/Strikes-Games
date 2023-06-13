@@ -6,17 +6,19 @@ import Strikeboom.StrikesGames.game.GameInfo;
 import Strikeboom.StrikesGames.game.Games;
 import Strikeboom.StrikesGames.game.TurnBasedGame;
 import Strikeboom.StrikesGames.websocket.message.game.tictactoe.GiveRolesMessage;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.Random;
 
 public class TicTacToe extends TurnBasedGame {
     User playerWithX;
     User playerWithO;
-    public TicTacToe(Lobby lobby) {
-        super(lobby);
+    public TicTacToe(Lobby lobby, SimpMessagingTemplate template) {
+        super(lobby,template);
         int randomUser = new Random().nextInt(2);
         playerWithX = lobby.getUsers().get(randomUser);
-        playerWithO = lobby.getUsers().get(lobby.getUsers().size() - randomUser);
+        playerOnTurn = playerWithX;
+        playerWithO = lobby.getUsers().get(lobby.getUsers().size() - 1 - randomUser);
         sendMessageToUsers(new GiveRolesMessage(playerWithX.getSeparationId(),"X"),playerWithX);
         sendMessageToUsers(new GiveRolesMessage(playerWithO.getSeparationId(),"O"),playerWithO);
     }
