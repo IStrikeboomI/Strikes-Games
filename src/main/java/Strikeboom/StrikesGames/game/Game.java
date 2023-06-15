@@ -8,8 +8,6 @@ import Strikeboom.StrikesGames.websocket.message.game.GameMessage;
 import Strikeboom.StrikesGames.websocket.message.game.GameMessageHandler;
 import Strikeboom.StrikesGames.websocket.message.lobby.LobbyMessage;
 import lombok.Getter;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.lang.reflect.InvocationTargetException;
@@ -47,10 +45,7 @@ public abstract class Game {
     }
     public void sendMessageToUsers(LobbyMessage message, User... users) {
         for (User u : users) {
-            SimpMessageHeaderAccessor s = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
-            s.setSessionId(u.getId().toString());
-            s.setLeaveMutable(true);
-            simpMessagingTemplate.convertAndSend(String.format("/broker/%s", lobby.getJoinCode()), message, s.getMessageHeaders());
+            simpMessagingTemplate.convertAndSendToUser(u.getId().toString(),String.format("/broker/%s", lobby.getJoinCode()), message);
         }
     }
     public void sendMessageToAll(LobbyMessage message) {

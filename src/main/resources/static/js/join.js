@@ -133,7 +133,7 @@ function connectAndSend() {
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function(frame) {
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/broker/'+ location.pathname.substr(location.pathname.indexOf("/join/")+6), function(message) {
+        stompClient.subscribe('/user/broker/'+ location.pathname.substr(location.pathname.indexOf("/join/")+6), function(message) {
             handleWebSocketMessage(JSON.parse(message.body));
         });
     });
