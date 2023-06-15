@@ -12,13 +12,13 @@ function init() {
     let user1Element = document.createElement("p");
     user1Element.className = "user";
     user1Element.innerHTML = user1.name;
-    user1Element.setAttribute("separationId",user.separationId);
+    user1Element.setAttribute("separationId",user1.separationId);
     users.appendChild(user1Element);
 
     let user2Element = document.createElement("p");
     user2Element.className = "user";
     user2Element.innerHTML = user2.name;
-    user2Element.setAttribute("separationId",user.separationId);
+    user2Element.setAttribute("separationId",user2.separationId);
     users.appendChild(user2Element);
 
     document.body.appendChild(users);
