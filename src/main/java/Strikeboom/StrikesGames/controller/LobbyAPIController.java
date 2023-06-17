@@ -12,11 +12,9 @@ import Strikeboom.StrikesGames.websocket.message.lobby.UserJoinedMessage;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,9 +29,6 @@ import java.util.UUID;
 @RequestMapping("/api/lobby/")
 @AllArgsConstructor
 public class LobbyAPIController {
-    @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
-
     private final LobbyService lobbyService;
     private final UserService userService;
 
@@ -65,7 +60,7 @@ public class LobbyAPIController {
             lobbyService.joinLobby(lobby, user);
         }
         if (userJoined) {
-            simpMessagingTemplate.convertAndSend("/broker/" + lobby.getJoinCode(),new UserJoinedMessage(UserService.mapToDto(user)));
+            lobbyService.sendWebsocketMessage(lobby,new UserJoinedMessage(UserService.mapToDto(user)));
             Cookie cookie = new Cookie("userId",user.getId().toString());
             cookie.setHttpOnly(true);
             cookie.setPath("/");

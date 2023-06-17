@@ -49,6 +49,6 @@ public abstract class Game {
         }
     }
     public void sendMessageToAll(LobbyMessage message) {
-        simpMessagingTemplate.convertAndSend(String.format("/broker/%s",lobby.getJoinCode()),message);
+        sendMessageToUsers(message,lobby.getUsers().toArray(new User[0]));
     }
 }
