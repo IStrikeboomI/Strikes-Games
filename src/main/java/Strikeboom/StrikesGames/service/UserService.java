@@ -39,13 +39,15 @@ public class UserService {
     }
 
     /**
-     * Helper method to write less code
+     * Helper method to write less code <br>
      * Sends a websocket message to everyone in the lobby
-     * @param joinCode join code of the lobby
+     * @param lobby lobby to send message in
      * @param message lobby message to send based off the abstract class {@link LobbyMessage}
      */
-    public void sendWebsocketMessage(String joinCode, LobbyMessage message) {
-        simpMessagingTemplate.convertAndSend(String.format("/broker/%s",joinCode),message);
+    public void sendWebsocketMessage(Lobby lobby, LobbyMessage message) {
+        for (User u : lobby.getUsers()) {
+            simpMessagingTemplate.convertAndSendToUser(u.getId().toString(),String.format("/broker/%s", lobby.getJoinCode()), message);
+        }
     }
     /**
      * Method that deletes a user from a lobby and the users messages
@@ -64,7 +66,7 @@ public class UserService {
             if (user.isCreator()) {
                 User newCreator = lobby.getUsers().get(0);
                 newCreator.setCreator(true);
-                sendWebsocketMessage(lobby.getJoinCode(),new UserPromotedToCreator(newCreator.getSeparationId()));
+                sendWebsocketMessage(lobby,new UserPromotedToCreator(newCreator.getSeparationId()));
             }
         } else {
             lobbyRepository.delete(lobby);
@@ -86,11 +88,11 @@ public class UserService {
                 public void run() {
                     User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
                     deleteUser(user);
-                    sendWebsocketMessage(user.getLobby().getJoinCode(),new UserKickedMessage(user.getSeparationId()));
+                    sendWebsocketMessage(user.getLobby(),new UserKickedMessage(user.getSeparationId()));
                 }
             },1000 * 60);
             userDisconnectTimers.put(userId,timer);
-            sendWebsocketMessage(user.getLobby().getJoinCode(),new UserDisconnectedMessage(user.getSeparationId()));
+            sendWebsocketMessage(user.getLobby(),new UserDisconnectedMessage(user.getSeparationId()));
         });
     }
     /**
@@ -100,6 +102,6 @@ public class UserService {
     public void userReconnected(User user) {
         userDisconnectTimers.getOrDefault(user.getId(),new Timer()).cancel();
         userDisconnectTimers.remove(user.getId());
-        sendWebsocketMessage(user.getLobby().getJoinCode(),new UserReconnectedMessage(user.getSeparationId()));
+        sendWebsocketMessage(user.getLobby(),new UserReconnectedMessage(user.getSeparationId()));
     }
 }

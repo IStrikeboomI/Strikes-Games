@@ -119,7 +119,7 @@ public class LobbyService {
     }
 
     /**
-     * Removes (not deletes) user from lobby
+     * Removes (not deletes) user from lobby <br>
      * Separate from the delete user method in UserService because that one deletes it from the repository
      * @param user user to remove
      */
@@ -129,13 +129,15 @@ public class LobbyService {
     }
 
     /**
-     * Helper method to write less code
+     * Helper method to write less code <br>
      * Sends a websocket message to everyone in the lobby
-     * @param joinCode join code of the lobby
+     * @param lobby lobby to send message in
      * @param message lobby message to send based off the abstract class {@link LobbyMessage}
      */
-    public void sendWebsocketMessage(String joinCode, LobbyMessage message) {
-        simpMessagingTemplate.convertAndSend(String.format("/broker/%s",joinCode),message);
+    public void sendWebsocketMessage(Lobby lobby, LobbyMessage message) {
+        for (User u : lobby.getUsers()) {
+            simpMessagingTemplate.convertAndSendToUser(u.getId().toString(),String.format("/broker/%s", lobby.getJoinCode()), message);
+        }
     }
     //check every hour for the expired lobbies (lobbies created 7 days ago) and delete
     @Scheduled(fixedRate = 1000*60*60)
@@ -154,7 +156,7 @@ public class LobbyService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         Lobby lobby = user.getLobby();
         user.setName(name);
-        sendWebsocketMessage(lobby.getJoinCode(),new UserChangedNameMessage(user.getSeparationId(), name));
+        sendWebsocketMessage(lobby,new UserChangedNameMessage(user.getSeparationId(), name));
     }
 
     /**
@@ -169,7 +171,7 @@ public class LobbyService {
             User userGettingKicked = lobby.getUsers().stream().filter(user1 -> user1.getSeparationId().equals(playerGettingKickedId)).findFirst()
                     .orElseThrow(() -> new UserNotFoundException(String.format("User with Id:%s Is In Different lobby!",playerGettingKickedId.toString())));
             userService.deleteUser(userGettingKicked);
-            sendWebsocketMessage(lobby.getJoinCode(),new UserKickedMessage(userGettingKicked.getSeparationId()));
+            sendWebsocketMessage(lobby,new UserKickedMessage(userGettingKicked.getSeparationId()));
         } else {
             throw new UserInsufficientPermissions("Only Lobby Creators Can Kick Users!");
         }
@@ -190,7 +192,7 @@ public class LobbyService {
                 .text(message)
                 .build();
         chatService.addMessage(chatMessage);
-        sendWebsocketMessage(lobby.getJoinCode(),new UserSentMessageMessage(ChatService.mapToDto(chatMessage)));
+        sendWebsocketMessage(lobby,new UserSentMessageMessage(ChatService.mapToDto(chatMessage)));
     }
 
     /**
@@ -203,7 +205,7 @@ public class LobbyService {
             Lobby lobby = user.getLobby();
             //if (!lobby.isGameStarted()) {
                 lobby.setGameStarted(true);
-                sendWebsocketMessage(lobby.getJoinCode(), new GameStartedMessage());
+                sendWebsocketMessage(lobby, new GameStartedMessage());
                 lobby.setGameInstance(Game.newInstance(lobby,simpMessagingTemplate));
             //} else {
             //    throw new GameAlreadyStartedException("Game already started!");
@@ -220,7 +222,7 @@ public class LobbyService {
         GameMessageHandler<Game> handler = (GameMessageHandler<Game>) gameInstance.getMessageHandler(message);
         if (handler.handle(gameInstance,user)) {
             if (handler.canDispatch(gameInstance,user)) {
-                simpMessagingTemplate.convertAndSend(String.format("/broker/%s",lobby.getJoinCode()),handler.dispatch(gameInstance,user));
+                sendWebsocketMessage(lobby,handler.dispatch(gameInstance,user));
             }
         }
     }
