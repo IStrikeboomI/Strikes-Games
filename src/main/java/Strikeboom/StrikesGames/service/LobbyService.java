@@ -17,6 +17,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.HtmlUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
@@ -85,7 +86,7 @@ public class LobbyService {
                 .game(lobby.getGame())
                 .isPrivate(lobby.isPrivate())
                 .maxPlayers(lobby.getMaxPlayers())
-                .name(lobby.getName())
+                .name(HtmlUtils.htmlEscape(lobby.getName()))
                 .joinCode(generateValidJoinCode())
                 .users(new ArrayList<>())
                 .messages(new ArrayList<>())
@@ -155,8 +156,8 @@ public class LobbyService {
     public void changeName(String name, UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         Lobby lobby = user.getLobby();
-        user.setName(name);
-        sendWebsocketMessage(lobby,new UserChangedNameMessage(user.getSeparationId(), name));
+        user.setName(HtmlUtils.htmlEscape(name));
+        sendWebsocketMessage(lobby,new UserChangedNameMessage(user.getSeparationId(), user.getName()));
     }
 
     /**
@@ -189,7 +190,7 @@ public class LobbyService {
                 .created(Instant.now())
                 .lobby(lobby)
                 .user(user)
-                .text(message)
+                .text(HtmlUtils.htmlEscape(message))
                 .build();
         chatService.addMessage(chatMessage);
         sendWebsocketMessage(lobby,new UserSentMessageMessage(ChatService.mapToDto(chatMessage)));
