@@ -8,6 +8,11 @@
     width:25%;
     margin-top:25px;
     position: absolute;
+    left:.5%;
+    transition: left ease .5s;
+}
+.chatbox_hidden {
+    left:-50% !important;
 }
 #send-message {
     border-top: 1px solid gray;
