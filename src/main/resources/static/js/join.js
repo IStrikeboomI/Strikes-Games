@@ -4,7 +4,7 @@ document.getElementById("username").addEventListener("blur", (e) => changeUserna
 document.getElementById("copy-url").addEventListener("click", (e) => copyUrl());
 document.getElementById("message-input").addEventListener("keydown", (e) => checkForEnter(e));
 document.getElementById("send-message-button").addEventListener("click", (e) => sendMessage());
-document.getElementById("hide-chatbox-button").addEventListener("click", (e) => hideChatbox());
+document.getElementById("hide-chatbox-button").addEventListener("click", (e) => hideChatbox(e));
 
 document.getElementById("invite-link").value = location.href;
 function copyUrl() {
@@ -58,12 +58,15 @@ function addChatMessage(message) {
 
     messagesDiv.scrollTop = messagesDiv.scrollTopMax;
 }
-function hideChatbox() {
+function hideChatbox(e) {
     let chatbox = document.getElementById("chatbox");
+    let button = e.currentTarget;
     if (chatbox.className === "") {
         chatbox.className = "chatbox_hidden";
+        button.innerHTML = ">>";
     } else {
         chatbox.className = "";
+        button.innerHTML = "<<";
     }
 }
 

@@ -12,7 +12,12 @@
     transition: left ease .5s;
 }
 .chatbox_hidden {
-    left:-50% !important;
+    left:-25% !important;
+}
+#hide-chatbox-button {
+    position: absolute;
+    left: 101%;
+    top:5%;
 }
 #send-message {
     border-top: 1px solid gray;
