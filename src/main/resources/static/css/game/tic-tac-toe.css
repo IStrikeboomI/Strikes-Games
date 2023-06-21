@@ -1,3 +1,20 @@
 #chatbox {
     bottom: 50px;
 }
+#users {
+    position: absolute;
+}
+#player-on-turn {
+    font-size: 40px;
+    position: absolute;
+    left: 10%;
+    top: 10%;
+}
+.user {
+    padding: 10px;
+}
+img.role {
+    height: 50px;
+    width: 50px;
+    float: left;
+}
