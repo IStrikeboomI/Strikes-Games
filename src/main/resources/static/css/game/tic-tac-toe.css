@@ -3,11 +3,12 @@
 }
 #users {
     position: absolute;
+    top: 20%;
 }
 #player-on-turn {
     font-size: 40px;
     position: absolute;
-    left: 10%;
+    left: 5%;
     top: 10%;
 }
 .user {
@@ -17,4 +18,9 @@ img.role {
     height: 50px;
     width: 50px;
     float: left;
+}
+canvas {
+
+    position: absolute;
+    left: 30%;
 }

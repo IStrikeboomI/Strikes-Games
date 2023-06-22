@@ -84,15 +84,19 @@ function userDisconnected(message) {
             element = e;
         }
     }
-    element.style.color = "gray";
-    element.style.textDecoration = "line-through";
-    let hoverText = element.getElementsByClassName("hoverText")[0];
-    hoverText.style.color = "gray";
-    hoverText.style.userSelect = "none";
-    hoverText.style.textDecoration = "none";
-    hoverText.style.display = "inline-block";
-    hoverText.style.padding = "5px";
-    hoverText.innerHTML = " User has 60 seconds to reconnect";
+    if (element) {
+        element.style.color = "gray";
+        element.style.textDecoration = "line-through";
+        let hoverText = element.getElementsByClassName("hoverText")[0];
+        if (hoverText) {
+            hoverText.style.color = "gray";
+            hoverText.style.userSelect = "none";
+            hoverText.style.textDecoration = "none";
+            hoverText.style.display = "inline-block";
+            hoverText.style.padding = "5px";
+            hoverText.innerHTML = " User has 60 seconds to reconnect";
+        }
+    }
 
     let name = lobby.users.filter(u => u.separationId === message.separationId)[0].name;
     addLobbyMessage(`User ${name} Disconnected`,"#F72035");

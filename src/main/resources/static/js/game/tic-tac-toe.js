@@ -8,10 +8,6 @@ function init() {
     let user1 = lobby.users[0]
     let user2 = lobby.users[1]
 
-    let canvas = document.createElement("canvas");
-
-    document.body.appendChild(canvas);
-
     playerOnTurnElement = document.createElement("span");
     playerOnTurnElement.id = "player-on-turn";
     document.body.appendChild(playerOnTurnElement);
@@ -41,4 +37,22 @@ function init() {
     users.appendChild(user2Div);
 
     document.body.appendChild(users);
+
+    let canvas = document.createElement("canvas");
+
+    canvas.height = document.documentElement.clientHeight;
+    canvas.width = document.documentElement.clientWidth * (2/3);
+
+    const ctx = canvas.getContext("2d");
+    ctx.strokeStyle = "rgb(0, 0, 0)";
+    ctx.fillStyle = "rgba(53, 53, 53, .5)";
+    ctx.beginPath();
+    ctx.roundRect(200, 25, 25, 800, 20);
+    ctx.roundRect(600, 25, 25, 800, 20);
+    ctx.roundRect(25, 200, 800, 25, 20);
+    ctx.roundRect(25, 600, 800, 25, 20);
+    ctx.stroke();
+    ctx.fill();
+
+    document.body.appendChild(canvas);
 }

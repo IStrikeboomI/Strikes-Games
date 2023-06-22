@@ -5,7 +5,7 @@ const gameMessageHandlers = [
 function giveRoles(message) {
     if (message.role === "X") {
         playerWithX = user;
-        playerWithO = lobby.users.at(lobby.users.length - 1 - lobby.users.indexOf(user));
+        playerWithO = lobby.users[lobby.users.length - 1 - lobby.users.indexOf(user)]
         for (let u of document.querySelectorAll('[separationId]')) {
             if (u.getAttribute("separationId") === user.separationId) {
                 playerWithXElement = u;
@@ -14,7 +14,7 @@ function giveRoles(message) {
             }
         }
     } else {
-        playerWithX = lobby.users.at(lobby.users.length - 1 - lobby.users.indexOf(user));;
+        playerWithX = lobby.users[lobby.users.length - 1 - lobby.users.indexOf(user)];
         playerWithO = user;
         for (let u of document.querySelectorAll('[separationId]')) {
             if (u.getAttribute("separationId") === user.separationId) {
