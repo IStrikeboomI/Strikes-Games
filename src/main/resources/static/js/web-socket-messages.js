@@ -103,23 +103,27 @@ function userDisconnected(message) {
 }
 function userReconnected(message) {
     let element;
-        for (let e of document.querySelectorAll('[separationId]')) {
-            if (e.getAttribute("separationId") === message.separationId) {
-                element = e;
-            }
+    for (let e of document.querySelectorAll('[separationId]')) {
+        if (e.getAttribute("separationId") === message.separationId) {
+            element = e;
         }
+    }
+    if (element) {
         element.style.color = "";
         element.style.textDecoration = "";
         let hoverText = element.getElementsByClassName("hoverText")[0];
-        hoverText.style.color = "gray";
-        hoverText.style.userSelect = "none";
-        hoverText.style.textDecoration = "none";
-        hoverText.style.display = "inline-block";
-        hoverText.style.padding = "5px";
-        hoverText.innerHTML = "";
+        if (hoverText) {
+            hoverText.style.color = "gray";
+            hoverText.style.userSelect = "none";
+            hoverText.style.textDecoration = "none";
+            hoverText.style.display = "inline-block";
+            hoverText.style.padding = "5px";
+            hoverText.innerHTML = "";
+        }
+    }
 
-        let name = lobby.users.filter(u => u.separationId === message.separationId)[0].name;
-        addLobbyMessage(`User ${name} Reconnected`,"#75FC0F");
+    let name = lobby.users.filter(u => u.separationId === message.separationId)[0].name;
+    addLobbyMessage(`User ${name} Reconnected`,"#75FC0F");
 }
 function userSentMessage(message) {
     lobby.messages.push(message.chatMessage);
