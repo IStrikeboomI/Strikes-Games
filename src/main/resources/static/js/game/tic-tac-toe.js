@@ -89,7 +89,12 @@ function onCanvasClick(e) {
     } else if (e.layerY > canvasThirdHeight * 2) {
         gridY = 2;
     }
-    console.log(gridY + "x"+gridX);
+
+    let message = {
+        gridX: gridX,
+        gridY: gridY
+    };
+    stompClient.send("/lobby/game/tic-tac-toe/makeMove",{},JSON.stringify(message));
 }
 
 function onCanvasHover(e) {

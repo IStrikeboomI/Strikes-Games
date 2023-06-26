@@ -29,6 +29,6 @@ function giveRoles(message) {
 
     playerOnTurnElement.innerHTML = playerWithX.name + "'s Turn"
 }
-function makeMove(makeMove) {
+function makeMove(message) {
 
 }

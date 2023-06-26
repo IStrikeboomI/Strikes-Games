@@ -34,14 +34,14 @@ public abstract class Game {
      * @param message message
      * @return whether the message can be received
      */
-    public GameMessageHandler<?> getMessageHandler(GameMessage message) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public GameMessageHandler<?> getMessageHandler(String messageName,GameMessage message) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return getGameInfo().messages().stream().filter(aClass -> {
             try {
-                return aClass.getDeclaredField("messageName").get("").equals(message.getGameMessageName());
+                return aClass.getDeclaredField("messageName").get("").equals(messageName);
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
-        }).findFirst().orElseThrow(() -> new MessageNotFoundException(String.format("Message %s not found!",message.getGameMessageName()))).getConstructor(Object.class).newInstance(message.getData());
+        }).findFirst().orElseThrow(() -> new MessageNotFoundException(String.format("Message %s not found!",messageName))).getConstructor(Object.class).newInstance(message.getData());
     }
     public void sendMessageToUsers(LobbyMessage message, User... users) {
         for (User u : users) {

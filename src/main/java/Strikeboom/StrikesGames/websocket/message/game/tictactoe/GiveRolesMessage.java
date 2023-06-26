@@ -1,13 +1,12 @@
 package Strikeboom.StrikesGames.websocket.message.game.tictactoe;
 
-import Strikeboom.StrikesGames.game.Games;
-import Strikeboom.StrikesGames.websocket.message.game.GameMessage;
+import Strikeboom.StrikesGames.websocket.message.game.ClientBoundGameMessage;
 
 import java.util.Map;
 import java.util.UUID;
 
-public class GiveRolesMessage extends GameMessage {
+public class GiveRolesMessage extends ClientBoundGameMessage {
     public GiveRolesMessage(UUID separationId, String role) {
-        super(Games.TIC_TAC_TOE.name(), "giveRoles", Map.of("separationId",separationId,"role",role));
+        super("giveRoles", Map.of("separationId",separationId,"role",role));
     }
 }

@@ -216,14 +216,16 @@ public class LobbyService {
         }
     }
 
-    public void receiveGameMessage(UUID userId, GameMessage message) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public void receiveGameMessage(UUID userId, String game, String messageName, GameMessage message) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         Lobby lobby = user.getLobby();
         Game gameInstance = lobby.getGameInstance();
-        GameMessageHandler<Game> handler = (GameMessageHandler<Game>) gameInstance.getMessageHandler(message);
-        if (handler.handle(gameInstance,user)) {
-            if (handler.canDispatch(gameInstance,user)) {
-                sendWebsocketMessage(lobby,handler.dispatch(gameInstance,user));
+        if (gameInstance.getGameInfo().name().equals(game)) {
+            GameMessageHandler<Game> handler = (GameMessageHandler<Game>) gameInstance.getMessageHandler(messageName, message);
+            if (handler.handle(gameInstance, user)) {
+                if (handler.canDispatch(gameInstance, user)) {
+                    gameInstance.sendMessageToUsers(handler.dispatch(gameInstance,user),handler.dispatchTo(gameInstance).toArray(new User[0]));
+                }
             }
         }
     }

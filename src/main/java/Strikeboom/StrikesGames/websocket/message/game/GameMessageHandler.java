@@ -3,11 +3,14 @@ package Strikeboom.StrikesGames.websocket.message.game;
 import Strikeboom.StrikesGames.entity.User;
 import Strikeboom.StrikesGames.game.Game;
 
+import java.util.List;
 import java.util.Map;
 
 public abstract class GameMessageHandler<T extends Game> extends GameMessage{
-    public GameMessageHandler(String game, String messageName, Map<String,Object> data) {
-        super(game, messageName, data);
+    public final String messageName;
+    public GameMessageHandler(String messageName, Map<String,Object> data) {
+        super(data);
+        this.messageName = messageName;
     }
     /**
      * Handles the message received
@@ -34,5 +37,15 @@ public abstract class GameMessageHandler<T extends Game> extends GameMessage{
      * @param player Player that sent message
      * @return GameInfo message to be sent out
      */
-    public abstract GameMessage dispatch(T game, User player);
+    public abstract ClientBoundGameMessage dispatch(T game, User player);
+
+    /**
+     * Some messages only need to be sent to some people so a method to choose who to send to <br>
+     * Defaults to sending to everyone
+     * @param game Instance of game
+     * @return Players to dispatch message to
+     */
+    public List<User> dispatchTo(T game) {
+        return game.getLobby().getUsers();
+    }
 }

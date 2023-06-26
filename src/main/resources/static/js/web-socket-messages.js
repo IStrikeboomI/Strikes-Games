@@ -10,9 +10,7 @@ const handlers = [
 ]
 function gameMessage(message) {
     if (lobby.gameStarted) {
-        if (lobby.game === message.game) {
-            gameMessageHandlers.find(h => h.name === message.gameMessageName).handler(message.data);
-        }
+        gameMessageHandlers.find(h => h.name === message.gameMessageName).handler(message.data);
     }
 }
 function userJoined(message) {
