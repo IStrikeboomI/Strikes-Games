@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -37,8 +38,8 @@ public class LobbyWebSocketController {
     }
     //Used for receiving game messages from clients
     @MessageMapping("/game/{game}/{messageName}")
-    public void game(@PathVariable String game, @PathVariable String messageName, @RequestBody GameMessage message, SimpMessageHeaderAccessor headerAccessor) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        lobbyService.receiveGameMessage(getIdFromHeaders(headerAccessor),game,messageName,message);
+    public void game(@PathVariable String game, @PathVariable String messageName, @RequestBody Map<String,Object> message, SimpMessageHeaderAccessor headerAccessor) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        lobbyService.receiveGameMessage(getIdFromHeaders(headerAccessor),game,messageName,new GameMessage(message));
     }
     //Gets the UUID from the user that sent the message
     private static UUID getIdFromHeaders(SimpMessageHeaderAccessor headerAccessor) {
