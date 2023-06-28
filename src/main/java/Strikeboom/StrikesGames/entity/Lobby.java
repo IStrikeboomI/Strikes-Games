@@ -1,6 +1,5 @@
 package Strikeboom.StrikesGames.entity;
 
-import Strikeboom.StrikesGames.game.Game;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,6 +39,4 @@ public class Lobby {
     private boolean gameStarted;
     @OneToMany(orphanRemoval = true)
     private List<ChatMessage> messages;
-    @Transient
-    Game gameInstance;
 }

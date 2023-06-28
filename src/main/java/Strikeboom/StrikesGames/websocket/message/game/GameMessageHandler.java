@@ -8,10 +8,12 @@ import java.util.Map;
 
 public abstract class GameMessageHandler<T extends Game> extends GameMessage{
     public final String messageName;
-    public GameMessageHandler(String messageName, Map<String,Object> data) {
+
+    public GameMessageHandler(String messageName,Map<String, Object> data) {
         super(data);
         this.messageName = messageName;
     }
+
     /**
      * Handles the message received
      * @param game Instance of game

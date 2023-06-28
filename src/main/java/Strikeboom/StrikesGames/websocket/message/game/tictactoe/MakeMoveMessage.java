@@ -8,8 +8,8 @@ import Strikeboom.StrikesGames.websocket.message.game.GameMessageHandler;
 import java.util.Map;
 
 public class MakeMoveMessage extends GameMessageHandler<TicTacToe> {
-    public MakeMoveMessage(Map<String,Object> data) {
-        super("makeMove",data);
+    public MakeMoveMessage(String messageName, Map<String, Object> data) {
+        super(messageName, data);
     }
 
     @Override

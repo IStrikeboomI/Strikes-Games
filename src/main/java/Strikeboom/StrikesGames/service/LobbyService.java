@@ -4,7 +4,10 @@ import Strikeboom.StrikesGames.dto.LobbyDto;
 import Strikeboom.StrikesGames.entity.ChatMessage;
 import Strikeboom.StrikesGames.entity.Lobby;
 import Strikeboom.StrikesGames.entity.User;
-import Strikeboom.StrikesGames.exception.*;
+import Strikeboom.StrikesGames.exception.LobbyNotFoundException;
+import Strikeboom.StrikesGames.exception.UserInsufficientPermissions;
+import Strikeboom.StrikesGames.exception.UserNotFoundException;
+import Strikeboom.StrikesGames.exception.UserUnableToJoinException;
 import Strikeboom.StrikesGames.game.Game;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
@@ -22,10 +25,7 @@ import org.springframework.web.util.HtmlUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -195,7 +195,9 @@ public class LobbyService {
         chatService.addMessage(chatMessage);
         sendWebsocketMessage(lobby,new UserSentMessageMessage(ChatService.mapToDto(chatMessage)));
     }
-
+    //Map for storing game instances instead of saving to database
+    //Long is lobby id and Game is game's instance
+    private final Map<Long,Game> gameInstances;
     /**
      *  Starts off the game for the lobby, can only be sent by lobby creator
      * @param userId user that sent message
@@ -207,7 +209,7 @@ public class LobbyService {
             //if (!lobby.isGameStarted()) {
                 lobby.setGameStarted(true);
                 sendWebsocketMessage(lobby, new GameStartedMessage());
-                lobby.setGameInstance(Game.newInstance(lobby,simpMessagingTemplate));
+                gameInstances.put(lobby.getId(),Game.newInstance(lobby,simpMessagingTemplate));
             //} else {
             //    throw new GameAlreadyStartedException("Game already started!");
             //}
@@ -219,9 +221,10 @@ public class LobbyService {
     public void receiveGameMessage(UUID userId, String game, String messageName, GameMessage message) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         Lobby lobby = user.getLobby();
-        Game gameInstance = lobby.getGameInstance();
-        if (gameInstance.getGameInfo().name().equals(game)) {
+        Game gameInstance = gameInstances.get(lobby.getId());
+        if (gameInstance.getGameInfo().name().equalsIgnoreCase(game)) {
             GameMessageHandler<Game> handler = (GameMessageHandler<Game>) gameInstance.getMessageHandler(messageName, message);
+            System.out.println(handler);
             if (handler.handle(gameInstance, user)) {
                 if (handler.canDispatch(gameInstance, user)) {
                     gameInstance.sendMessageToUsers(handler.dispatch(gameInstance,user),handler.dispatchTo(gameInstance).toArray(new User[0]));

@@ -11,6 +11,8 @@ import lombok.Getter;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Map;
 
 @Getter
 public abstract class Game {
@@ -34,14 +36,13 @@ public abstract class Game {
      * @param message message
      * @return whether the message can be received
      */
-    public GameMessageHandler<?> getMessageHandler(String messageName,GameMessage message) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        return getGameInfo().messages().stream().filter(aClass -> {
-            try {
-                return aClass.getDeclaredField("messageName").get("").equals(messageName);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }).findFirst().orElseThrow(() -> new MessageNotFoundException(String.format("Message %s not found!",messageName))).getConstructor(Object.class).newInstance(message.getData());
+    public GameMessageHandler<?> getMessageHandler(String messageName,GameMessage message) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+        if (getGameInfo().messages().containsKey(messageName)) {
+            System.out.println(Arrays.toString(getGameInfo().messages().get(messageName).getConstructors()));
+            return getGameInfo().messages().get(messageName).getConstructor(String.class, Map.class).newInstance(messageName,message.getData());
+        } else {
+            throw new MessageNotFoundException(String.format("Message %s not found!",messageName));
+        }
     }
     public void sendMessageToUsers(LobbyMessage message, User... users) {
         for (User u : users) {

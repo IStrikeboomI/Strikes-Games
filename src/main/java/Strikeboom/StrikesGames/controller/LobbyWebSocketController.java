@@ -3,9 +3,9 @@ package Strikeboom.StrikesGames.controller;
 import Strikeboom.StrikesGames.service.LobbyService;
 import Strikeboom.StrikesGames.websocket.message.game.GameMessage;
 import lombok.AllArgsConstructor;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,7 +38,7 @@ public class LobbyWebSocketController {
     }
     //Used for receiving game messages from clients
     @MessageMapping("/game/{game}/{messageName}")
-    public void game(@PathVariable String game, @PathVariable String messageName, @RequestBody Map<String,Object> message, SimpMessageHeaderAccessor headerAccessor) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public void game(@DestinationVariable String game, @DestinationVariable String messageName, @RequestBody Map<String,Object> message, SimpMessageHeaderAccessor headerAccessor) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         lobbyService.receiveGameMessage(getIdFromHeaders(headerAccessor),game,messageName,new GameMessage(message));
     }
     //Gets the UUID from the user that sent the message

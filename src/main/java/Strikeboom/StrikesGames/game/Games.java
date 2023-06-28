@@ -6,6 +6,7 @@ import Strikeboom.StrikesGames.websocket.message.game.tictactoe.MakeMoveMessage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Games {
     public static final List<GameInfo> GAMES = new ArrayList<>();
@@ -15,14 +16,14 @@ public class Games {
             .name("Seth-Head")
             .minPlayers(2)
             .maxPlayers(4)
-            .messages(List.of())
+            .messages(Map.of())
             .build());
     public static final GameInfo TIC_TAC_TOE = addToList(GameInfo.builder()
              .gameInstanceClass(TicTacToe.class)
              .name("Tic-Tac-Toe")
              .minPlayers(2)
              .maxPlayers(2)
-            .messages(List.of(MakeMoveMessage.class))
+            .messages(Map.of("makeMove",MakeMoveMessage.class))
             .build());
 
     private static GameInfo addToList(GameInfo gameInfo) {
