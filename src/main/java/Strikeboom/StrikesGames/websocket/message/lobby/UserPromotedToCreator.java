@@ -1,10 +1,12 @@
 package Strikeboom.StrikesGames.websocket.message.lobby;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.util.UUID;
 
-@Data
+@Getter
+@ToString
 public class UserPromotedToCreator extends LobbyMessage {
     UUID separationId;
 

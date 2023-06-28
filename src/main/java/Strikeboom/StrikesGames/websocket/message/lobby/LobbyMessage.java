@@ -1,12 +1,14 @@
 package Strikeboom.StrikesGames.websocket.message.lobby;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
 
 /**
  * Abstract class used for creating lobby message
  */
-@Data
+@Getter
+@ToString
 @AllArgsConstructor
 public abstract class LobbyMessage {
     /**

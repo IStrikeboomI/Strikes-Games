@@ -1,9 +1,11 @@
 package Strikeboom.StrikesGames.websocket.message.lobby;
 
 import Strikeboom.StrikesGames.dto.UserDto;
-import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
 
-@Data
+@Getter
+@ToString
 public class UserJoinedMessage extends LobbyMessage{
     UserDto user;
     public UserJoinedMessage(UserDto user) {
