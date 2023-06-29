@@ -24,6 +24,16 @@ public abstract class GameMessageHandler<T extends Game> extends GameMessage{
     public abstract boolean handle(T game, User player);
 
     /**
+     * Method that gets called AFTER message is handled and dispatched <br>
+     * Ex. override this to cycle player
+     * @param game Instance of game player
+     * @param player Player that sent message
+     */
+    public void postHandle(T game, User player) {
+
+    }
+
+    /**
      * Determines if the message should be sent out to all the clients <br>
      * Can only dispatch out if the message can be received
      * @param game Instance of game
@@ -33,11 +43,11 @@ public abstract class GameMessageHandler<T extends Game> extends GameMessage{
     public abstract boolean canDispatch(T game, User player);
 
     /**
-     * GameInfo message to be sent to all the clients <br>
+     * ClientBoundGameMessage message to be sent to all the clients <br>
      * Does not actually sent, just prepares the message
      * @param game Instance of game
      * @param player Player that sent message
-     * @return GameInfo message to be sent out
+     * @return ClientBoundGameMessage message to be sent out
      */
     public abstract ClientBoundGameMessage dispatch(T game, User player);
 

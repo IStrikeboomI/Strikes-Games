@@ -224,11 +224,11 @@ public class LobbyService {
         Game gameInstance = gameInstances.get(lobby.getId());
         if (gameInstance.getGameInfo().name().equalsIgnoreCase(game)) {
             GameMessageHandler<Game> handler = (GameMessageHandler<Game>) gameInstance.getMessageHandler(messageName, message);
-            System.out.println(handler);
             if (handler.handle(gameInstance, user)) {
                 if (handler.canDispatch(gameInstance, user)) {
                     gameInstance.sendMessageToUsers(handler.dispatch(gameInstance,user),handler.dispatchTo(gameInstance).toArray(new User[0]));
                 }
+                handler.postHandle(gameInstance,user);
             }
         }
     }

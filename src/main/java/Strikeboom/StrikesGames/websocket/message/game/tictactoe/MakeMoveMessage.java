@@ -14,16 +14,31 @@ public class MakeMoveMessage extends GameMessageHandler<TicTacToe> {
 
     @Override
     public boolean handle(TicTacToe game, User player) {
-        return true;
+        if (canDispatch(game,player)) {
+            if (getData().containsKey("gridX") && getData().containsKey("gridY")) {
+                int gridX = (int) getData().get("gridX");
+                int gridY = (int) getData().get("gridY");
+                if (game.grid[gridX][gridY] == ' ') {
+                    game.grid[gridX][gridY] = game.getTurnFromPlayer(player);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
     public boolean canDispatch(TicTacToe game, User player) {
-        return true;
+        return game.playerOnTurn.getId().equals(player.getId());
     }
 
     @Override
     public ClientBoundGameMessage dispatch(TicTacToe game, User player) {
         return new ClientBoundGameMessage(messageName,getData());
+    }
+
+    @Override
+    public void postHandle(TicTacToe game, User player) {
+        game.cycleTurn();
     }
 }
