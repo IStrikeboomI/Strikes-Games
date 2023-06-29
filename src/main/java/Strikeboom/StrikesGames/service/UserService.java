@@ -87,8 +87,8 @@ public class UserService {
                 @Override
                 public void run() {
                     User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
-                    deleteUser(user);
                     sendWebsocketMessage(user.getLobby(),new UserKickedMessage(user.getSeparationId()));
+                    deleteUser(user);
                 }
             },1000 * 60);
             userDisconnectTimers.put(userId,timer);

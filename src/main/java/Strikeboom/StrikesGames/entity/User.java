@@ -21,7 +21,7 @@ public class User {
     private UUID separationId = UUID.randomUUID();
     @NotBlank(message = "name must not be empty!")
     private String name;
-    @OneToOne(fetch = FetchType.EAGER,orphanRemoval = true)
+    @OneToOne(fetch = FetchType.EAGER)
     //exclude lobby from string to prevent a stackoverflow exception
     @ToString.Exclude
     private Lobby lobby;
