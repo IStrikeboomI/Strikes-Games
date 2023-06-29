@@ -24,11 +24,23 @@ function giveRoles(message) {
             }
         }
     }
+    playerOnTurn = playerWithX;
     playerWithXElement.children[0].src = "/image/game/tic-tac-toe/x.png";
     playerWithOElement.children[0].src = "/image/game/tic-tac-toe/o.png";
 
-    playerOnTurnElement.innerHTML = playerWithX.name + "'s Turn"
+    playerOnTurnElement.innerHTML = playerWithX.name + "'s Turn" + (playerOnTurn == user ? " (You!)" : "");
 }
 function makeMove(message) {
-
+    let characterToFill;
+    //cycle turn
+    if (playerOnTurn == playerWithX) {
+        playerOnTurn = playerWithO;
+        characterToFill = "X";
+    } else {
+        playerOnTurn = playerWithX;
+        characterToFill = "O";
+    }
+    let gridX = message.data.gridX;
+    let gridY = message.data.gridY;
+    grid[gridX][gridY] = characterToFill;
 }

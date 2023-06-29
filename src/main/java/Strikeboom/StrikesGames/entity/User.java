@@ -28,4 +28,5 @@ public class User {
     private boolean isCreator;
     @OneToMany(orphanRemoval = true,fetch = FetchType.EAGER)
     private List<ChatMessage> messages;
+
 }

@@ -4,6 +4,7 @@ let grid = [["","",""]
 
 let playerWithX;
 let playerWithO;
+let playerOnTurn;
 
 let playerWithXElement;
 let playerWithOElement;
@@ -29,7 +30,7 @@ function init() {
     user1Div.appendChild(rolePicture.cloneNode(true));
     let user1Element = document.createElement("p");
     user1Div.className = "user";
-    user1Element.innerHTML = user1.name;
+    user1Element.innerHTML = user1.name + (user1 == user ? " (You!)" : "");
     user1Div.setAttribute("separationId",user1.separationId);
     user1Div.appendChild(user1Element);
     users.appendChild(user1Div);
@@ -38,7 +39,7 @@ function init() {
     user2Div.appendChild(rolePicture.cloneNode(true));
     let user2Element = document.createElement("p");
     user2Div.className = "user";
-    user2Element.innerHTML = user2.name;
+    user2Element.innerHTML = user2.name + (user2 == user ? " (You!)" : "");
     user2Div.setAttribute("separationId",user2.separationId);
     user2Div.appendChild(user2Element);
     users.appendChild(user2Div);
@@ -94,7 +95,9 @@ function onCanvasClick(e) {
         gridX: gridX,
         gridY: gridY
     };
-    stompClient.send("/lobby/game/tic-tac-toe/makeMove",{},JSON.stringify(message));
+    if (playerOnTurn == user) {
+        stompClient.send("/lobby/game/tic-tac-toe/makeMove",{},JSON.stringify(message));
+    }
 }
 
 function onCanvasHover(e) {
