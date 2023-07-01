@@ -40,6 +40,7 @@ function makeMove(message) {
         playerOnTurn = playerWithX;
         characterToFill = "O";
     }
+    playerOnTurnElement.innerHTML = playerOnTurn.name + "'s Turn" + (playerOnTurn == user ? " (You!)" : "");
     let gridX = message.data.gridX;
     let gridY = message.data.gridY;
     grid[gridX][gridY] = characterToFill;
