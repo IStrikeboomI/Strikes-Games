@@ -7,7 +7,9 @@ import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -29,4 +31,14 @@ public class User {
     @OneToMany(orphanRemoval = true,fetch = FetchType.EAGER)
     private List<ChatMessage> messages;
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof User user) {
+            return user.id.equals(this.id);
+        }
+        if (obj instanceof UUID uuid) {
+            return uuid.equals(id);
+        }
+        return super.equals(obj);
+    }
 }

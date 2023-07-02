@@ -21,8 +21,6 @@ public class TicTacToe extends TurnBasedGame {
         playerWithX = lobby.getUsers().get(randomUser);
         playerOnTurn = playerWithX;
         playerWithO = lobby.getUsers().get(lobby.getUsers().size() - 1 - randomUser);
-        sendMessageToUsers(new GiveRolesMessage(playerWithX.getSeparationId(),"X"),playerWithX);
-        sendMessageToUsers(new GiveRolesMessage(playerWithO.getSeparationId(),"O"),playerWithO);
 
         grid = new char[3][3];
         for (char[] row : grid) {
@@ -34,7 +32,17 @@ public class TicTacToe extends TurnBasedGame {
     public GameInfo getGameInfo() {
         return Games.TIC_TAC_TOE;
     }
-    public char getTurnFromPlayer(User user) {
+
+    @Override
+    public void initMessages(User user) {
+        if (playerWithX.equals(user)) {
+            sendMessageToUsers(new GiveRolesMessage(playerWithO.getSeparationId(),"O"),playerWithX);
+        } else {
+            sendMessageToUsers(new GiveRolesMessage(playerWithX.getSeparationId(),"X"),playerWithO);
+        }
+    }
+
+    public char getTurnFromPlayerOnTurn() {
         if (getPlayerOnTurn().equals(playerWithX)) {
             return 'X';
         } else {

@@ -1,6 +1,7 @@
 package Strikeboom.StrikesGames.game.games;
 
 import Strikeboom.StrikesGames.entity.Lobby;
+import Strikeboom.StrikesGames.entity.User;
 import Strikeboom.StrikesGames.game.GameInfo;
 import Strikeboom.StrikesGames.game.Games;
 import Strikeboom.StrikesGames.game.TurnBasedGame;
@@ -14,5 +15,10 @@ public class SethHead extends TurnBasedGame {
     @Override
     public GameInfo getGameInfo() {
         return Games.SETH_HEAD;
+    }
+
+    @Override
+    public void initMessages(User user) {
+
     }
 }

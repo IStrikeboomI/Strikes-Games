@@ -11,7 +11,6 @@ import lombok.Getter;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.Map;
 
 @Getter
@@ -24,6 +23,13 @@ public abstract class Game {
     }
 
     public abstract GameInfo getGameInfo();
+
+    /**
+     * Method to send messages to clients at the start of a game <br>
+     * Also called when a user reconnects to game
+     * @param user user to send message to
+     */
+    public abstract void initMessages(User user);
 
     public static Game newInstance(Lobby lobby,SimpMessagingTemplate template) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         GameInfo g = Games.GAMES.stream().filter(game1 -> game1.name().equals(lobby.getGame())).findFirst()
@@ -38,7 +44,6 @@ public abstract class Game {
      */
     public GameMessageHandler<?> getMessageHandler(String messageName,GameMessage message) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if (getGameInfo().messages().containsKey(messageName)) {
-            System.out.println(Arrays.toString(getGameInfo().messages().get(messageName).getConstructors()));
             return getGameInfo().messages().get(messageName).getConstructor(String.class, Map.class).newInstance(messageName,message.getData());
         } else {
             throw new MessageNotFoundException(String.format("Message %s not found!",messageName));

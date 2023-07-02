@@ -3,7 +3,7 @@ const gameMessageHandlers = [
     {"name": "makeMove","handler":makeMove}
 ]
 function giveRoles(message) {
-    if (message.role === "X") {
+    if (message.role === "O") {
         playerWithX = user;
         playerWithO = lobby.users[lobby.users.length - 1 - lobby.users.indexOf(user)]
         for (let u of document.querySelectorAll('[separationId]')) {
@@ -41,7 +41,7 @@ function makeMove(message) {
         characterToFill = "O";
     }
     playerOnTurnElement.innerHTML = playerOnTurn.name + "'s Turn" + (playerOnTurn == user ? " (You!)" : "");
-    let gridX = message.data.gridX;
-    let gridY = message.data.gridY;
+    let gridX = message.gridX;
+    let gridY = message.gridY;
     grid[gridX][gridY] = characterToFill;
 }

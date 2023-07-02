@@ -19,7 +19,7 @@ public class MakeMoveMessage extends GameMessageHandler<TicTacToe> {
                 int gridX = (int) getData().get("gridX");
                 int gridY = (int) getData().get("gridY");
                 if (game.grid[gridX][gridY] == ' ') {
-                    game.grid[gridX][gridY] = game.getTurnFromPlayer(player);
+                    game.grid[gridX][gridY] = game.getTurnFromPlayerOnTurn();
                     return true;
                 }
             }
@@ -29,7 +29,7 @@ public class MakeMoveMessage extends GameMessageHandler<TicTacToe> {
 
     @Override
     public boolean canDispatch(TicTacToe game, User player) {
-        return game.playerOnTurn.getId().equals(player.getId());
+        return game.playerOnTurn.equals(player);
     }
 
     @Override

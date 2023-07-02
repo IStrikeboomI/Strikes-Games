@@ -132,7 +132,7 @@ xhttp.onload = (event) => {
         document.body.appendChild(messagesScript);
         connectAndSend();
     } else {
-        //alert("An error has occurred, more information in the console");
+        alert("An error has occurred, more information in the console");
         console.log(event);
         console.log(xhttp);
     }
@@ -148,6 +148,9 @@ function connectAndSend() {
         stompClient.subscribe('/user/broker/'+ location.pathname.substr(location.pathname.indexOf("/join/")+6), function(message) {
             handleWebSocketMessage(JSON.parse(message.body));
         });
+        if (lobby.gameStarted) {
+            gameStarted(null);
+        }
     });
 }
 function handleWebSocketMessage(message) {

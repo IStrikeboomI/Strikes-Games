@@ -13,6 +13,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/broker");
         registry.setApplicationDestinationPrefixes("/lobby");
+        registry.setUserDestinationPrefix("/user");
     }
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {

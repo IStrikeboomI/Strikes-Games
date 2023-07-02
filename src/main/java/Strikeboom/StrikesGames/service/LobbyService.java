@@ -40,6 +40,10 @@ public class LobbyService {
     private final ChatService chatService;
     private final UserService userService;
 
+    //Map for storing game instances instead of saving to database
+    //Long is lobby id and Game is game's instance
+    private final Map<Long,Game> gameInstances;
+
     public Lobby createLobby(LobbyDto lobbyDto) {
         return lobbyRepository.save(map(lobbyDto));
     }
@@ -146,7 +150,15 @@ public class LobbyService {
         List<Lobby> expiredLobbies = lobbyRepository.findLobbiesMadeSince(Instant.now().minus(7, ChronoUnit.DAYS));
         lobbyRepository.deleteAll(expiredLobbies);
     }
-
+    public void sendGameInitMessages(User user) {
+        if (user.getLobby().isGameStarted() && gameInstances.containsKey(user.getLobby().getId())) {
+            gameInstances.get(user.getLobby().getId()).initMessages(user);
+        }
+    }
+    public void sendGameInitMessages(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
+        sendGameInitMessages(user);
+    }
     //below is everything to be received by websockets by LobbyWebSocketController
     /**
      *
@@ -195,9 +207,6 @@ public class LobbyService {
         chatService.addMessage(chatMessage);
         sendWebsocketMessage(lobby,new UserSentMessageMessage(ChatService.mapToDto(chatMessage)));
     }
-    //Map for storing game instances instead of saving to database
-    //Long is lobby id and Game is game's instance
-    private final Map<Long,Game> gameInstances;
     /**
      *  Starts off the game for the lobby, can only be sent by lobby creator
      * @param userId user that sent message
@@ -209,7 +218,11 @@ public class LobbyService {
             //if (!lobby.isGameStarted()) {
                 lobby.setGameStarted(true);
                 sendWebsocketMessage(lobby, new GameStartedMessage());
-                gameInstances.put(lobby.getId(),Game.newInstance(lobby,simpMessagingTemplate));
+                Game instance = Game.newInstance(lobby,simpMessagingTemplate);
+                gameInstances.put(lobby.getId(),instance);
+                for (User u : lobby.getUsers()) {
+                    instance.initMessages(u);
+                }
             //} else {
             //    throw new GameAlreadyStartedException("Game already started!");
             //}
