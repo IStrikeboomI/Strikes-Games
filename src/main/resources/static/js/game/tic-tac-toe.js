@@ -10,7 +10,7 @@ let playerWithXElement;
 let playerWithOElement;
 let playerOnTurnElement;
 
-const BAR_LONG = 800;
+const BAR_LONG = document.documentElement.clientHeight * .95;
 const BAR_THICKNESS = 25;
 function init() {
     let user1 = lobby.users[0]
@@ -52,7 +52,7 @@ function init() {
     canvas.addEventListener('mousemove', (e) => onCanvasHover(e));
 
     canvas.height = document.documentElement.clientHeight;
-    canvas.width = 850;
+    canvas.width = document.documentElement.clientWidth / 2;
 
     drawGrid(canvas);
 
@@ -143,10 +143,12 @@ function drawGrid(canvas) {
     ctx.fillStyle = "rgba(53, 53, 53, .5)";
     ctx.globalCompositeOperation = "xor";
     ctx.beginPath();
-    ctx.roundRect(thirdWidth - BAR_THICKNESS/2, 25, BAR_THICKNESS, BAR_LONG, 20);
-    ctx.roundRect(thirdWidth * 2 - BAR_THICKNESS/2, 25, BAR_THICKNESS, BAR_LONG, 20);
-    ctx.roundRect(25, thirdHeight - BAR_THICKNESS/2, BAR_LONG, BAR_THICKNESS, 20);
-    ctx.roundRect(25, thirdHeight * 2 - BAR_THICKNESS/2, BAR_LONG, BAR_THICKNESS, 20);
+    //two vertical bars
+    ctx.roundRect(thirdWidth - BAR_THICKNESS/2, 25, BAR_THICKNESS, document.documentElement.clientHeight * .95, 20);
+    ctx.roundRect(thirdWidth * 2 - BAR_THICKNESS/2, 25, BAR_THICKNESS, document.documentElement.clientHeight * .95, 20);
+    //two horizontal bars
+    ctx.roundRect(25, thirdHeight - BAR_THICKNESS/2, canvas.width * .95, BAR_THICKNESS, 20);
+    ctx.roundRect(25, thirdHeight * 2 - BAR_THICKNESS/2, canvas.width * .95, BAR_THICKNESS, 20);
     ctx.fill();
     ctx.stroke();
 }
