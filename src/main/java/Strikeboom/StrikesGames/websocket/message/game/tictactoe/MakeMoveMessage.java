@@ -18,8 +18,8 @@ public class MakeMoveMessage extends GameMessageHandler<TicTacToe> {
             if (getData().containsKey("gridX") && getData().containsKey("gridY")) {
                 int gridX = (int) getData().get("gridX");
                 int gridY = (int) getData().get("gridY");
-                if (game.grid[gridX][gridY] == ' ') {
-                    game.grid[gridX][gridY] = game.getTurnFromPlayerOnTurn();
+                if (game.grid[gridY][gridX] == ' ') {
+                    game.grid[gridY][gridX] = game.getTurnFromPlayerOnTurn();
                     return true;
                 }
             }

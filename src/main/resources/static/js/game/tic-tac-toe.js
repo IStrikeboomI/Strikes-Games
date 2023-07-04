@@ -1,6 +1,6 @@
-let grid = [["","",""]
-           ,["","",""],
-            ["","",""]];
+let grid = [[" "," "," "]
+           ,[" "," "," "],
+            [" "," "," "]];
 
 let playerWithX;
 let playerWithO;
@@ -9,6 +9,11 @@ let playerOnTurn;
 let playerWithXElement;
 let playerWithOElement;
 let playerOnTurnElement;
+
+let playerWithXImage;
+let playerWithOImage;
+
+let canvas;
 
 const BAR_LONG = document.documentElement.clientHeight * .95;
 const BAR_THICKNESS = 25;
@@ -46,15 +51,17 @@ function init() {
 
     document.body.appendChild(users);
 
-    let canvas = document.createElement("canvas");
+    canvas = document.createElement("canvas");
 
-    canvas.addEventListener('click', (e) => onCanvasClick(e));
+    canvas.addEventListener('mousedown', (e) => onCanvasClick(e));
     canvas.addEventListener('mousemove', (e) => onCanvasHover(e));
 
     canvas.height = document.documentElement.clientHeight;
     canvas.width = document.documentElement.clientWidth / 2;
 
-    drawGrid(canvas);
+    canvas.onload = () => {
+        drawGrid();
+    }
 
     document.body.appendChild(canvas);
 }
@@ -71,7 +78,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
 }
 
 function onCanvasClick(e) {
-    let canvasThirdWidth = e.target.width / 3;
+    let canvasThirdWidth = canvas.width / 3;
     let gridX;
     if (e.layerX < canvasThirdWidth) {
         gridX = 0;
@@ -81,7 +88,7 @@ function onCanvasClick(e) {
         gridX = 2;
     }
 
-    let canvasThirdHeight = e.target.height / 3;
+    let canvasThirdHeight = canvas.height / 3;
     let gridY;
     if (e.layerY < canvasThirdHeight) {
         gridY = 0;
@@ -90,18 +97,18 @@ function onCanvasClick(e) {
     } else if (e.layerY > canvasThirdHeight * 2) {
         gridY = 2;
     }
-
     let message = {
         gridX: gridX,
         gridY: gridY
     };
     if (playerOnTurn == user) {
-        stompClient.send("/lobby/game/tic-tac-toe/makeMove",{},JSON.stringify(message));
+        if (grid[gridY][gridX] === " ") {
+            stompClient.send("/lobby/game/tic-tac-toe/makeMove",{},JSON.stringify(message));
+        }
     }
 }
 
 function onCanvasHover(e) {
-    let canvas = e.target;
     let canvasThirdWidth = canvas.width / 3;
     let gridX;
     if (e.layerX < canvasThirdWidth) {
@@ -123,9 +130,7 @@ function onCanvasHover(e) {
     }
 
     const ctx = canvas.getContext("2d");
-    //redraw grid to clear old yellow block
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    drawGrid(canvas);
+    drawGrid();
     ctx.globalCompositeOperation = 'destination-over';
     ctx.strokeStyle = "rgba(201,188,6,1)";
     ctx.fillStyle = "rgba(244, 229, 17, .5)";
@@ -134,7 +139,11 @@ function onCanvasHover(e) {
     ctx.stroke();
     ctx.fill();
 }
-function drawGrid(canvas) {
+function clearCanvas() {
+    canvas.getContext("2d").clearRect(0,0,canvas.width,canvas.height);
+}
+function drawGrid() {
+    clearCanvas();
     const thirdWidth = canvas.width / 3;
     const thirdHeight = canvas.height / 3;
 
@@ -151,4 +160,21 @@ function drawGrid(canvas) {
     ctx.roundRect(25, thirdHeight * 2 - BAR_THICKNESS/2, canvas.width * .95, BAR_THICKNESS, 20);
     ctx.fill();
     ctx.stroke();
+
+    for (let row in grid) {
+        for (let column in grid[row]) {
+            let move = grid[column][row];
+            let imageToDraw;
+            if (move === "X") {
+                imageToDraw = playerWithXImage;
+            } else if (move === "O") {
+                imageToDraw = playerWithOImage;
+            }
+            if (imageToDraw) {
+                let desiredImageWidth = thirdWidth * .75;
+                let desiredImageHeight = thirdHeight * .75;
+                ctx.drawImage(imageToDraw,thirdWidth * row + thirdWidth/2 - desiredImageWidth/2,thirdHeight * column + thirdHeight/2 - desiredImageHeight/2,desiredImageWidth,desiredImageHeight);
+            }
+        }
+    }
 }

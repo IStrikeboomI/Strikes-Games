@@ -156,6 +156,13 @@ function connectAndSend() {
 function handleWebSocketMessage(message) {
      handlers.find(h => h.name === message.messageName).handler(message);
  }
+ function getUserFromSeparationId(uuid) {
+    for (let user of lobby.users) {
+        if (user.separationId == uuid) {
+            return user;
+        }
+    }
+ }
 function changeUsername(name) {
     //don't send message to change name if it's blank
     if (name && name !== "") {

@@ -5,10 +5,12 @@ import Strikeboom.StrikesGames.entity.User;
 import Strikeboom.StrikesGames.game.GameInfo;
 import Strikeboom.StrikesGames.game.Games;
 import Strikeboom.StrikesGames.game.TurnBasedGame;
+import Strikeboom.StrikesGames.websocket.message.game.ClientBoundGameMessage;
 import Strikeboom.StrikesGames.websocket.message.game.tictactoe.GiveRolesMessage;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Random;
 
 public class TicTacToe extends TurnBasedGame {
@@ -40,6 +42,8 @@ public class TicTacToe extends TurnBasedGame {
         } else {
             sendMessageToUsers(new GiveRolesMessage(playerWithX.getSeparationId(),"X"),playerWithO);
         }
+        sendMessageToUsers(new ClientBoundGameMessage("getGrid", Map.of("grid",grid)),user);
+        sendMessageToUsers(new ClientBoundGameMessage("getPlayerOnTurn", Map.of("separationId",playerOnTurn.getSeparationId())),user);
     }
 
     public char getTurnFromPlayerOnTurn() {

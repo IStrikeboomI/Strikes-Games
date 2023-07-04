@@ -1,5 +1,7 @@
 const gameMessageHandlers = [
     {"name": "giveRoles","handler":giveRoles},
+    {"name": "getGrid","handler":getGrid},
+    {"name": "getPlayerOnTurn","handler":getPlayerOnTurn},
     {"name": "makeMove","handler":makeMove}
 ]
 function giveRoles(message) {
@@ -24,11 +26,27 @@ function giveRoles(message) {
             }
         }
     }
-    playerOnTurn = playerWithX;
-    playerWithXElement.children[0].src = "/image/game/tic-tac-toe/x.png";
-    playerWithOElement.children[0].src = "/image/game/tic-tac-toe/o.png";
+    playerWithXImage = playerWithXElement.children[0];
+    playerWithOImage = playerWithOElement.children[0];
 
-    playerOnTurnElement.innerHTML = playerWithX.name + "'s Turn" + (playerOnTurn == user ? " (You!)" : "");
+    playerWithXImage.src = "/image/game/tic-tac-toe/x.png";
+    playerWithOImage.src = "/image/game/tic-tac-toe/o.png";
+
+    playerWithXImage.onload = () => {
+        drawGrid();
+    }
+    playerWithOImage.onload = () => {
+        drawGrid();
+    }
+}
+function getGrid(message) {
+    for (let row in message.grid) {
+        grid[row] = message.grid[row].split('');
+    }
+}
+function getPlayerOnTurn(message) {
+    playerOnTurn = getUserFromSeparationId(message.separationId);
+    playerOnTurnElement.innerHTML = playerOnTurn.name + "'s Turn" + (playerOnTurn == user ? " (You!)" : "");
 }
 function makeMove(message) {
     let characterToFill;
@@ -43,5 +61,6 @@ function makeMove(message) {
     playerOnTurnElement.innerHTML = playerOnTurn.name + "'s Turn" + (playerOnTurn == user ? " (You!)" : "");
     let gridX = message.gridX;
     let gridY = message.gridY;
-    grid[gridX][gridY] = characterToFill;
+    grid[gridY][gridX] = characterToFill;
+    drawGrid();
 }

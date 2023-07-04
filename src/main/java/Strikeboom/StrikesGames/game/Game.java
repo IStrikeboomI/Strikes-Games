@@ -10,6 +10,7 @@ import Strikeboom.StrikesGames.websocket.message.lobby.LobbyMessage;
 import lombok.Getter;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
+import javax.validation.constraints.NotEmpty;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
@@ -49,7 +50,7 @@ public abstract class Game {
             throw new MessageNotFoundException(String.format("Message %s not found!",messageName));
         }
     }
-    public void sendMessageToUsers(LobbyMessage message, User... users) {
+    public void sendMessageToUsers(LobbyMessage message, @NotEmpty User... users) {
         for (User u : users) {
             simpMessagingTemplate.convertAndSendToUser(u.getId().toString(),String.format("/broker/%s", lobby.getJoinCode()), message);
         }
