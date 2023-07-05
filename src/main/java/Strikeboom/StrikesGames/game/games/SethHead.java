@@ -21,4 +21,14 @@ public class SethHead extends TurnBasedGame {
     public void initMessages(User user) {
 
     }
+
+    @Override
+    public boolean isGameEnded() {
+        return false;
+    }
+
+    @Override
+    public void onGameEnded() {
+
+    }
 }

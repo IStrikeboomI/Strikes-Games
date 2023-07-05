@@ -46,6 +46,30 @@ public class TicTacToe extends TurnBasedGame {
         sendMessageToUsers(new ClientBoundGameMessage("getPlayerOnTurn", Map.of("separationId",playerOnTurn.getSeparationId())),user);
     }
 
+    @Override
+    public boolean isGameEnded() {
+        //check for tie by seeing if all grids all filled
+        int filledGrids = 0;
+        for (char[] row : grid) {
+            for (char move : row) {
+                if (move != ' ') {
+                    filledGrids++;
+                }
+            }
+        }
+        if (filledGrids == 9) {
+            return true;
+        }
+        return false;
+    }
+    private boolean checkForWin(int x1, int y1, int x2, int y2, int x3, int y3, char character) {
+        return grid[x1][y1] == character && grid[x2][y2] == character && grid[x3][y3] == character;
+    }
+    @Override
+    public void onGameEnded() {
+
+    }
+
     public char getTurnFromPlayerOnTurn() {
         if (getPlayerOnTurn().equals(playerWithX)) {
             return 'X';

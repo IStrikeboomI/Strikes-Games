@@ -32,6 +32,9 @@ public abstract class Game {
      */
     public abstract void initMessages(User user);
 
+    public abstract boolean isGameEnded();
+    public abstract void onGameEnded();
+
     public static Game newInstance(Lobby lobby,SimpMessagingTemplate template) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         GameInfo g = Games.GAMES.stream().filter(game1 -> game1.name().equals(lobby.getGame())).findFirst()
                 .orElseThrow(() -> new GameNotFoundException(String.format("Game %s not found!",lobby.getGame())));
@@ -57,5 +60,10 @@ public abstract class Game {
     }
     public void sendMessageToAll(LobbyMessage message) {
         sendMessageToUsers(message,lobby.getUsers().toArray(new User[0]));
+    }
+    public void checkForGameEnd() {
+        if (isGameEnded()) {
+            onGameEnded();
+        }
     }
 }

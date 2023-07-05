@@ -40,5 +40,6 @@ public class MakeMoveMessage extends GameMessageHandler<TicTacToe> {
     @Override
     public void postHandle(TicTacToe game, User player) {
         game.cycleTurn();
+        game.checkForGameEnd();
     }
 }
