@@ -2,7 +2,8 @@ const gameMessageHandlers = [
     {"name": "giveRoles","handler":giveRoles},
     {"name": "getGrid","handler":getGrid},
     {"name": "getPlayerOnTurn","handler":getPlayerOnTurn},
-    {"name": "makeMove","handler":makeMove}
+    {"name": "makeMove","handler":makeMove},
+    {"name": "gameEnded","handler":gameEnded}
 ]
 function giveRoles(message) {
     if (message.role === "O") {
@@ -63,4 +64,7 @@ function makeMove(message) {
     let gridY = message.gridY;
     grid[gridY][gridX] = characterToFill;
     drawGrid();
+}
+function gameEnded(message) {
+
 }

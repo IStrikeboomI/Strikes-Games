@@ -2,6 +2,7 @@ package Strikeboom.StrikesGames.game.games;
 
 import Strikeboom.StrikesGames.entity.Lobby;
 import Strikeboom.StrikesGames.entity.User;
+import Strikeboom.StrikesGames.game.GameEndedData;
 import Strikeboom.StrikesGames.game.GameInfo;
 import Strikeboom.StrikesGames.game.Games;
 import Strikeboom.StrikesGames.game.TurnBasedGame;
@@ -23,12 +24,12 @@ public class SethHead extends TurnBasedGame {
     }
 
     @Override
-    public boolean isGameEnded() {
-        return false;
+    public GameEndedData isGameEnded() {
+        return null;
     }
 
     @Override
-    public void onGameEnded() {
+    public void onGameEnded(GameEndedData data) {
 
     }
 }

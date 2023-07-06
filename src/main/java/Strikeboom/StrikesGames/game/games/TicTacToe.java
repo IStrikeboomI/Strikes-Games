@@ -2,6 +2,7 @@ package Strikeboom.StrikesGames.game.games;
 
 import Strikeboom.StrikesGames.entity.Lobby;
 import Strikeboom.StrikesGames.entity.User;
+import Strikeboom.StrikesGames.game.GameEndedData;
 import Strikeboom.StrikesGames.game.GameInfo;
 import Strikeboom.StrikesGames.game.Games;
 import Strikeboom.StrikesGames.game.TurnBasedGame;
@@ -47,7 +48,27 @@ public class TicTacToe extends TurnBasedGame {
     }
 
     @Override
-    public boolean isGameEnded() {
+    public GameEndedData isGameEnded() {
+        GameEndedData data = new GameEndedData();
+        for (int i = 0; i < grid.length; i++) {
+            if (checkForWin(0,i, 1,i, 2,i,'O') || checkForWin(i,0, i,1, i,2,'O') ) {
+                data.setGameEnded(true);
+                data.data.put("winner",'O');
+            }
+            if (checkForWin(0,i, 1,i, 2,i,'X') || checkForWin(i,0, i,1, i,2,'X') ) {
+                data.setGameEnded(true);
+                data.data.put("winner",'X');
+            }
+        }
+        //diagonals
+        if (checkForWin(0,0,1,1,2,2,'X') || checkForWin(0,2,1,1,2,0,'X')) {
+            data.setGameEnded(true);
+            data.data.put("winner",'X');
+        }
+        if (checkForWin(0,0,1,1,2,2,'O') || checkForWin(0,2,1,1,2,0,'O')) {
+            data.setGameEnded(true);
+            data.data.put("winner",'O');
+        }
         //check for tie by seeing if all grids all filled
         int filledGrids = 0;
         for (char[] row : grid) {
@@ -58,16 +79,17 @@ public class TicTacToe extends TurnBasedGame {
             }
         }
         if (filledGrids == 9) {
-            return true;
+            data.setGameEnded(true);
+            data.data.put("winner","tie");
         }
-        return false;
+        return data;
     }
     private boolean checkForWin(int x1, int y1, int x2, int y2, int x3, int y3, char character) {
         return grid[x1][y1] == character && grid[x2][y2] == character && grid[x3][y3] == character;
     }
     @Override
-    public void onGameEnded() {
-
+    public void onGameEnded(GameEndedData data) {
+        sendMessageToAll(new ClientBoundGameMessage("gameEnded",data.data));
     }
 
     public char getTurnFromPlayerOnTurn() {
