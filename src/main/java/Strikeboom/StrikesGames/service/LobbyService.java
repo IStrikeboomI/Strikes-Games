@@ -235,7 +235,7 @@ public class LobbyService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         Lobby lobby = user.getLobby();
         Game gameInstance = gameInstances.get(lobby.getId());
-        if (gameInstance.getGameInfo().name().equalsIgnoreCase(game)) {
+        if (gameInstance.getGameInfo().name().equalsIgnoreCase(game) && !gameInstance.gameEnded) {
             GameMessageHandler<Game> handler = (GameMessageHandler<Game>) gameInstance.getMessageHandler(messageName, message);
             if (handler.handle(gameInstance, user)) {
                 if (handler.canDispatch(gameInstance, user)) {

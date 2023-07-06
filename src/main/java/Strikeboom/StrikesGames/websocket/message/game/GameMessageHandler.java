@@ -2,6 +2,7 @@ package Strikeboom.StrikesGames.websocket.message.game;
 
 import Strikeboom.StrikesGames.entity.User;
 import Strikeboom.StrikesGames.game.Game;
+import Strikeboom.StrikesGames.game.TurnBasedGame;
 
 import java.util.List;
 import java.util.Map;
@@ -34,16 +35,21 @@ public abstract class GameMessageHandler<T extends Game> extends GameMessage{
     }
 
     /**
-     * Determines if the message should be sent out to all the clients <br>
+     * Determines if the message should be sent out to the clients <br>
      * Can only dispatch out if the message can be received
      * @param game Instance of game
      * @param player Player that sent message
      * @return whether message can be sent
      */
-    public abstract boolean canDispatch(T game, User player);
+    public boolean canDispatch(T game, User player) {
+        if (game instanceof TurnBasedGame turnBasedGame) {
+            return turnBasedGame.playerOnTurn.equals(player);
+        }
+        return false;
+    }
 
     /**
-     * ClientBoundGameMessage message to be sent to all the clients <br>
+     * ClientBoundGameMessage message to be sent to the clients <br>
      * Does not actually sent, just prepares the message
      * @param game Instance of game
      * @param player Player that sent message

@@ -18,6 +18,7 @@ import java.util.Map;
 public abstract class Game {
     private final Lobby lobby;
     private final SimpMessagingTemplate simpMessagingTemplate;
+    public boolean gameEnded;
     public Game(Lobby lobby, SimpMessagingTemplate simpMessagingTemplate) {
         this.lobby = lobby;
         this.simpMessagingTemplate = simpMessagingTemplate;
@@ -64,6 +65,7 @@ public abstract class Game {
     public void checkForGameEnd() {
         GameEndedData data = isGameEnded();
         if (data != null && data.isGameEnded()) {
+            gameEnded = true;
             onGameEnded(data);
         }
     }

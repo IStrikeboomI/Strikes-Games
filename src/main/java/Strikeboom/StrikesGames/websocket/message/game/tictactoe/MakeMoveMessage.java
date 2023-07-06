@@ -28,11 +28,6 @@ public class MakeMoveMessage extends GameMessageHandler<TicTacToe> {
     }
 
     @Override
-    public boolean canDispatch(TicTacToe game, User player) {
-        return game.playerOnTurn.equals(player);
-    }
-
-    @Override
     public ClientBoundGameMessage dispatch(TicTacToe game, User player) {
         return new ClientBoundGameMessage(messageName,getData());
     }
