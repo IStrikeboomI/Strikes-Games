@@ -44,7 +44,10 @@ public class TicTacToe extends TurnBasedGame {
             sendMessageToUsers(new GiveRolesMessage(playerWithX.getSeparationId(),"X"),playerWithO);
         }
         sendMessageToUsers(new ClientBoundGameMessage("getGrid", Map.of("grid",grid)),user);
-        sendMessageToUsers(new ClientBoundGameMessage("getPlayerOnTurn", Map.of("separationId",playerOnTurn.getSeparationId())),user);
+        sendMessageToUsers(new ClientBoundGameMessage("getPlayerOnTurn", Map.of("separationId", playerOnTurn.getSeparationId())), user);
+        if (gameEnded) {
+            sendMessageToUsers(new ClientBoundGameMessage("gameEnded",isGameEnded().data),user);
+        }
     }
 
     @Override

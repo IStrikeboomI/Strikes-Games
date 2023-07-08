@@ -66,5 +66,18 @@ function makeMove(message) {
     drawGrid();
 }
 function gameEnded(message) {
+    hasGameEnded = true;
+    winner = message.winner;
+    switch(winner) {
+        case "tie":
+            playerOnTurnElement.innerHTML = "Tie!";
+            break;
+        case "X":
+            playerOnTurnElement.innerHTML = "Winner: " + playerWithX.name + "!";
+            break;
+        case "O":
+            playerOnTurnElement.innerHTML = "Winner: " + playerWithO.name + "!";
+            break;
+    }
 
 }

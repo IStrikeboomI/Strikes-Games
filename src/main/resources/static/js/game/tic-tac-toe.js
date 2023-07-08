@@ -2,6 +2,9 @@ let grid = [[" "," "," "]
            ,[" "," "," "],
             [" "," "," "]];
 
+let hasGameEnded = false;
+let winner;
+
 let playerWithX;
 let playerWithO;
 let playerOnTurn;
@@ -57,7 +60,7 @@ function init() {
     canvas.addEventListener('mousemove', (e) => onCanvasHover(e));
 
     canvas.height = document.documentElement.clientHeight;
-    canvas.width = document.documentElement.clientWidth / 2;
+    canvas.width = document.documentElement.clientWidth * .65;
 
     canvas.onload = () => {
         drawGrid();
@@ -101,7 +104,7 @@ function onCanvasClick(e) {
         gridX: gridX,
         gridY: gridY
     };
-    if (playerOnTurn == user) {
+    if (playerOnTurn == user && !hasGameEnded) {
         if (grid[gridY][gridX] === " ") {
             stompClient.send("/lobby/game/tic-tac-toe/makeMove",{},JSON.stringify(message));
         }
@@ -134,6 +137,7 @@ function onCanvasHover(e) {
     ctx.globalCompositeOperation = 'destination-over';
     ctx.strokeStyle = "rgba(201,188,6,1)";
     ctx.fillStyle = "rgba(244, 229, 17, .5)";
+    ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.rect(gridX * canvasThirdWidth + BAR_THICKNESS/2,gridY * canvasThirdHeight + BAR_THICKNESS/2,canvasThirdWidth - BAR_THICKNESS,canvasThirdHeight - BAR_THICKNESS);
     ctx.stroke();
@@ -151,6 +155,7 @@ function drawGrid() {
     ctx.strokeStyle = "rgba(0,0,0,1)";
     ctx.fillStyle = "rgba(53, 53, 53, .5)";
     ctx.globalCompositeOperation = "xor";
+    ctx.lineWidth = 2;
     ctx.beginPath();
     //two vertical bars
     ctx.roundRect(thirdWidth - BAR_THICKNESS/2, 25, BAR_THICKNESS, document.documentElement.clientHeight * .95, 20);
@@ -177,4 +182,53 @@ function drawGrid() {
             }
         }
     }
+    if (hasGameEnded) {
+        if (winner && winner != "tie") {
+            let gridX1;
+            let gridY1;
+            let gridX2;
+            let gridY2;
+            for (let x = 0;x < grid.length;x++) {
+                if (checkForWin(x,0,x,1,x,2,winner)) {
+                    gridX1 = 0;
+                    gridY1 = x;
+                    gridX2 = 2;
+                    gridY2 = x;
+                }
+                if (checkForWin(0,x,1,x,2,x,winner)) {
+                    gridX1 = x;
+                    gridY1 = 0;
+                    gridX2 = x;
+                    gridY2 = 2;
+                }
+            }
+            if (checkForWin(0,0,1,1,2,2,winner)) {
+                gridX1 = 0;
+                gridY1 = 0;
+                gridX2 = 2;
+                gridY2 = 2;
+            }
+            if (checkForWin(0,2,1,1,2,0,winner)) {
+                gridX1 = 0;
+                gridY1 = 2;
+                gridX2 = 2;
+                gridY2 = 0;
+            }
+            let x1 = gridX1 * thirdWidth + (thirdWidth/2);
+            let y1 = gridY1 * thirdHeight + (thirdHeight/2);
+            let x2 = (gridX2 + 1) * thirdWidth - (thirdWidth/2);
+            let y2 = (gridY2 + 1) * thirdHeight - (thirdHeight/2);
+
+            ctx.globalCompositeOperation = "source-over";
+            ctx.lineWidth = 15;
+            ctx.lineCap = "round";
+            ctx.beginPath();
+            ctx.moveTo(x1,y1);
+            ctx.lineTo(x2,y2);
+            ctx.stroke();
+        }
+    }
+}
+function checkForWin(x1, y1, x2, y2, x3, y3, character) {
+    return grid[x1][y1] === character && grid[x2][y2] === character && grid[x3][y3] === character;
 }
