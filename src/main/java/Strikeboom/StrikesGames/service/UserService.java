@@ -90,7 +90,7 @@ public class UserService {
                     sendWebsocketMessage(user.getLobby(),new UserKickedMessage(user.getSeparationId()));
                     deleteUser(user);
                 }
-            },1000 * 3);
+            }, 1000 * 60);
             userDisconnectTimers.put(userId,timer);
             sendWebsocketMessage(user.getLobby(),new UserDisconnectedMessage(user.getSeparationId()));
         });

@@ -36,6 +36,10 @@ public class LobbyWebSocketController {
     public void start(SimpMessageHeaderAccessor headerAccessor) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         lobbyService.start(getIdFromHeaders(headerAccessor));
     }
+    @MessageMapping("/restart")
+    public void restart(SimpMessageHeaderAccessor headerAccessor) {
+        lobbyService.restart(getIdFromHeaders(headerAccessor));
+    }
     //Used for receiving game messages from clients
     @MessageMapping("/game/{game}/{messageName}")
     public void game(@DestinationVariable String game, @DestinationVariable String messageName, @RequestBody Map<String,Object> message, SimpMessageHeaderAccessor headerAccessor) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {

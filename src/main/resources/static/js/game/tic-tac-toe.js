@@ -16,6 +16,8 @@ let playerOnTurnElement;
 let playerWithXImage;
 let playerWithOImage;
 
+let gameRestartButton;
+
 let canvas;
 
 const BAR_LONG = document.documentElement.clientHeight * .95;
@@ -53,6 +55,17 @@ function init() {
     users.appendChild(user2Div);
 
     document.body.appendChild(users);
+    //button to make game restart should only be visible for creator
+    if (user.creator) {
+        gameRestartButton = document.createElement("button");
+        //only show restart button when game is ended
+        gameRestartButton.style.display = "none";
+        gameRestartButton.onclick = () => {
+            stompClient.send("/lobby/restart",{},true);
+        }
+        gameRestartButton.innerHTML = "Restart Game";
+        document.body.appendChild(gameRestartButton);
+    }
 
     canvas = document.createElement("canvas");
 
@@ -67,6 +80,7 @@ function init() {
     }
 
     document.body.appendChild(canvas);
+
 }
 //Some browsers might not support roundRect so a manual implement
 CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {

@@ -4,10 +4,7 @@ import Strikeboom.StrikesGames.dto.LobbyDto;
 import Strikeboom.StrikesGames.entity.ChatMessage;
 import Strikeboom.StrikesGames.entity.Lobby;
 import Strikeboom.StrikesGames.entity.User;
-import Strikeboom.StrikesGames.exception.LobbyNotFoundException;
-import Strikeboom.StrikesGames.exception.UserInsufficientPermissions;
-import Strikeboom.StrikesGames.exception.UserNotFoundException;
-import Strikeboom.StrikesGames.exception.UserUnableToJoinException;
+import Strikeboom.StrikesGames.exception.*;
 import Strikeboom.StrikesGames.game.Game;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
@@ -215,7 +212,7 @@ public class LobbyService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         if (user.isCreator()) {
             Lobby lobby = user.getLobby();
-            //if (!lobby.isGameStarted()) {
+            if (!lobby.isGameStarted()) {
                 lobby.setGameStarted(true);
                 sendWebsocketMessage(lobby, new GameStartedMessage());
                 Game instance = Game.newInstance(lobby,simpMessagingTemplate);
@@ -223,14 +220,40 @@ public class LobbyService {
                 for (User u : lobby.getUsers()) {
                     instance.initMessages(u);
                 }
-            //} else {
-            //    throw new GameAlreadyStartedException("Game already started!");
-            //}
+            } else {
+                throw new GameAlreadyStartedException("Game already started!");
+            }
         } else {
             throw new UserInsufficientPermissions("User must be the creator to start game!");
         }
     }
 
+    /**
+     * Restarts game <br>
+     * Can only work if the current game has been ended
+     * @param userId user that sent message
+     */
+    public void restart(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
+        if (user.isCreator()) {
+            Lobby lobby = user.getLobby();
+            if (gameInstances.containsKey(lobby.getId())) {
+                Game instance = gameInstances.get(lobby.getId());
+                if (instance.gameEnded) {
+                    lobby.setGameStarted(false);
+                    sendWebsocketMessage(lobby, new GameRestartedMessage());
+                }
+            }
+        }
+    }
+
+    /**
+     * Handles game message
+     * @param userId user that sent message
+     * @param game game that message should be sent for
+     * @param messageName name of message
+     * @param message message data
+     */
     public void receiveGameMessage(UUID userId, String game, String messageName, GameMessage message) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         Lobby lobby = user.getLobby();

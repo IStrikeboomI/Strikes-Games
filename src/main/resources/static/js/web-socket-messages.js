@@ -6,7 +6,8 @@ const handlers = [
 {"name": "userDisconnected","handler":userDisconnected},
 {"name": "userReconnected","handler":userReconnected},
 {"name": "userSentMessage","handler":userSentMessage},
-{"name": "gameStarted","handler":gameStarted}
+{"name": "gameStarted","handler":gameStarted},
+{"name": "gameRestarted","handler":gameRestarted}
 ]
 function gameMessage(message) {
     if (lobby.gameStarted) {
@@ -148,4 +149,7 @@ function gameStarted(message) {
     init();
 
     document.head.appendChild(css);
+}
+function gameRestarted(message) {
+    location.reload();
 }

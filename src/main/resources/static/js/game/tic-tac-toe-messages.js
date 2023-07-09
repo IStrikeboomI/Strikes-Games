@@ -68,6 +68,9 @@ function makeMove(message) {
 function gameEnded(message) {
     hasGameEnded = true;
     winner = message.winner;
+    if (user.creator) {
+        gameRestartButton.style.display = "block";
+    }
     switch(winner) {
         case "tie":
             playerOnTurnElement.innerHTML = "Tie!";
