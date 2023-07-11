@@ -72,7 +72,6 @@ public class UserService {
             lobbyRepository.delete(lobby);
         }
         userRepository.delete(user);
-
     }
     //Stores the uuid of users and timers for user that have disconnect and need to join back
     HashMap<UUID, Timer> userDisconnectTimers;
@@ -90,7 +89,7 @@ public class UserService {
                     sendWebsocketMessage(user.getLobby(),new UserKickedMessage(user.getSeparationId()));
                     deleteUser(user);
                 }
-            }, 1000 * 60);
+            }, 1000 * 3);
             userDisconnectTimers.put(userId,timer);
             sendWebsocketMessage(user.getLobby(),new UserDisconnectedMessage(user.getSeparationId()));
         });
