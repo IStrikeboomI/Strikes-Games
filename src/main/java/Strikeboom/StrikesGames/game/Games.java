@@ -30,4 +30,18 @@ public class Games {
         GAMES.add(gameInfo);
         return gameInfo;
     }
+
+    /**
+     * Gets game info from the name of game
+     * @param game name of game
+     * @return game info, returns null if game name is not found
+     */
+    public static GameInfo getGame(String game) {
+        for (GameInfo gameInfo : GAMES) {
+            if (gameInfo.name().equalsIgnoreCase(game)) {
+                return gameInfo;
+            }
+        }
+        return null;
+    }
 }

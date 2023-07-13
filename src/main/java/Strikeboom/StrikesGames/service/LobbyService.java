@@ -6,6 +6,7 @@ import Strikeboom.StrikesGames.entity.Lobby;
 import Strikeboom.StrikesGames.entity.User;
 import Strikeboom.StrikesGames.exception.*;
 import Strikeboom.StrikesGames.game.Game;
+import Strikeboom.StrikesGames.game.Games;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
 import Strikeboom.StrikesGames.websocket.message.game.GameMessage;
@@ -212,16 +213,20 @@ public class LobbyService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         if (user.isCreator()) {
             Lobby lobby = user.getLobby();
-            if (!lobby.isGameStarted()) {
-                lobby.setGameStarted(true);
-                sendWebsocketMessage(lobby, new GameStartedMessage());
-                Game instance = Game.newInstance(lobby,simpMessagingTemplate);
-                gameInstances.put(lobby.getId(),instance);
-                for (User u : lobby.getUsers()) {
-                    instance.initMessages(u);
+            if (lobby.getUsers().size() >= Objects.requireNonNull(Games.getGame(lobby.getGame())).minPlayers()) {
+                if (!lobby.isGameStarted()) {
+                    lobby.setGameStarted(true);
+                    sendWebsocketMessage(lobby, new GameStartedMessage());
+                    Game instance = Game.newInstance(lobby, simpMessagingTemplate);
+                    gameInstances.put(lobby.getId(), instance);
+                    for (User u : lobby.getUsers()) {
+                        instance.initMessages(u);
+                    }
+                } else {
+                    throw new GameAlreadyStartedException("Game already started!");
                 }
             } else {
-                throw new GameAlreadyStartedException("Game already started!");
+                throw new NotEnoughPlayersException("Not enough players to start!");
             }
         } else {
             throw new UserInsufficientPermissions("User must be the creator to start game!");
