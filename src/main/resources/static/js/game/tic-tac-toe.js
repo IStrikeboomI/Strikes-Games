@@ -73,7 +73,11 @@ function init() {
     canvas.addEventListener('mousemove', (e) => onCanvasHover(e));
 
     canvas.height = document.documentElement.clientHeight;
-    canvas.width = document.documentElement.clientWidth * .65;
+    if (document.documentElement.clientWidth <= 600) {
+        canvas.width = document.documentElement.clientWidth;
+    } else {
+        canvas.width = document.documentElement.clientWidth * .65;
+    }
 
     canvas.onload = () => {
         drawGrid();
