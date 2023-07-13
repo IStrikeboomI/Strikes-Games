@@ -5,14 +5,15 @@
     border: 5px solid rgba(0, 0, 0, 1);
     border-radius: 40px;
     height:400px;
-    width:25%;
+    width:300px;
     margin-top:25px;
     position: absolute;
     left:.5%;
     transition: left ease .5s;
+    z-index: 10;
 }
 .chatbox_hidden {
-    left:-25% !important;
+    left:-300px !important;
 }
 #hide-chatbox-button {
     position: absolute;

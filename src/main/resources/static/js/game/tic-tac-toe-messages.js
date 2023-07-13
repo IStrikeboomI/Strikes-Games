@@ -82,5 +82,5 @@ function gameEnded(message) {
             playerOnTurnElement.innerHTML = "Winner: " + playerWithO.name + "!";
             break;
     }
-
+    drawGrid();
 }

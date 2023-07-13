@@ -193,7 +193,7 @@ function sendMessage() {
         if (sendMessageCooldown == 0) {
             stompClient.send("/lobby/send-message", {}, message);
             messageInput.value = "";
-            sendMessageCooldown = 5;
+            sendMessageCooldown = 2;
         }
     }
 }
