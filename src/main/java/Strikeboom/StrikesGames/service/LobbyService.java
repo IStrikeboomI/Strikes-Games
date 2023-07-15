@@ -77,12 +77,6 @@ public class LobbyService {
     public boolean doesLobbyExist(String joinCode) {
         return lobbyRepository.findLobbyFromJoinCode(joinCode).isPresent();
     }
-    public LobbyDto getLobbyFromJoinCode(String joinCode) {
-        return mapToDto(lobbyRepository.findLobbyFromJoinCode(joinCode).orElseThrow(() -> new LobbyNotFoundException(String.format("Lobby with join code: %s not found",joinCode))));
-    }
-    public LobbyDto getLobbyFromId(long id) {
-        return mapToDto(lobbyRepository.findById(id).orElseThrow(() -> new LobbyNotFoundException(String.format("Lobby with id: %s not found",id))));
-    }
     public static LobbyDto mapToDto(Lobby lobby) {
         return LobbyDto.builder()
                 .created(lobby.getCreated())
