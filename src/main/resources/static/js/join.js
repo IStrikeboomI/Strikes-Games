@@ -79,6 +79,7 @@ xhttp.onload = (event) => {
     if (xhttp.status === 200) {
         let response = JSON.parse(xhttp.responseText);
         lobby = response.lobby;
+
         localStorage.setItem("separationId",response.separationId);
         for (let user of lobby.users) {
             let div = document.createElement("div");
@@ -131,6 +132,22 @@ xhttp.onload = (event) => {
         messagesScript.src = "/js/game/" + lobby.game.toLowerCase() + "-messages.js";
         document.body.appendChild(messagesScript);
         connectAndSend();
+        let gamesXHTTP = new XMLHttpRequest();
+        gamesXHTTP.onload = (event) => {
+            for (let game of JSON.parse(event.target.responseText)) {
+                if (game.name === lobby.game) {
+                    lobby.game = game;
+                    if (lobby.users.length >= game.minPlayers) {
+                        document.getElementById("start").style.display = "block";
+                    } else {
+                        document.getElementById("start").style.display = "none";
+                    }
+                    break;
+                }
+            }
+        }
+        gamesXHTTP.open("GET","/games.json");
+        gamesXHTTP.send();
     } else {
         alert("An error has occurred, more information in the console");
         console.log(event);
@@ -246,6 +263,10 @@ function clickOnUser(event) {
 //send message to server to start the game
 function start() {
     if (user.creator) {
-        stompClient.send("/lobby/start",{});
+        if (lobby.users.length >= lobby.game.minPlayers) {
+            stompClient.send("/lobby/start",{});
+        } else {
+            alert(`Not enough people to start!, need at least ${lobby.game.minPlayers} to start!`);
+        }
     }
 }

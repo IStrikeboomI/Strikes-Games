@@ -44,6 +44,10 @@ function userJoined(message) {
     document.getElementById("users").appendChild(div);
 
     addLobbyMessage("User Joined","#75FC0F");
+
+    if (user.creator && lobby.users.length >= lobby.game.minPlayers) {
+        document.getElementById("start").style.display = "block";
+    }
 }
 function userChangedName(message) {
     let userId = message.separationId;
@@ -75,6 +79,9 @@ function userKicked(message) {
         }
     }
     addLobbyMessage(`User ${name} Kicked`,"#F72035");
+    if (user.creator && lobby.users.length < lobby.game.minPlayers) {
+        document.getElementById("start").style.display = "none";
+    }
 }
 function userDisconnected(message) {
     let element;
