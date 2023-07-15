@@ -185,15 +185,27 @@ function changeUsername(name) {
     if (name && name !== "") {
         //don't send message to change name if name is the same
         if (name !== user.name) {
-            if (name.length < 50) {
-               stompClient.send("/lobby/change-name", {}, name);
+            if (!doesLobbyHavePlayerWithName(name)) {
+                if (name.length < 50) {
+                   stompClient.send("/lobby/change-name", {}, name);
+                } else {
+                    alert("Name too long! Max is 50 characters");
+                }
             } else {
-                alert("Name too long! Max is 50 characters");
+                alert("A user has already taken that name!")
             }
         }
     } else {
         alert("Name cannot be empty!");
     }
+}
+function doesLobbyHavePlayerWithName(name) {
+    for (let user of  lobby.users) {
+        if (user.name === name) {
+            return true;
+        }
+    }
+    return false;
 }
 //called when the send message input box is selected and should send message when pressing enter
 function checkForEnter(event) {

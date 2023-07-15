@@ -48,6 +48,13 @@ public class LobbyService {
     public void joinLobby(Lobby lobby, User user) {
         if (lobby.getUsers().size() < lobby.getMaxPlayers()) {
             if (!isUserInLobby(user,lobby)) {
+                if (doesLobbyHavePlayerWithName(user.getName(),lobby)) {
+                    int appendedNumberToName = 1;
+                    while (doesLobbyHavePlayerWithName(user.getName()+appendedNumberToName,lobby)) {
+                        appendedNumberToName++;
+                    }
+                    user.setName(user.getName() + appendedNumberToName);
+                }
                 userRepository.save(user);
                 user.setLobby(lobby);
                 lobby.getUsers().add(user);
@@ -57,6 +64,14 @@ public class LobbyService {
         } else {
             throw new UserUnableToJoinException("Lobby is full!");
         }
+    }
+    public boolean doesLobbyHavePlayerWithName(String name, Lobby lobby) {
+        for (User user : lobby.getUsers()) {
+            if (user.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
     }
     @Transactional(readOnly = true)
     public boolean doesLobbyExist(String joinCode) {
@@ -166,8 +181,10 @@ public class LobbyService {
     public void changeName(String name, UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         Lobby lobby = user.getLobby();
-        user.setName(HtmlUtils.htmlEscape(name));
-        sendWebsocketMessage(lobby,new UserChangedNameMessage(user.getSeparationId(), user.getName()));
+        if (!doesLobbyHavePlayerWithName(name,lobby)) {
+            user.setName(HtmlUtils.htmlEscape(name));
+            sendWebsocketMessage(lobby, new UserChangedNameMessage(user.getSeparationId(), user.getName()));
+        }
     }
 
     /**
