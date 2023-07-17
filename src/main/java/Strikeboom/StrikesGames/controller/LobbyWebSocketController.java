@@ -32,6 +32,10 @@ public class LobbyWebSocketController {
     public void sendMessage(@RequestBody String message, SimpMessageHeaderAccessor headerAccessor) {
         lobbyService.sendMessage(message,getIdFromHeaders(headerAccessor));
     }
+    @MessageMapping("/update-setting")
+    public void updateSetting(@RequestBody String key,@RequestBody Object value, SimpMessageHeaderAccessor headerAccessor) {
+        lobbyService.updateSetting(key, value,getIdFromHeaders(headerAccessor));
+    }
     @MessageMapping("/start")
     public void start(SimpMessageHeaderAccessor headerAccessor) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         lobbyService.start(getIdFromHeaders(headerAccessor));

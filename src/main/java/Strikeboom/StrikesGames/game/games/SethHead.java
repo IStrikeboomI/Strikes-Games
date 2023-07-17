@@ -4,7 +4,6 @@ import Strikeboom.StrikesGames.entity.Lobby;
 import Strikeboom.StrikesGames.entity.User;
 import Strikeboom.StrikesGames.game.GameEndedData;
 import Strikeboom.StrikesGames.game.GameInfo;
-import Strikeboom.StrikesGames.game.Games;
 import Strikeboom.StrikesGames.game.TurnBasedGame;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
@@ -15,7 +14,7 @@ public class SethHead extends TurnBasedGame {
 
     @Override
     public GameInfo getGameInfo() {
-        return Games.SETH_HEAD;
+        return GameInfo.SETH_HEAD;
     }
 
     @Override

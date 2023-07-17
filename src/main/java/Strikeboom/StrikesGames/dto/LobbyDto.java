@@ -1,5 +1,6 @@
 package Strikeboom.StrikesGames.dto;
 
+import Strikeboom.StrikesGames.game.GameSettings;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,4 +32,5 @@ public class LobbyDto {
     private List<UserDto> users;
     private boolean gameStarted;
     private List<ChatMessageDto> messages;
+    private GameSettings settings;
 }

@@ -79,7 +79,7 @@ xhttp.onload = (event) => {
     if (xhttp.status === 200) {
         let response = JSON.parse(xhttp.responseText);
         lobby = response.lobby;
-
+        lobby.settings = lobby.settings.settings;
         localStorage.setItem("separationId",response.separationId);
         for (let user of lobby.users) {
             let div = document.createElement("div");
@@ -120,6 +120,31 @@ xhttp.onload = (event) => {
             div.appendChild(userAttributes);
             div.appendChild(hoverText);
             document.getElementById("users").appendChild(div);
+        }
+        for (let setting of lobby.settings) {
+            let label = document.createElement("label");
+            label.innerHTML = setting.name + ": ";
+            label.setAttribute("for",setting.key);
+            let input = document.createElement("input");
+            input.value = setting.value;
+            switch (setting.type) {
+                case "BOOLEAN":
+                    input.type = checkbox;
+                    break;
+                case "INTEGER":
+                    input.type = "number";
+                    if (setting.min) {
+                        input.setAttribute("min",setting.min);
+                    }
+                    if (setting.max) {
+                        input.setAttribute("max",setting.max);
+                    }
+                    break;
+            }
+            input.id = setting.key;
+            input.setAttribute("key",setting.key);
+            document.getElementById("settings").appendChild(label);
+            document.getElementById("settings").appendChild(input);
         }
         for (let message of lobby.messages) {
             addChatMessage(message);

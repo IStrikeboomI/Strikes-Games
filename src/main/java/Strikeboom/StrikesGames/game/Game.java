@@ -13,6 +13,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import javax.validation.constraints.NotEmpty;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.stream.Stream;
 
 @Getter
 public abstract class Game {
@@ -37,9 +38,9 @@ public abstract class Game {
     public abstract void onGameEnded(GameEndedData data);
 
     public static Game newInstance(Lobby lobby,SimpMessagingTemplate template) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        GameInfo g = Games.GAMES.stream().filter(game1 -> game1.name().equals(lobby.getGame())).findFirst()
-                .orElseThrow(() -> new GameNotFoundException(String.format("Game %s not found!",lobby.getGame())));
-        return g.gameInstanceClass().getConstructor(Lobby.class,SimpMessagingTemplate.class).newInstance(lobby,template);
+        GameInfo g = Stream.of(GameInfo.values()).filter(game1 -> game1.name().equals(lobby.getGame().name())).findFirst()
+                .orElseThrow(() -> new GameNotFoundException(String.format("Game %s not found!",lobby.getGame().name())));
+        return g.gameInstanceClass.getConstructor(Lobby.class,SimpMessagingTemplate.class).newInstance(lobby,template);
     }
 
     /**
@@ -48,8 +49,8 @@ public abstract class Game {
      * @return whether the message can be received
      */
     public GameMessageHandler<?> getMessageHandler(String messageName,GameMessage message) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        if (getGameInfo().messages().containsKey(messageName)) {
-            return getGameInfo().messages().get(messageName).getConstructor(String.class, Map.class).newInstance(messageName,message.getData());
+        if (getGameInfo().messages.containsKey(messageName)) {
+            return getGameInfo().messages.get(messageName).getConstructor(String.class, Map.class).newInstance(messageName,message.getData());
         } else {
             throw new MessageNotFoundException(String.format("Message %s not found!",messageName));
         }

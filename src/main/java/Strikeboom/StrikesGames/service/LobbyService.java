@@ -5,8 +5,7 @@ import Strikeboom.StrikesGames.entity.ChatMessage;
 import Strikeboom.StrikesGames.entity.Lobby;
 import Strikeboom.StrikesGames.entity.User;
 import Strikeboom.StrikesGames.exception.*;
-import Strikeboom.StrikesGames.game.Game;
-import Strikeboom.StrikesGames.game.Games;
+import Strikeboom.StrikesGames.game.*;
 import Strikeboom.StrikesGames.repository.LobbyRepository;
 import Strikeboom.StrikesGames.repository.UserRepository;
 import Strikeboom.StrikesGames.websocket.message.game.GameMessage;
@@ -80,7 +79,7 @@ public class LobbyService {
     public static LobbyDto mapToDto(Lobby lobby) {
         return LobbyDto.builder()
                 .created(lobby.getCreated())
-                .game(lobby.getGame())
+                .game(lobby.getGame().getName())
                 .isPrivate(lobby.isPrivate())
                 .maxPlayers(lobby.getMaxPlayers())
                 .name(lobby.getName())
@@ -88,13 +87,18 @@ public class LobbyService {
                 .users(lobby.getUsers().stream().map(UserService::mapToDto).toList())
                 .messages(lobby.getMessages().stream().map(ChatService::mapToDto).toList())
                 .gameStarted(lobby.isGameStarted())
+                .settings(lobby.getSettings())
                 .build();
     }
     //called only on creation of lobby
     private Lobby map(LobbyDto lobby) {
+        GameSettings settings = new GameSettings().addSetting(new RangedIntegerSetting("playerTimer","Player Timer",30,10,60));
+        for (GameSetting setting : GameInfo.getGame(lobby.getGame()).getDefaultSettings()) {
+            settings.addSetting(setting);
+        }
         return Lobby.builder()
                 .created(Instant.now())
-                .game(lobby.getGame())
+                .game(GameInfo.getGame(lobby.getGame()))
                 .isPrivate(lobby.isPrivate())
                 .maxPlayers(lobby.getMaxPlayers())
                 .name(HtmlUtils.htmlEscape(lobby.getName()))
@@ -102,6 +106,7 @@ public class LobbyService {
                 .users(new ArrayList<>())
                 .messages(new ArrayList<>())
                 .gameStarted(false)
+                .settings(settings)
                 .build();
     }
 
@@ -198,7 +203,18 @@ public class LobbyService {
             throw new UserInsufficientPermissions("Only Lobby Creators Can Kick Users!");
         }
     }
-
+    public void updateSetting(String key, Object value,UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
+        if (user.isCreator()) {
+            Lobby lobby = user.getLobby();
+            if (!lobby.isGameStarted()) {
+                lobby.getSettings().update(key, value);
+                sendWebsocketMessage(lobby, new GameSettingUpdatedMessage(key, value));
+            }
+        } else {
+            throw new UserInsufficientPermissions("Only Lobby Creators Can Update Settings!");
+        }
+    }
     /**
      * Recives a chat message and relays it to rest of the lobby
      * @param message chat message that gets sent by user
@@ -224,7 +240,7 @@ public class LobbyService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         if (user.isCreator()) {
             Lobby lobby = user.getLobby();
-            if (lobby.getUsers().size() >= Objects.requireNonNull(Games.getGame(lobby.getGame())).minPlayers()) {
+            if (lobby.getUsers().size() >= lobby.getGame().getMinPlayers()) {
                 if (!lobby.isGameStarted()) {
                     lobby.setGameStarted(true);
                     sendWebsocketMessage(lobby, new GameStartedMessage());

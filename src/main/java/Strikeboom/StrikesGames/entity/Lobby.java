@@ -1,10 +1,14 @@
 package Strikeboom.StrikesGames.entity;
 
+import Strikeboom.StrikesGames.game.GameInfo;
+import Strikeboom.StrikesGames.game.GameSettings;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;
@@ -25,8 +29,8 @@ public class Lobby {
     @NotBlank(message = "name must not be empty!")
     @Size(max = 40,message = "Name is too long! Max is 40 characters")
     private String name;
-    @NotBlank(message = "game name must not be empty!")
-    private String game;
+    @Enumerated(EnumType.STRING)
+    private GameInfo game;
     private boolean isPrivate;
     @Positive(message = "max players must be positive!")
     private int maxPlayers;
@@ -39,4 +43,6 @@ public class Lobby {
     private boolean gameStarted;
     @OneToMany(orphanRemoval = true)
     private List<ChatMessage> messages;
+    @JdbcTypeCode(SqlTypes.JSON)
+    private GameSettings settings;
 }
