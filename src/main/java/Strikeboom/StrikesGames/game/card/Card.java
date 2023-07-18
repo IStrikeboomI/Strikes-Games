@@ -20,7 +20,7 @@ public class Card implements Comparable<Card>{
     }
 
     /**
-     * Card converted to string is letter of suit then value
+     * Card converted to string is letter of suit then defaultValue
      */
     @Override
     public String toString() {
@@ -43,7 +43,7 @@ public class Card implements Comparable<Card>{
     }
 
     /**
-     * Cards are ranked first by suit then by value <br>
+     * Cards are ranked first by suit then by defaultValue <br>
      * Suits are ranked from spades, clubs, hearts, and diamonds <br>
      * Values are ranked from 1 through 10 then jack, queen, and king <br>
      * Jokers are last, first red then black <br>

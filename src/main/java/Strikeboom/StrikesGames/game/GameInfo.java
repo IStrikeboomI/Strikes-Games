@@ -17,8 +17,8 @@ import java.util.Map;
 @Getter
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum GameInfo {
-    SETH_HEAD(SethHead.class,"Seth-Head",2,4,Map.of(),List.of(new GameSetting("test","Test",false, GameSetting.Type.BOOLEAN))),
-    TIC_TAC_TOE(TicTacToe.class,"Tic-Tac-Toe",2,2,Map.of("makeMove", MakeMoveMessage.class),List.of());
+    SETH_HEAD(SethHead.class,"Seth-Head",2,4,Map.of(),List.of(new RangedIntegerSetting("playerTimer","Player Timer",30,15,60),new GameSetting("test","Test",false, GameSetting.Type.BOOLEAN))),
+    TIC_TAC_TOE(TicTacToe.class,"Tic-Tac-Toe",2,2,Map.of("makeMove", MakeMoveMessage.class),List.of(new RangedIntegerSetting("playerTimer","Player Timer",30,15,60)));
 
     public static GameInfo getGame(String name) {
         for (GameInfo g : values()) {
@@ -36,7 +36,5 @@ public enum GameInfo {
     final int maxPlayers;
     @JsonIgnore
     final Map<String,Class<? extends GameMessageHandler<?>>> messages;
-    @JsonIgnore
     final List<GameSetting> defaultSettings;
-
 }

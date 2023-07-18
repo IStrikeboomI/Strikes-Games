@@ -79,7 +79,6 @@ xhttp.onload = (event) => {
     if (xhttp.status === 200) {
         let response = JSON.parse(xhttp.responseText);
         lobby = response.lobby;
-        lobby.settings = lobby.settings.settings;
         localStorage.setItem("separationId",response.separationId);
         for (let user of lobby.users) {
             let div = document.createElement("div");
@@ -121,31 +120,6 @@ xhttp.onload = (event) => {
             div.appendChild(hoverText);
             document.getElementById("users").appendChild(div);
         }
-        for (let setting of lobby.settings) {
-            let label = document.createElement("label");
-            label.innerHTML = setting.name + ": ";
-            label.setAttribute("for",setting.key);
-            let input = document.createElement("input");
-            input.value = setting.value;
-            switch (setting.type) {
-                case "BOOLEAN":
-                    input.type = checkbox;
-                    break;
-                case "INTEGER":
-                    input.type = "number";
-                    if (setting.min) {
-                        input.setAttribute("min",setting.min);
-                    }
-                    if (setting.max) {
-                        input.setAttribute("max",setting.max);
-                    }
-                    break;
-            }
-            input.id = setting.key;
-            input.setAttribute("key",setting.key);
-            document.getElementById("settings").appendChild(label);
-            document.getElementById("settings").appendChild(input);
-        }
         for (let message of lobby.messages) {
             addChatMessage(message);
         }
@@ -162,10 +136,41 @@ xhttp.onload = (event) => {
             for (let game of JSON.parse(event.target.responseText)) {
                 if (game.name === lobby.game) {
                     lobby.game = game;
-                    if (lobby.users.length >= game.minPlayers) {
+                    lobby.settings = Object.entries(lobby.settings).map(s => ({key:s[0],value:s[1]}));
+                    if (lobby.users.length >= game.minPlayers && user.creator) {
                         document.getElementById("start").style.display = "block";
                     } else {
                         document.getElementById("start").style.display = "none";
+                    }
+                    //adds game settings
+                    for (let s of lobby.settings) {
+                        let setting = game.defaultSettings.find(set => set.key===s.key);
+                        let label = document.createElement("label");
+                        label.innerHTML = setting.name + ": ";
+                        label.setAttribute("for",setting.key);
+                        let input = document.createElement("input");
+                        input.value = s.value;
+                        switch (setting.type) {
+                            case "BOOLEAN":
+                                input.type = "checkbox";
+                                input.checked = s.value;
+                                break;
+                            case "INTEGER":
+                                input.type = "number";
+                                if (setting.min) {
+                                    input.setAttribute("min",setting.min);
+                                }
+                                if (setting.max) {
+                                    input.setAttribute("max",setting.max);
+                                }
+                                input.addEventListener("keydown", (e) => checkIfNumber(e));
+                                break;
+                        }
+                        input.id = setting.key;
+                        input.setAttribute("key",setting.key);
+                        document.getElementById("settings").appendChild(label);
+                        document.getElementById("settings").appendChild(input);
+                        document.getElementById("settings").appendChild(document.createElement("br"));
                     }
                     break;
                 }
@@ -305,5 +310,11 @@ function start() {
         } else {
             alert(`Not enough people to start!, need at least ${lobby.game.minPlayers} to start!`);
         }
+    }
+}
+//called every time key is down, checks if what got inputted was a number
+function checkIfNumber(event) {
+    if (!(event.key >= '0' && event.key <= '9') && event.key!=="Backspace") {
+        event.preventDefault();
     }
 }

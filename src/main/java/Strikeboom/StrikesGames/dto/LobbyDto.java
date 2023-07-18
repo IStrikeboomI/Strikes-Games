@@ -1,6 +1,5 @@
 package Strikeboom.StrikesGames.dto;
 
-import Strikeboom.StrikesGames.game.GameSettings;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +11,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -32,5 +32,5 @@ public class LobbyDto {
     private List<UserDto> users;
     private boolean gameStarted;
     private List<ChatMessageDto> messages;
-    private GameSettings settings;
+    private Map<String,Object> settings;
 }

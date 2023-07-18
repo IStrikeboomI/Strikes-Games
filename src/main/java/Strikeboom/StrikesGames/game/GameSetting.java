@@ -12,7 +12,7 @@ import lombok.Setter;
 public class GameSetting {
     String key;
     String name;
-    Object value;
+    Object defaultValue;
     Type type;
     public enum Type {
         BOOLEAN,

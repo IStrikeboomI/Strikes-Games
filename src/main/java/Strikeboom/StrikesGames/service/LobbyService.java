@@ -92,9 +92,9 @@ public class LobbyService {
     }
     //called only on creation of lobby
     private Lobby map(LobbyDto lobby) {
-        GameSettings settings = new GameSettings().addSetting(new RangedIntegerSetting("playerTimer","Player Timer",30,10,60));
+        Map<String, Object> settings = new HashMap<>();
         for (GameSetting setting : GameInfo.getGame(lobby.getGame()).getDefaultSettings()) {
-            settings.addSetting(setting);
+            settings.put(setting.getKey(),setting.getDefaultValue());
         }
         return Lobby.builder()
                 .created(Instant.now())
@@ -208,7 +208,7 @@ public class LobbyService {
         if (user.isCreator()) {
             Lobby lobby = user.getLobby();
             if (!lobby.isGameStarted()) {
-                lobby.getSettings().update(key, value);
+                lobby.getSettings().put(key, value);
                 sendWebsocketMessage(lobby, new GameSettingUpdatedMessage(key, value));
             }
         } else {
@@ -290,7 +290,7 @@ public class LobbyService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         Lobby lobby = user.getLobby();
         Game gameInstance = gameInstances.get(lobby.getId());
-        if (gameInstance.getGameInfo().name().equalsIgnoreCase(game) && !gameInstance.gameEnded) {
+        if (gameInstance.getGameInfo().getName().equalsIgnoreCase(game) && !gameInstance.gameEnded) {
             GameMessageHandler<Game> handler = (GameMessageHandler<Game>) gameInstance.getMessageHandler(messageName, message);
             if (handler.handle(gameInstance, user)) {
                 if (handler.canDispatch(gameInstance, user)) {

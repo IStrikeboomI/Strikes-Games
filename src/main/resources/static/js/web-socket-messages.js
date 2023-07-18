@@ -151,7 +151,7 @@ function gameStarted(message) {
 
     let css = document.createElement("link");
     css.rel = "stylesheet";
-    css.href = "/css/game/" + lobby.game.toLowerCase() + ".css";
+    css.href = "/css/game/" + lobby.game.name.toLowerCase() + ".css";
 
     init();
 
