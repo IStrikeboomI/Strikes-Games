@@ -23,6 +23,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -92,10 +93,6 @@ public class LobbyService {
     }
     //called only on creation of lobby
     private Lobby map(LobbyDto lobby) {
-        Map<String, Object> settings = new HashMap<>();
-        for (GameSetting setting : GameInfo.getGame(lobby.getGame()).getDefaultSettings()) {
-            settings.put(setting.getKey(),setting.getDefaultValue());
-        }
         return Lobby.builder()
                 .created(Instant.now())
                 .game(GameInfo.getGame(lobby.getGame()))
@@ -106,7 +103,7 @@ public class LobbyService {
                 .users(new ArrayList<>())
                 .messages(new ArrayList<>())
                 .gameStarted(false)
-                .settings(settings)
+                .settings(GameInfo.getGame(lobby.getGame()).getDefaultSettings().stream().map(setting -> new SimpleGameSetting(setting.getKey(),setting.getValue())).collect(Collectors.toSet()))
                 .build();
     }
 
@@ -203,13 +200,20 @@ public class LobbyService {
             throw new UserInsufficientPermissions("Only Lobby Creators Can Kick Users!");
         }
     }
-    public void updateSetting(String key, Object value,UUID userId) {
+    public void updateSetting(SimpleGameSetting setting,UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         if (user.isCreator()) {
             Lobby lobby = user.getLobby();
             if (!lobby.isGameStarted()) {
-                lobby.getSettings().put(key, value);
-                sendWebsocketMessage(lobby, new GameSettingUpdatedMessage(key, value));
+                for (SimpleGameSetting s : lobby.getSettings()) {
+                    if (s.getKey().equals(setting.getKey())) {
+                        if (s.getValue() != setting.getValue()) {
+                            s.setValue(setting.getValue());
+                            sendWebsocketMessage(lobby, new GameSettingUpdatedMessage(setting));
+                            break;
+                        }
+                    }
+                }
             }
         } else {
             throw new UserInsufficientPermissions("Only Lobby Creators Can Update Settings!");

@@ -1,19 +1,22 @@
 package Strikeboom.StrikesGames.game;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class GameSetting {
-    String key;
+public class GameSetting extends SimpleGameSetting{
     String name;
-    Object defaultValue;
     Type type;
+
+    public GameSetting(String key, String name, Object value, Type type) {
+        super(key, value);
+        this.name = name;
+        this.type = type;
+    }
+
     public enum Type {
         BOOLEAN,
         INTEGER

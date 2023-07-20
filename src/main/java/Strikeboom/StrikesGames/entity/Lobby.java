@@ -1,6 +1,7 @@
 package Strikeboom.StrikesGames.entity;
 
 import Strikeboom.StrikesGames.game.GameInfo;
+import Strikeboom.StrikesGames.game.SimpleGameSetting;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +16,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -44,5 +45,5 @@ public class Lobby {
     @OneToMany(orphanRemoval = true)
     private List<ChatMessage> messages;
     @JdbcTypeCode(SqlTypes.JSON)
-    private Map<String,Object> settings;
+    private Set<SimpleGameSetting> settings;
 }

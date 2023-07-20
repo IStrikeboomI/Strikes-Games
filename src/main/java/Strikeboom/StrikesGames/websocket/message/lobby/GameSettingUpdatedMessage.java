@@ -1,16 +1,15 @@
 package Strikeboom.StrikesGames.websocket.message.lobby;
 
+import Strikeboom.StrikesGames.game.SimpleGameSetting;
 import lombok.Getter;
 import lombok.ToString;
 
 @Getter
 @ToString
 public class GameSettingUpdatedMessage extends LobbyMessage {
-    String key;
-    Object value;
-    public GameSettingUpdatedMessage(String key, Object value) {
+    SimpleGameSetting setting;
+    public GameSettingUpdatedMessage(SimpleGameSetting setting) {
         super("gameSettingUpdated");
-        this.key = key;
-        this.value = value;
+        this.setting = setting;
     }
 }

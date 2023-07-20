@@ -1,5 +1,6 @@
 package Strikeboom.StrikesGames.controller;
 
+import Strikeboom.StrikesGames.game.SimpleGameSetting;
 import Strikeboom.StrikesGames.service.LobbyService;
 import Strikeboom.StrikesGames.websocket.message.game.GameMessage;
 import lombok.AllArgsConstructor;
@@ -33,8 +34,8 @@ public class LobbyWebSocketController {
         lobbyService.sendMessage(message,getIdFromHeaders(headerAccessor));
     }
     @MessageMapping("/update-setting")
-    public void updateSetting(@RequestBody String key,@RequestBody Object value, SimpMessageHeaderAccessor headerAccessor) {
-        lobbyService.updateSetting(key, value,getIdFromHeaders(headerAccessor));
+    public void updateSetting(@RequestBody SimpleGameSetting setting, SimpMessageHeaderAccessor headerAccessor) {
+        lobbyService.updateSetting(setting,getIdFromHeaders(headerAccessor));
     }
     @MessageMapping("/start")
     public void start(SimpMessageHeaderAccessor headerAccessor) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {

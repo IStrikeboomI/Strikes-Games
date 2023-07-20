@@ -136,11 +136,12 @@ xhttp.onload = (event) => {
             for (let game of JSON.parse(event.target.responseText)) {
                 if (game.name === lobby.game) {
                     lobby.game = game;
-                    lobby.settings = Object.entries(lobby.settings).map(s => ({key:s[0],value:s[1]}));
-                    if (lobby.users.length >= game.minPlayers && user.creator) {
-                        document.getElementById("start").style.display = "block";
-                    } else {
-                        document.getElementById("start").style.display = "none";
+                    if (user.creator) {
+                        if (lobby.users.length >= game.minPlayers) {
+                            document.getElementById("start").style.display = "block";
+                        } else {
+                            document.getElementById("start").style.display = "none";
+                        }
                     }
                     //adds game settings
                     for (let s of lobby.settings) {
@@ -164,6 +165,7 @@ xhttp.onload = (event) => {
                                     input.setAttribute("max",setting.max);
                                 }
                                 input.addEventListener("keydown", (e) => checkIfNumber(e));
+                                input.addEventListener("blur", (e) => checkAndSendNumberSetting(e));
                                 break;
                         }
                         input.id = setting.key;
@@ -317,4 +319,15 @@ function checkIfNumber(event) {
     if (!(event.key >= '0' && event.key <= '9') && event.key!=="Backspace") {
         event.preventDefault();
     }
+}
+function checkAndSendNumberSetting(e) {
+    let element = e.target;
+    let value = parseInt(element.value) || 0;
+    if (value > parseInt(element.max)) {
+        element.value = element.max;
+    }
+    if (value < parseInt(element.min)) {
+        element.value = element.min;
+    }
+    stompClient.send("/lobby/update-setting",{},JSON.stringify({key:element.getAttribute("key"),value:parseInt(element.value)}));
 }

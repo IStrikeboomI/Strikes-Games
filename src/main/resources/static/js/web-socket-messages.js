@@ -7,7 +7,8 @@ const handlers = [
 {"name": "userReconnected","handler":userReconnected},
 {"name": "userSentMessage","handler":userSentMessage},
 {"name": "gameStarted","handler":gameStarted},
-{"name": "gameRestarted","handler":gameRestarted}
+{"name": "gameRestarted","handler":gameRestarted},
+{"name": "gameSettingUpdated","handler":gameSettingUpdated}
 ]
 function gameMessage(message) {
     if (lobby.gameStarted) {
@@ -159,4 +160,13 @@ function gameStarted(message) {
 }
 function gameRestarted(message) {
     location.reload();
+}
+function gameSettingUpdated(message) {
+    for (let e of document.querySelectorAll('[key]')) {
+        if (e.getAttribute("key") === message.setting.key) {
+            addLobbyMessage(`Setting \"${lobby.game.defaultSettings.find(set => set.key===message.setting.key).name}\" changed from ${e.value} to ${message.setting.value}`,"#1A1A1E80");
+            e.value = message.setting.value;
+            e.checked = message.setting.value;
+        }
+    }
 }
