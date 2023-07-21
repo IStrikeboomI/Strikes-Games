@@ -154,7 +154,14 @@ xhttp.onload = (event) => {
                         switch (setting.type) {
                             case "BOOLEAN":
                                 input.type = "checkbox";
+                                input.value = s.value;
                                 input.checked = s.value;
+                                if (user.creator) {
+                                    input.addEventListener("change", (e) => checkboxToggled(e));
+                                } else {
+                                    input.addEventListener("click", (e) => {e.preventDefault();});
+                                    input.addEventListener("keydown", (e) => {e.preventDefault();});
+                                }
                                 break;
                             case "INTEGER":
                                 input.type = "number";
@@ -164,8 +171,12 @@ xhttp.onload = (event) => {
                                 if (setting.max) {
                                     input.setAttribute("max",setting.max);
                                 }
-                                input.addEventListener("keydown", (e) => checkIfNumber(e));
-                                input.addEventListener("blur", (e) => checkAndSendNumberSetting(e));
+                                if (user.creator) {
+                                    input.addEventListener("keydown", (e) => checkIfNumber(e));
+                                    input.addEventListener("blur", (e) => checkAndSendNumberSetting(e));
+                                } else {
+                                     input.readOnly = true;
+                                 }
                                 break;
                         }
                         input.id = setting.key;
@@ -320,6 +331,7 @@ function checkIfNumber(event) {
         event.preventDefault();
     }
 }
+
 function checkAndSendNumberSetting(e) {
     let element = e.target;
     let value = parseInt(element.value) || 0;
@@ -330,4 +342,8 @@ function checkAndSendNumberSetting(e) {
         element.value = element.min;
     }
     stompClient.send("/lobby/update-setting",{},JSON.stringify({key:element.getAttribute("key"),value:parseInt(element.value)}));
+}
+function checkboxToggled(e) {
+    let element = e.target;
+    stompClient.send("/lobby/update-setting",{},JSON.stringify({key:element.getAttribute("key"),value:element.checked}));
 }

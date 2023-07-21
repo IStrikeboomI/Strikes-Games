@@ -200,6 +200,7 @@ public class LobbyService {
             throw new UserInsufficientPermissions("Only Lobby Creators Can Kick Users!");
         }
     }
+    @Transactional
     public void updateSetting(SimpleGameSetting setting,UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         if (user.isCreator()) {
@@ -208,7 +209,8 @@ public class LobbyService {
                 for (SimpleGameSetting s : lobby.getSettings()) {
                     if (s.getKey().equals(setting.getKey())) {
                         if (s.getValue() != setting.getValue()) {
-                            s.setValue(setting.getValue());
+                            lobby.getSettings().remove(s);
+                            lobby.getSettings().add(setting);
                             sendWebsocketMessage(lobby, new GameSettingUpdatedMessage(setting));
                             break;
                         }
