@@ -341,7 +341,9 @@ function checkAndSendNumberSetting(e) {
     if (value < parseInt(element.min)) {
         element.value = element.min;
     }
-    stompClient.send("/lobby/update-setting",{},JSON.stringify({key:element.getAttribute("key"),value:parseInt(element.value)}));
+    if (parseInt(element.value) !== lobby.settings.find(s => s.key===element.getAttribute("key")).value) {
+        stompClient.send("/lobby/update-setting",{},JSON.stringify({key:element.getAttribute("key"),value:parseInt(element.value)}));
+    }
 }
 function checkboxToggled(e) {
     let element = e.target;

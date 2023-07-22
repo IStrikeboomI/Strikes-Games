@@ -167,6 +167,7 @@ function gameSettingUpdated(message) {
             addLobbyMessage(`Setting \"${lobby.game.defaultSettings.find(set => set.key===message.setting.key).name}\" changed from ${e.value} to ${message.setting.value}`,"#1A1A1E80");
             e.value = message.setting.value;
             e.checked = message.setting.value;
+            lobby.settings.find(s => s.key===message.setting.key).value = message.setting.value;
         }
     }
 }

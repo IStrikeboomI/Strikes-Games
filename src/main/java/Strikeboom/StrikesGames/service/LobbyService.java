@@ -168,6 +168,22 @@ public class LobbyService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         sendGameInitMessages(user);
     }
+
+    /**
+     * Updates game setting in lobby by deleting old setting and adding the new setting
+     * @param lobby lobby with setting to update
+     * @param setting setting to update with
+     */
+    public void updateSetting(Lobby lobby, SimpleGameSetting setting) {
+        for (SimpleGameSetting s : lobby.getSettings()) {
+            if (s.getKey().equals(setting.getKey())) {
+                lobby.getSettings().remove(s);
+                lobby.getSettings().add(setting);
+                sendWebsocketMessage(lobby, new GameSettingUpdatedMessage(setting));
+                break;
+            }
+        }
+    }
     //below is everything to be received by websockets by LobbyWebSocketController
     /**
      *
@@ -200,7 +216,12 @@ public class LobbyService {
             throw new UserInsufficientPermissions("Only Lobby Creators Can Kick Users!");
         }
     }
-    @Transactional
+
+    /**
+     * Updates game setting
+     * @param setting setting to update, key needs to exist in lobby's game settings and value has to be same type
+     * @param userId user that sent update, has to be creator
+     */
     public void updateSetting(SimpleGameSetting setting,UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format("User With Id:%s Not Found!",userId)));
         if (user.isCreator()) {
@@ -209,9 +230,21 @@ public class LobbyService {
                 for (SimpleGameSetting s : lobby.getSettings()) {
                     if (s.getKey().equals(setting.getKey())) {
                         if (s.getValue() != setting.getValue()) {
-                            lobby.getSettings().remove(s);
-                            lobby.getSettings().add(setting);
-                            sendWebsocketMessage(lobby, new GameSettingUpdatedMessage(setting));
+                            for (GameSetting gameSetting : lobby.getGame().getDefaultSettings()) {
+                                //if setting is integer
+                                if (gameSetting.getType()== GameSetting.Type.INTEGER && setting.getValue() instanceof Integer) {
+                                    if (gameSetting instanceof RangedIntegerSetting rangedIntegerSetting) {
+                                        int value = (int) setting.getValue();
+                                        if (value >= rangedIntegerSetting.getMin() && value <= rangedIntegerSetting.getMax()) {
+                                            updateSetting(lobby, setting);
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (gameSetting.getType()== GameSetting.Type.BOOLEAN && setting.getValue() instanceof Boolean) {
+                                    updateSetting(lobby, setting);
+                                }
+                            }
                             break;
                         }
                     }
