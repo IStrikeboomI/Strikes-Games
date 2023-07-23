@@ -171,6 +171,9 @@ xhttp.onload = (event) => {
                                 if (setting.max) {
                                     input.setAttribute("max",setting.max);
                                 }
+                                if (setting.min && setting.max) {
+                                    label.innerHTML = `${setting.name} (Number Between ${setting.min}-${setting.max}): `;
+                                }
                                 if (user.creator) {
                                     input.addEventListener("keydown", (e) => checkIfNumber(e));
                                     input.addEventListener("blur", (e) => checkAndSendNumberSetting(e));
