@@ -17,7 +17,7 @@ import java.util.Set;
 @Getter
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum GameInfo {
-    SETH_HEAD(SethHead.class,"Seth-Head",2,4,Map.of(),Set.of(new RangedIntegerSetting("playerTimer","Player Timer",30,15,60),new GameSetting("test","Test",false, GameSetting.Type.BOOLEAN))),
+    SETH_HEAD(SethHead.class,"Seth-Head",2,4,Map.of(),Set.of(new RangedIntegerSetting("playerTimer","Player Timer",30,15,60))),
     TIC_TAC_TOE(TicTacToe.class,"Tic-Tac-Toe",2,2,Map.of("makeMove", MakeMoveMessage.class),Set.of(new RangedIntegerSetting("playerTimer","Player Timer",30,15,60)));
 
     public static GameInfo getGame(String name) {

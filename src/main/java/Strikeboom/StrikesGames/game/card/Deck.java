@@ -1,12 +1,15 @@
 package Strikeboom.StrikesGames.game.card;
 
 import Strikeboom.StrikesGames.exception.SplitSizeNotEvenException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class Deck {
+    @JsonValue
     public List<Card> cards;
     public Deck(List<Card> cards) {
         this.cards = cards;
@@ -49,6 +52,10 @@ public class Deck {
         cards.add(card);
         return this;
     }
+    public Card pop() {
+        Card first = cards.get(0);
+        return cards.remove(0);
+    }
     public int size() {
         return cards.size();
     }
@@ -59,6 +66,20 @@ public class Deck {
     public Deck removeCards(List<Card> cards) {
         this.cards.removeAll(cards);
         return this;
+    }
+    @JsonIgnore
+    public Card getFirstCard() {
+        if (cards.isEmpty()) {
+            return null;
+        }
+        return cards.get(0);
+    }
+    @JsonIgnore
+    public Card getLastCard() {
+        if (cards.isEmpty()) {
+            return null;
+        }
+        return cards.get(cards.size()-1);
     }
     public Deck shuffle() {
         Collections.shuffle(cards);

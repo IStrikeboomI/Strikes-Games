@@ -1,12 +1,15 @@
 package Strikeboom.StrikesGames.game.card;
 
 import Strikeboom.StrikesGames.exception.CardNotFoundException;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 
 import java.util.Arrays;
 import java.util.List;
 
 @AllArgsConstructor
+@JsonSerialize(using = ToStringSerializer.class)
 public class Card implements Comparable<Card>{
     public Suit suit;
     public Value value;
