@@ -36,6 +36,7 @@ public class SethHead extends TurnBasedGame {
             }
             topValidCard = extraCards.cards.get(i);
         }
+        extraCards.removeCard(topValidCard);
         pile = new Deck().addCard(topValidCard);
         hands = new HashMap<>();
         visibleCards = new HashMap<>();
@@ -61,6 +62,13 @@ public class SethHead extends TurnBasedGame {
                 break;
             }
         }
+        Map<UUID, Integer> handsSize = new HashMap<>();
+        for (User u : hands.keySet()) {
+            if (!u.equals(user)) {
+                handsSize.put(u.getSeparationId(),hands.get(u).size());
+            }
+        }
+        data.put("handsSize",handsSize);
         Map<UUID,Deck> visibleCardsByUUID = new HashMap<>();
         for (User u : visibleCards.keySet()) {
             visibleCardsByUUID.put(u.getSeparationId(),visibleCards.get(u));
