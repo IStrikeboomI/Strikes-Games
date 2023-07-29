@@ -53,7 +53,6 @@ public class Deck {
         return this;
     }
     public Card pop() {
-        Card first = cards.get(0);
         return cards.remove(0);
     }
     public int size() {
