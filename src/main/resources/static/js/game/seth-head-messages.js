@@ -4,6 +4,7 @@ const gameMessageHandlers = [
 ]
 function getGameData(message) {
     console.log(message);
+    window.requestAnimationFrame(animate);
 }
 function makeMove(message) {
 

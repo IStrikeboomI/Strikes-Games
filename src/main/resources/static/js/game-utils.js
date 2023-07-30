@@ -51,3 +51,9 @@ cards.push(back);
 function getCard(name) {
 	return cards.find(c => c.name===name);
 }
+function randomInt(min, max) {
+    return Math.round(Math.random() * (max - min) + min);
+}
+function randomBoolean() {
+    return randomInt(0,1) === 0;
+}
