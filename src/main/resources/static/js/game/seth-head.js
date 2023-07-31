@@ -1,5 +1,13 @@
+//location of where users are as follows, bottom is always the client then the user order is top, right, then left
 let canvas;
 let ctx;
+
+let hand = [];
+let visibleCards = [];
+let extraCardSize;
+let topPileCard;
+let playerOnTurn;
+let usersWithData = [];
 function init() {
     canvas = document.createElement("canvas");
     canvas.height = document.documentElement.clientHeight;
@@ -8,7 +16,26 @@ function init() {
     } else {
         canvas.width = document.documentElement.clientWidth;
     }
-
+    //add client first
+    usersWithData.push( {user: user, x: canvas.width/2, y: canvas.height * .95});
+    //add all the other users after
+    for (let i = 0;i < getOtherUsers().length;i++) {
+        let u = getOtherUsers()[i];
+        let userWithData = {user: u};
+        //first user goes on top
+        if (i == 0) {
+            userWithData.x = canvas.width/2
+            userWithData.y = canvas.height * .05;
+        } else {
+            if (i == 1) {
+                userWithData.x = canvas.width * .95;
+            } else {
+                userWithData.x = canvas.width * .05;
+            }
+            userWithData.y = canvas.height / 2;
+        }
+        usersWithData.push(userWithData);
+    }
     ctx = canvas.getContext("2d");
     document.body.appendChild(canvas);
 }
@@ -20,6 +47,12 @@ function animate(siteTimestamp) {
     }
     let timestamp = siteTimestamp - startTimestamp;
     ctx.clearRect(0,0,canvas.width,canvas.height);
+    //draws usernames
+    ctx.textAlign = "center";
+    ctx.font = "30px Arial";
+    for (let u of usersWithData) {
+        ctx.fillText(u.user.name, u.x,u.y);
+    }
     let backImage = getCard("back").image;
     backImage.width = 100;
     backImage.height = 140;

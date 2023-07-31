@@ -352,3 +352,7 @@ function checkboxToggled(e) {
     let element = e.target;
     stompClient.send("/lobby/update-setting",{},JSON.stringify({key:element.getAttribute("key"),value:element.checked}));
 }
+//Gets all users NOT including client
+function getOtherUsers() {
+    return lobby.users.filter(u => u !== user);
+}
