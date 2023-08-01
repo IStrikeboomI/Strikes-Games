@@ -17,7 +17,7 @@ function init() {
         canvas.width = document.documentElement.clientWidth;
     }
     //add client first
-    usersWithData.push( {user: user, x: canvas.width/2, y: canvas.height * .95});
+    usersWithData.push({user: user, x: canvas.width/2, y: canvas.height * .95, position: "bottom"});
     //add all the other users after
     for (let i = 0;i < getOtherUsers().length;i++) {
         let u = getOtherUsers()[i];
@@ -26,11 +26,15 @@ function init() {
         if (i == 0) {
             userWithData.x = canvas.width/2
             userWithData.y = canvas.height * .05;
+            userWithData.position = "top";
         } else {
             if (i == 1) {
                 userWithData.x = canvas.width * .95;
+                userWithData.position = "right";
+
             } else {
                 userWithData.x = canvas.width * .05;
+                userWithData.position = "left";
             }
             userWithData.y = canvas.height / 2;
         }
@@ -53,6 +57,7 @@ function animate(siteTimestamp) {
     for (let u of usersWithData) {
         ctx.fillText(u.user.name, u.x,u.y);
     }
+
     let backImage = getCard("back").image;
     backImage.width = 100;
     backImage.height = 140;
@@ -70,6 +75,7 @@ function animate(siteTimestamp) {
         ctx.restore();
     } else {
         const TIME_TO_DEAL = 300;
+
         //this block is to deal out the cards
         ctx.drawImage(backImage,canvas.width / 2 - backImage.width/2,canvas.height/2-backImage.height/2-(timestamp % TIME_TO_DEAL),backImage.width,backImage.height);
         ctx.drawImage(backImage,canvas.width / 2 - backImage.width/2,canvas.height/2-backImage.height/2+(timestamp % TIME_TO_DEAL),backImage.width,backImage.height);
