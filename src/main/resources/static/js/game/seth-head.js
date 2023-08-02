@@ -7,6 +7,7 @@ let visibleCards = [];
 let extraCardSize;
 let topPileCard;
 let playerOnTurn;
+//stores users along with additional data like where they are on canvas and what their cards are
 let usersWithData = [];
 function init() {
     canvas = document.createElement("canvas");
