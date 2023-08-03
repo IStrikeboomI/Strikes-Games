@@ -3,7 +3,6 @@ const gameMessageHandlers = [
     {"name": "makeMove","handler":makeMove}
 ]
 function getGameData(message) {
-    console.log(message);
     extraCardsSize = message.extraCardSize;
     topPileCard = message.topPileCard;
     playerOnTurn = lobby.users.find(u => u.separationId===message.playerOnTurn);
