@@ -18,25 +18,23 @@ function init() {
         canvas.width = document.documentElement.clientWidth;
     }
     //add client first
-    usersWithData.push({user: user, x: canvas.width/2, y: canvas.height * .95, rotation:0});
+    usersWithData.push({user: user, rotation:0, radius: canvas.height/2});
     //add all the other users after
     for (let i = 0;i < getOtherUsers().length;i++) {
         let u = getOtherUsers()[i];
         let userWithData = {user: u};
         //first user goes on top
         if (i == 0) {
-            userWithData.x = canvas.width/2
-            userWithData.y = canvas.height * .05;
             userWithData.rotation = Math.PI;
+            userWithData.radius = canvas.height/2;
         } else {
             if (i == 1) {
-                userWithData.x = canvas.width * .95;
                 userWithData.rotation = 3*Math.PI/2;
+                userWithData.radius = canvas.width/2;
             } else {
-                userWithData.x = canvas.width * .05;
                 userWithData.rotation = Math.PI/2;
+                userWithData.radius = canvas.width/2;
             }
-            userWithData.y = canvas.height / 2;
         }
         usersWithData.push(userWithData);
     }
@@ -55,7 +53,12 @@ function animate(siteTimestamp) {
     ctx.textAlign = "center";
     ctx.font = "30px Arial sans-serif";
     for (let u of usersWithData) {
-        ctx.fillText(u.user.name, u.x,u.y);
+        ctx.save();
+        ctx.translate(canvas.width/2,canvas.height/2);
+        ctx.rotate(u.rotation);
+        ctx.fillText(u.user.name, 0,u.radius * .95);
+        u.textDimensions = ctx.measureText(u.user.name);
+        ctx.restore();
     }
 
     let backImage = getCard("back").image;
@@ -75,25 +78,33 @@ function animate(siteTimestamp) {
         ctx.restore();
     } else {
         const TIME_TO_DEAL = canvas.width/2;
-        ctx.save();
-        ctx.translate(canvas.width/2 - backImage.width/2,canvas.height/2 - backImage.height/2);
-        ctx.rotate(1 * Math.PI / 2);
-        ctx.drawImage(backImage,0,timestamp % TIME_TO_DEAL,backImage.width,backImage.height);
+        //ctx.drawImage(backImage,0,timestamp % TIME_TO_DEAL,backImage.width,backImage.height);
+        //displays all the cards in the hand
         for (let u of usersWithData) {
-            //width of entire hand of user, used for centering the hand to the name
-            let handWidth = u.handSize*(backImage.width/2);
-            for (let handSize = 0;handSize < u.handSize;handSize++) {
-                ctx.drawImage(backImage,(u.x + handSize*(backImage.width/2)) - handWidth/2,u.y,backImage.width,backImage.height)
+            ctx.save();
+            ctx.translate(canvas.width/2,canvas.height/2);
+            ctx.rotate(u.rotation);
+            for (let h = 0;h < u.handSize;h++) {
+                //if drawing the current user then draw the client's hand otherwise draw everyone else's card using the back card texture
+                if (u.user != user) {
+                    ctx.drawImage(backImage,h*(backImage.width/2) - (u.handSize*backImage.width/2)/2,u.radius * .95 - (backImage.width*1.75),backImage.width,backImage.height);
+                } else {
+                    let card = getCard(hand[h]);
+                    let cardImage = card.image;
+                    cardImage.width = 100;
+                    cardImage.height = 140;
+                    ctx.drawImage(cardImage,h*(cardImage.width * 1.05) - (u.handSize*cardImage.width)/2,u.radius * .95 - (cardImage.width*1.75),cardImage.width,cardImage.height);
+                }
             }
+            ctx.restore();
         }
-        ctx.restore();
         //this block is to deal out the cards
         //ctx.drawImage(backImage,canvas.width / 2 - backImage.width/2,canvas.height/2-backImage.height/2-(timestamp % TIME_TO_DEAL),backImage.width,backImage.height);
         //ctx.drawImage(backImage,canvas.width / 2 - backImage.width/2,canvas.height/2-backImage.height/2+(timestamp % TIME_TO_DEAL),backImage.width,backImage.height);
         //ctx.drawImage(backImage,canvas.width / 2 - backImage.width/2- (timestamp % TIME_TO_DEAL),canvas.height/2-backImage.height/2,backImage.width,backImage.height);
         //ctx.drawImage(backImage,canvas.width / 2 - backImage.width/2+ (timestamp % TIME_TO_DEAL),canvas.height/2-backImage.height/2,backImage.width,backImage.height);
         //since timestamp is a float it wont work properly with modulo, still needs testing/fixing
-        if (timestamp % TIME_TO_DEAL <= 10) {
+        if (Math.round(timestamp) % 10 == 0) {
             cardsHandedOut += 1;
         }
         for (let i = 0; i < 54 - cardsHandedOut;i++) {
