@@ -18,7 +18,7 @@ function init() {
         canvas.width = document.documentElement.clientWidth;
     }
     //add client first
-    usersWithData.push({user: user, x: canvas.width/2, y: canvas.height * .95, position: "bottom", scaleX:1, scaleY:-1});
+    usersWithData.push({user: user, x: canvas.width/2, y: canvas.height * .95, rotation:0});
     //add all the other users after
     for (let i = 0;i < getOtherUsers().length;i++) {
         let u = getOtherUsers()[i];
@@ -27,20 +27,14 @@ function init() {
         if (i == 0) {
             userWithData.x = canvas.width/2
             userWithData.y = canvas.height * .05;
-            userWithData.position = "top";
-            userWithData.scaleX = 1;
-            userWithData.scaleY = 1;
+            userWithData.rotation = Math.PI;
         } else {
             if (i == 1) {
                 userWithData.x = canvas.width * .95;
-                userWithData.position = "right";
-                userWithData.scaleX = -1;
-                userWithData.scaleY = 1;
+                userWithData.rotation = 3*Math.PI/2;
             } else {
                 userWithData.x = canvas.width * .05;
-                userWithData.position = "left";
-                userWithData.scaleX = -1;
-                userWithData.scaleY = -1;
+                userWithData.rotation = Math.PI/2;
             }
             userWithData.y = canvas.height / 2;
         }
@@ -80,14 +74,19 @@ function animate(siteTimestamp) {
         }
         ctx.restore();
     } else {
-        const TIME_TO_DEAL = 100;
+        const TIME_TO_DEAL = canvas.width/2;
+        ctx.save();
+        ctx.translate(canvas.width/2 - backImage.width/2,canvas.height/2 - backImage.height/2);
+        ctx.rotate(1 * Math.PI / 2);
+        ctx.drawImage(backImage,0,timestamp % TIME_TO_DEAL,backImage.width,backImage.height);
         for (let u of usersWithData) {
             //width of entire hand of user, used for centering the hand to the name
             let handWidth = u.handSize*(backImage.width/2);
             for (let handSize = 0;handSize < u.handSize;handSize++) {
-                ctx.drawImage(backImage,(u.x + handSize*(backImage.width/2)) - handWidth/2,u.y + (u.y * u.scaleY * .20),backImage.width,backImage.height)
+                ctx.drawImage(backImage,(u.x + handSize*(backImage.width/2)) - handWidth/2,u.y,backImage.width,backImage.height)
             }
         }
+        ctx.restore();
         //this block is to deal out the cards
         //ctx.drawImage(backImage,canvas.width / 2 - backImage.width/2,canvas.height/2-backImage.height/2-(timestamp % TIME_TO_DEAL),backImage.width,backImage.height);
         //ctx.drawImage(backImage,canvas.width / 2 - backImage.width/2,canvas.height/2-backImage.height/2+(timestamp % TIME_TO_DEAL),backImage.width,backImage.height);
