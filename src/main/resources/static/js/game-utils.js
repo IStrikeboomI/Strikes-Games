@@ -39,6 +39,8 @@ for (let name of cardNames) {
     }
 	cards.push(card);
 }
+cards[52].value = "JOKER";
+cards[53].value = "JOKER";
 let backImage = new Image();
 backImage.src = "/image/card/back.png"
 let back = {
@@ -49,7 +51,19 @@ let back = {
 }
 cards.push(back);
 function getCard(name) {
-	return cards.find(c => c.name===name);
+    //back is always last card
+    if (name === "back") {
+        return cards[cards.length-1];
+    }
+    if (name === "RJ") {
+        return cards[52];
+    }
+    if (name === "BJ") {
+        return cards[53];
+    }
+    let suit = Object.values(Suit).indexOf(name.substring(0,1));
+    let value = Object.values(Value).indexOf(name.substring(1));
+	return cards[suit * 13+ value];
 }
 function randomInt(min, max) {
     return Math.round(Math.random() * (max - min) + min);
