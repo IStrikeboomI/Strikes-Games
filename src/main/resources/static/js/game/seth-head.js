@@ -11,6 +11,8 @@ let playerOnTurn;
 let usersWithData = [];
 function init() {
     canvas = document.createElement("canvas");
+    canvas.addEventListener('mousedown', (e) => onCanvasClick(e));
+    canvas.addEventListener('mousemove', (e) => onCanvasHover(e));
     canvas.height = document.documentElement.clientHeight;
     if (document.documentElement.clientWidth <= 600) {
         canvas.width = document.documentElement.clientWidth;
@@ -113,6 +115,9 @@ function animate(siteTimestamp) {
     }
     window.requestAnimationFrame(animate);
 }
-function drawCard(user, timeToDeal) {
+function onCanvasHover(e) {
+
+}
+function onCanvasClick(e) {
 
 }
