@@ -45,8 +45,9 @@ public abstract class Game {
 
     /**
      * Gets message handler of game message <br>
+     * Message handler must be registered in messages map in game's enum in {@link GameInfo}
      * @param message message
-     * @return whether the message can be received
+     * @return message handler
      */
     public GameMessageHandler<?> getMessageHandler(String messageName,GameMessage message) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if (getGameInfo().messages.containsKey(messageName)) {
