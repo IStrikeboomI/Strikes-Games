@@ -81,6 +81,14 @@ public class SethHead extends TurnBasedGame {
     @Override
     public GameEndedData isGameEnded() {
         GameEndedData gameEndedData = new GameEndedData();
+        for (User u : getLobby().getUsers()) {
+            if (visibleCards.containsKey(u) && hands.containsKey(u)) {
+                if (visibleCards.get(u).size() == 0 && hands.get(u).size() == 0) {
+                    gameEndedData.gameEnded = true;
+                    gameEndedData.data.put("winner",u.getSeparationId());
+                }
+            }
+        }
         return gameEndedData;
     }
 
