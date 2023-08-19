@@ -18,26 +18,32 @@ public class MakeMoveMessage extends GameMessageHandler<SethHead> {
         if (canDispatch(game,player)) {
             if (getData().containsKey("card")) {
                 Card card = Card.fromString((String) getData().get("card"));
-                //if card that's played is in hand then take from hand
-                if (game.hands.get(player).containsCard(card)) {
-                    game.hands.get(player).removeCard(card);
-                }
-                //if card is from visible deck
-                if (game.visibleCards.get(player).containsCard(card)) {
-                    game.visibleCards.get(player).removeCard(card);
-                    //if there are still cards in hand, you need to replace the visible card played from a card in your hand
-                    if (game.hands.get(player).size() > 0) {
-                        if (getData().containsKey("replacementCard")) {
-                            Card replacementCard = Card.fromString((String) getData().get("replacementCard"));
-                            game.hands.get(player).removeCard(replacementCard);
-                            game.visibleCards.get(player).addCard(replacementCard);
-                        } else {
-                            return false;
+                //if card is valid then play
+                //if card is either same suit or value
+                if (card.suit.equals(game.pile.getLastCard().suit) || card.value.equals(game.pile.getLastCard().value)
+                        //or if card is wild (jack or joker)
+                    || card.value.equals(Card.Value.JACK) || card.value.equals(Card.Value.JOKER)) {
+                    //if card that's played is in hand then take from hand
+                    if (game.hands.get(player).containsCard(card)) {
+                        game.hands.get(player).removeCard(card);
+                    }
+                    //if card is from visible deck
+                    if (game.visibleCards.get(player).containsCard(card)) {
+                        game.visibleCards.get(player).removeCard(card);
+                        //if there are still cards in hand, you need to replace the visible card played from a card in your hand
+                        if (game.hands.get(player).size() > 0) {
+                            if (getData().containsKey("replacementCard")) {
+                                Card replacementCard = Card.fromString((String) getData().get("replacementCard"));
+                                game.hands.get(player).removeCard(replacementCard);
+                                game.visibleCards.get(player).addCard(replacementCard);
+                            } else {
+                                return false;
+                            }
                         }
                     }
+                    game.pile.addCard(card);
+                    return true;
                 }
-                game.pile.addCard(card);
-                return true;
             }
         }
         return false;
