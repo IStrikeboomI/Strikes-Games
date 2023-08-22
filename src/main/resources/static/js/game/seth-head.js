@@ -141,15 +141,21 @@ function drawCanvas() {
 function onCanvasHover(e) {
     let x = e.layerX;
     let y = e.layerY;
+    for (let h = 0;h < hand.length;h++) {
+        let cardXStart = h * (100 * 1.05) - (hand.length*100)/2 + canvas.width/2;
+        let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (100*1.75) + canvas.height/2;
+        if (x > cardXStart && x < cardXStart + 100 && y > cardYStart && y < cardYStart + 140) {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            drawCanvas();
+            ctx.globalCompositeOperation = 'destination-over';
+            ctx.strokeStyle = "rgba(201,188,6,1)";
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.roundRect(cardXStart,cardYStart,100,140,5);
+            ctx.stroke();
+        }
+    }
 
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    drawCanvas();
-    ctx.globalCompositeOperation = 'destination-over';
-    ctx.strokeStyle = "rgba(201,188,6,1)";
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.roundRect(e.layerX,e.layerY,100,100,5);
-    ctx.stroke();
 }
 function onCanvasClick(e) {
 
