@@ -141,6 +141,7 @@ function drawCanvas() {
 function onCanvasHover(e) {
     let x = e.layerX;
     let y = e.layerY;
+    //if hovering over card in hand then draw outline
     for (let h = 0;h < hand.length;h++) {
         let cardXStart = h * (100 * 1.05) - (hand.length*100)/2 + canvas.width/2;
         let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (100*1.75) + canvas.height/2;
@@ -155,7 +156,19 @@ function onCanvasHover(e) {
             ctx.stroke();
         }
     }
-
+    //if hovering over deck of cards (extra cards), then show outline
+    let extraCardX = canvas.width/2 - backImage.width/2;
+    let extraCardY = canvas.height/2 - backImage.height/2;
+    if (x > extraCardX && x < extraCardX + 100 && y > extraCardY && y < extraCardY + 140 + extraCardsSize) {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        drawCanvas();
+        ctx.globalCompositeOperation = 'destination-over';
+        ctx.strokeStyle = "rgba(201,188,6,1)";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.roundRect(extraCardX,extraCardY,100,140 + extraCardsSize,5);
+        ctx.stroke();
+    }
 }
 function onCanvasClick(e) {
 
