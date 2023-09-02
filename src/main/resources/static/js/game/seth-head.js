@@ -2,6 +2,9 @@
 let canvas;
 let ctx;
 
+let cardWidth = 100;
+let cardHeight = 140;
+
 let hand = [];
 let visibleCards = [];
 let extraCardsSize;
@@ -13,12 +16,13 @@ function init() {
     canvas = document.createElement("canvas");
     canvas.addEventListener('mousedown', (e) => onCanvasClick(e));
     canvas.addEventListener('mousemove', (e) => onCanvasHover(e));
-    canvas.height = document.documentElement.clientHeight;
+    canvas.height = document.documentElement.clientHeight * window.devicePixelRatio;
     if (document.documentElement.clientWidth <= 600) {
         canvas.width = document.documentElement.clientWidth;
     } else {
         canvas.width = document.documentElement.clientWidth;
     }
+	canvas.width *= window.devicePixelRatio;
     //add client first
     usersWithData.push({user: user, rotation:0, radius: canvas.height/2});
     //add all the other users after
@@ -62,8 +66,8 @@ function animate(siteTimestamp) {
         u.textDimensions = ctx.measureText(u.user.name);
         ctx.restore();
     }
-    backImage.width = 100;
-    backImage.height = 140;
+    backImage.width = cardWidth;
+    backImage.height = cardHeight;
     if (timestamp <= (canvas.width / 2 - backImage.width/2)) {
         //Everything here in this block is to show the card deck spinning onto the screen
         ctx.save();
@@ -102,6 +106,7 @@ function drawCanvas() {
     //draws usernames
     ctx.textAlign = "center";
     ctx.font = "30px Arial sans-serif";
+	ctx.imageSmoothingEnabled = false;
     for (let u of usersWithData) {
         ctx.save();
         ctx.translate(canvas.width/2,canvas.height/2);
@@ -112,8 +117,8 @@ function drawCanvas() {
     }
 
     let topPileCardImage = getCard(topPileCard).image;
-    topPileCardImage.width = 100;
-    topPileCardImage.height = 140;
+    topPileCardImage.width = cardWidth;
+    topPileCardImage.height = cardHeight;
     ctx.drawImage(topPileCardImage,canvas.width/2 - topPileCardImage.width*2,canvas.height/2 - topPileCardImage.height/2,topPileCardImage.width,topPileCardImage.height);
     for (let i = 0; i < extraCardsSize;i++) {
         ctx.drawImage(backImage,canvas.width/2 - backImage.width/2,canvas.height/2-backImage.height/2+i,backImage.width,backImage.height);
@@ -130,8 +135,8 @@ function drawCanvas() {
             } else {
                 let card = getCard(hand[h]);
                 let cardImage = card.image;
-                cardImage.width = 100;
-                cardImage.height = 140;
+                cardImage.width = cardWidth;
+                cardImage.height = cardHeight;
                 ctx.drawImage(cardImage,h*(cardImage.width * 1.05) - (u.handSize*cardImage.width)/2,u.radius * .95 - (cardImage.width*1.75),cardImage.width,cardImage.height);
             }
         }
@@ -143,30 +148,30 @@ function onCanvasHover(e) {
     let y = e.layerY;
     //if hovering over card in hand then draw outline
     for (let h = 0;h < hand.length;h++) {
-        let cardXStart = h * (100 * 1.05) - (hand.length*100)/2 + canvas.width/2;
-        let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (100*1.75) + canvas.height/2;
-        if (x > cardXStart && x < cardXStart + 100 && y > cardYStart && y < cardYStart + 140) {
+        let cardXStart = h * (cardWidth * 1.05) - (hand.length*cardWidth)/2 + canvas.width/2;
+        let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (cardWidth*1.75) + canvas.height/2;
+        if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
             ctx.clearRect(0,0,canvas.width,canvas.height);
             drawCanvas();
             ctx.globalCompositeOperation = 'destination-over';
             ctx.strokeStyle = "rgba(201,188,6,1)";
             ctx.lineWidth = 4;
             ctx.beginPath();
-            ctx.roundRect(cardXStart,cardYStart,100,140,5);
+            ctx.roundRect(cardXStart,cardYStart,cardWidth,cardHeight,5);
             ctx.stroke();
         }
     }
     //if hovering over deck of cards (extra cards), then show outline
     let extraCardX = canvas.width/2 - backImage.width/2;
     let extraCardY = canvas.height/2 - backImage.height/2;
-    if (x > extraCardX && x < extraCardX + 100 && y > extraCardY && y < extraCardY + 140 + extraCardsSize) {
+    if (x > extraCardX && x < extraCardX + cardWidth && y > extraCardY && y < extraCardY + cardHeight + extraCardsSize) {
         ctx.clearRect(0,0,canvas.width,canvas.height);
         drawCanvas();
         ctx.globalCompositeOperation = 'destination-over';
         ctx.strokeStyle = "rgba(201,188,6,1)";
         ctx.lineWidth = 4;
         ctx.beginPath();
-        ctx.roundRect(extraCardX,extraCardY,100,140 + extraCardsSize,5);
+        ctx.roundRect(extraCardX,extraCardY,cardWidth,cardHeight + extraCardsSize,5);
         ctx.stroke();
     }
 }
