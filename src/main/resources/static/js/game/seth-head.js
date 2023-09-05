@@ -120,6 +120,7 @@ function drawCanvas() {
     topPileCardImage.width = cardWidth;
     topPileCardImage.height = cardHeight;
     ctx.drawImage(topPileCardImage,canvas.width/2 - topPileCardImage.width*2,canvas.height/2 - topPileCardImage.height/2,topPileCardImage.width,topPileCardImage.height);
+    ctx.globalCompositeOperation = 'destination-over';
     for (let i = 0; i < extraCardsSize;i++) {
         ctx.drawImage(backImage,canvas.width/2 - backImage.width/2,canvas.height/2-backImage.height/2+i,backImage.width,backImage.height);
     }
