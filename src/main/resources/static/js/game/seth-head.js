@@ -120,27 +120,34 @@ function drawCanvas() {
     topPileCardImage.width = cardWidth;
     topPileCardImage.height = cardHeight;
     ctx.drawImage(topPileCardImage,canvas.width/2 - topPileCardImage.width*2,canvas.height/2 - topPileCardImage.height/2,topPileCardImage.width,topPileCardImage.height);
-    ctx.globalCompositeOperation = 'destination-over';
-    for (let i = 0; i < extraCardsSize;i++) {
+	ctx.globalCompositeOperation = 'destination-over';
+	for (let i = 0; i < extraCardsSize;i++) {
         ctx.drawImage(backImage,canvas.width/2 - backImage.width/2,canvas.height/2-backImage.height/2+i,backImage.width,backImage.height);
     }
-    //displays all the cards in the hand
+    //displays all the cards
     for (let u of usersWithData) {
         ctx.save();
         ctx.translate(canvas.width/2,canvas.height/2);
         ctx.rotate(u.rotation);
-        for (let h = 0;h < u.handSize;h++) {
+        for (let h = 0; h < u.handSize; h++) {
             //if drawing the current user then draw the client's hand otherwise draw everyone else's card using the back card texture
             if (u.user != user) {
-                ctx.drawImage(backImage,h*(backImage.width/2) - (u.handSize*backImage.width/2)/2,u.radius * .95 - (backImage.width*1.75),backImage.width,backImage.height);
+                ctx.drawImage(backImage,h*(backImage.width/2) - (u.handSize*backImage.width/2)/2,u.radius * .95 - (backImage.width*1.7),backImage.width,backImage.height);
             } else {
                 let card = getCard(hand[h]);
                 let cardImage = card.image;
                 cardImage.width = cardWidth;
                 cardImage.height = cardHeight;
-                ctx.drawImage(cardImage,h*(cardImage.width * 1.05) - (u.handSize*cardImage.width)/2,u.radius * .95 - (cardImage.width*1.75),cardImage.width,cardImage.height);
+                ctx.drawImage(cardImage,h*(cardImage.width * 1.05) - (u.handSize*cardImage.width)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height);
             }
         }
+		for (let c = 0; c < u.visibleCards.length; c++) {
+			let card = getCard(u.visibleCards[c]);
+			let cardImage = card.image;
+			cardImage.width = cardWidth;
+			cardImage.height = cardHeight;
+			ctx.drawImage(cardImage,c*(cardImage.width * 1.05) - (u.visibleCards.length*cardImage.width)/2,u.radius * .95 - (cardImage.width*3.2),cardImage.width,cardImage.height);
+		}
         ctx.restore();
     }
 }
@@ -150,7 +157,7 @@ function onCanvasHover(e) {
     //if hovering over card in hand then draw outline
     for (let h = 0;h < hand.length;h++) {
         let cardXStart = h * (cardWidth * 1.05) - (hand.length*cardWidth)/2 + canvas.width/2;
-        let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (cardWidth*1.75) + canvas.height/2;
+        let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (cardWidth*1.7) + canvas.height/2;
         if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
             ctx.clearRect(0,0,canvas.width,canvas.height);
             drawCanvas();
@@ -162,6 +169,21 @@ function onCanvasHover(e) {
             ctx.stroke();
         }
     }
+	//if hovering over visible cards then draw outline
+	for (let c = 0;c < visibleCards.length;c++) {
+		let cardXStart = c*(cardWidth * 1.05) - (visibleCards.length*cardWidth)/2 + canvas.width/2;
+		let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (cardWidth*3.2) + canvas.height/2;
+		if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            drawCanvas();
+            ctx.globalCompositeOperation = 'destination-over';
+            ctx.strokeStyle = "rgba(201,188,6,1)";
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.roundRect(cardXStart,cardYStart,cardWidth,cardHeight,5);
+            ctx.stroke();
+        }
+	}
     //if hovering over deck of cards (extra cards), then show outline
     let extraCardX = canvas.width/2 - backImage.width/2;
     let extraCardY = canvas.height/2 - backImage.height/2;
