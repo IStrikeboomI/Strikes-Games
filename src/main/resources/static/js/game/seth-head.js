@@ -80,10 +80,19 @@ function animate(siteTimestamp) {
             ctx.drawImage(backImage,imageX,canvas.height/2-backImage.height/2+i,backImage.width,backImage.height);
         }
         ctx.restore();
-        window.requestAnimationFrame(animate);
     } else {
-        drawCanvas();
+		let dealTimestamp = timestamp - (canvas.width / 2 - backImage.width/2);
+        for (let u of usersWithData) {
+			ctx.save();
+			ctx.translate(canvas.width/2,canvas.height/2);
+			ctx.rotate(u.rotation);
+			const TIME_TO_DEAL = canvas.width/2;
+			ctx.drawImage(backImage, -backImage.width/2, u.radius * ((dealTimestamp % TIME_TO_DEAL) / TIME_TO_DEAL),backImage.width,backImage.height);
+			ctx.restore();
+		}
     }
+	        window.requestAnimationFrame(animate);
+
    //else {
    //    const TIME_TO_DEAL = canvas.width/2;
    //    //ctx.drawImage(backImage,0,timestamp % TIME_TO_DEAL,backImage.width,backImage.height);
@@ -132,7 +141,7 @@ function drawCanvas() {
         for (let h = 0; h < u.handSize; h++) {
             //if drawing the current user then draw the client's hand otherwise draw everyone else's card using the back card texture
             if (u.user != user) {
-                ctx.drawImage(backImage,h*(backImage.width/2) - (u.handSize*backImage.width/2)/2,u.radius * .95 - (backImage.width*1.7),backImage.width,backImage.height);
+                ctx.drawImage(backImage,h*(backImage.width * .5) - (u.handSize*backImage.width)/2,u.radius * .95 - (backImage.width*1.7),backImage.width,backImage.height);
             } else {
                 let card = getCard(hand[h]);
                 let cardImage = card.image;
