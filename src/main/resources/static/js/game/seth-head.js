@@ -49,6 +49,7 @@ function init() {
 }
 let cardsHandedOut = 0;
 let startTimestamp;
+let stillDealing = true;
 function animate(siteTimestamp) {
     if (startTimestamp === undefined) {
         startTimestamp = siteTimestamp;
@@ -81,17 +82,30 @@ function animate(siteTimestamp) {
         }
         ctx.restore();
     } else {
+		const TIME_TO_DEAL = canvas.width/2;
 		let dealTimestamp = timestamp - (canvas.width / 2 - backImage.width/2);
+		let cardsDealt = Math.floor(dealTimestamp / TIME_TO_DEAL);
+		let largestCardAmount = 0;
         for (let u of usersWithData) {
-			ctx.save();
-			ctx.translate(canvas.width/2,canvas.height/2);
-			ctx.rotate(u.rotation);
-			const TIME_TO_DEAL = canvas.width/2;
-			ctx.drawImage(backImage, -backImage.width/2, u.radius * ((dealTimestamp % TIME_TO_DEAL) / TIME_TO_DEAL),backImage.width,backImage.height);
-			ctx.restore();
+			largestCardAmount = Math.max(largestCardAmount, u.handSize + u.visibleCards.length);
+			if (u.handSize + u.visibleCards.length >= cardsDealt) {
+				ctx.save();
+				ctx.translate(canvas.width/2,canvas.height/2);
+				ctx.rotate(u.rotation);
+				ctx.drawImage(backImage, -backImage.width/2, u.radius * ((dealTimestamp % TIME_TO_DEAL) / TIME_TO_DEAL),backImage.width,backImage.height);
+				ctx.restore();
+			}
+		}
+		if (cardsDealt > largestCardAmount) {
+			stillDealing = false;
 		}
     }
-	        window.requestAnimationFrame(animate);
+	if (stillDealing) {
+		window.requestAnimationFrame(animate);
+	} else {
+		ctx.clearRect(0,0,canvas.width,canvas.height);
+		drawCanvas();
+	}
 
    //else {
    //    const TIME_TO_DEAL = canvas.width/2;
@@ -208,5 +222,7 @@ function onCanvasHover(e) {
     }
 }
 function onCanvasClick(e) {
-
+	if (stillDealing) {
+		stillDealing = false;
+	}
 }
