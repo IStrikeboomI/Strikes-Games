@@ -86,16 +86,46 @@ function animate(siteTimestamp) {
 		let dealTimestamp = timestamp - (canvas.width / 2 - backImage.width/2);
 		let cardsDealt = Math.floor(dealTimestamp / TIME_TO_DEAL);
 		let largestCardAmount = 0;
+		ctx.globalCompositeOperation = 'destination-over';
+		for (let i = 0; i < extraCardsSize;i++) {
+            ctx.drawImage(backImage,canvas.width/2 - backImage.width/2,canvas.height/2-backImage.height/2+i,backImage.width,backImage.height);
+        }
         for (let u of usersWithData) {
 			largestCardAmount = Math.max(largestCardAmount, u.handSize + u.visibleCards.length);
-			if (u.handSize + u.visibleCards.length >= cardsDealt) {
+			if (u.handSize + u.visibleCards.length > cardsDealt) {
 				ctx.save();
 				ctx.translate(canvas.width/2,canvas.height/2);
 				ctx.rotate(u.rotation);
 				ctx.drawImage(backImage, -backImage.width/2, u.radius * ((dealTimestamp % TIME_TO_DEAL) / TIME_TO_DEAL),backImage.width,backImage.height);
 				ctx.restore();
 			}
+			ctx.save();
+			ctx.translate(canvas.width/2,canvas.height/2);
+			ctx.rotate(u.rotation);
+			for (let h = 0; h < Math.min(cardsDealt,u.handSize); h++) {
+				//if drawing the current user then draw the client's hand otherwise draw everyone else's card using the back card texture
+				if (u.user != user) {
+					ctx.drawImage(backImage,h*(backImage.width * .5) - (Math.min(cardsDealt,u.handSize)*backImage.width)/2,u.radius * .95 - (backImage.width*1.7),backImage.width,backImage.height);
+				} else {
+					let card = getCard(hand[h]);
+					let cardImage = card.image;
+					cardImage.width = cardWidth;
+					cardImage.height = cardHeight;
+					ctx.drawImage(cardImage,h*(cardImage.width * 1.05) - (Math.min(cardsDealt,u.handSize)*cardImage.width)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height);
+				}
+			}
+			if (cardsDealt > u.handSize) {
+				for (let c = 0; c < Math.min(cardsDealt - u.handSize, u.visibleCards.length); c++) {
+					let card = getCard(u.visibleCards[c]);
+					let cardImage = card.image;
+					cardImage.width = cardWidth;
+					cardImage.height = cardHeight;
+					ctx.drawImage(cardImage,c*(cardImage.width * 1.05) - (u.visibleCards.length*cardImage.width)/2,u.radius * .95 - (cardImage.width*3.2),cardImage.width,cardImage.height);
+				}
+			}
+			ctx.restore();
 		}
+
 		if (cardsDealt > largestCardAmount) {
 			stillDealing = false;
 		}
@@ -106,24 +136,6 @@ function animate(siteTimestamp) {
 		ctx.clearRect(0,0,canvas.width,canvas.height);
 		drawCanvas();
 	}
-
-   //else {
-   //    const TIME_TO_DEAL = canvas.width/2;
-   //    //ctx.drawImage(backImage,0,timestamp % TIME_TO_DEAL,backImage.width,backImage.height);
-
-   //    //this block is to deal out the cards
-   //    //ctx.drawImage(backImage,canvas.width / 2 - backImage.width/2,canvas.height/2-backImage.height/2-(timestamp % TIME_TO_DEAL),backImage.width,backImage.height);
-   //    //ctx.drawImage(backImage,canvas.width / 2 - backImage.width/2,canvas.height/2-backImage.height/2+(timestamp % TIME_TO_DEAL),backImage.width,backImage.height);
-   //    //ctx.drawImage(backImage,canvas.width / 2 - backImage.width/2- (timestamp % TIME_TO_DEAL),canvas.height/2-backImage.height/2,backImage.width,backImage.height);
-   //    //ctx.drawImage(backImage,canvas.width / 2 - backImage.width/2+ (timestamp % TIME_TO_DEAL),canvas.height/2-backImage.height/2,backImage.width,backImage.height);
-   //    //since timestamp is a float it wont work properly with modulo, still needs testing/fixing
-   //    if (Math.round(timestamp) % 10 == 0) {
-   //        cardsHandedOut += 1;
-   //    }
-   //    for (let i = 0; i < 54 - cardsHandedOut;i++) {
-   //        ctx.drawImage(backImage,canvas.width / 2 - backImage.width/2,canvas.height/2-backImage.height/2-i,backImage.width,backImage.height);
-   //    }
-   //}
 }
 function drawCanvas() {
     //draws usernames
