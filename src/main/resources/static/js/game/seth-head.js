@@ -82,7 +82,7 @@ function animate(siteTimestamp) {
         }
         ctx.restore();
     } else {
-		const TIME_TO_DEAL = canvas.width/2;
+		const TIME_TO_DEAL = canvas.width/4;
 		let dealTimestamp = timestamp - (canvas.width / 2 - backImage.width/2);
 		let cardsDealt = Math.floor(dealTimestamp / TIME_TO_DEAL);
 		let largestCardAmount = 0;
@@ -105,7 +105,7 @@ function animate(siteTimestamp) {
 			for (let h = 0; h < Math.min(cardsDealt,u.handSize); h++) {
 				//if drawing the current user then draw the client's hand otherwise draw everyone else's card using the back card texture
 				if (u.user != user) {
-					ctx.drawImage(backImage,h*(backImage.width * .5) - (Math.min(cardsDealt,u.handSize)*backImage.width)/2,u.radius * .95 - (backImage.width*1.7),backImage.width,backImage.height);
+					ctx.drawImage(backImage,h*(backImage.width * .5) - (Math.min(cardsDealt,u.handSize)*backImage.width)/2 + backImage.width/2,u.radius * .95 - (backImage.width*1.7),backImage.width,backImage.height);
 				} else {
 					let card = getCard(hand[h]);
 					let cardImage = card.image;
@@ -167,7 +167,7 @@ function drawCanvas() {
         for (let h = 0; h < u.handSize; h++) {
             //if drawing the current user then draw the client's hand otherwise draw everyone else's card using the back card texture
             if (u.user != user) {
-                ctx.drawImage(backImage,h*(backImage.width * .5) - (u.handSize*backImage.width)/2,u.radius * .95 - (backImage.width*1.7),backImage.width,backImage.height);
+                ctx.drawImage(backImage,h*(backImage.width/2) - (u.handSize*(backImage.width))/2 + backImage.width/2,u.radius * .95 - (backImage.width*1.7),backImage.width,backImage.height);
             } else {
                 let card = getCard(hand[h]);
                 let cardImage = card.image;
