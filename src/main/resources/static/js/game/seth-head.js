@@ -134,8 +134,72 @@ function animate(siteTimestamp) {
 		window.requestAnimationFrame(animate);
 	} else {
 		ctx.clearRect(0,0,canvas.width,canvas.height);
+		window.requestAnimationFrame(animateCardFlip);
+	}
+}
+let cardFlipStartTimestamp;
+function animateCardFlip(siteTimestamp) {
+	if (cardFlipStartTimestamp === undefined) {
+        cardFlipStartTimestamp = siteTimestamp;
+    }
+    let timestamp = siteTimestamp - cardFlipStartTimestamp;
+	ctx.clearRect(0,0,canvas.width,canvas.height);
+	//copied from drawCanvas()
+	//draws usernames
+    ctx.textAlign = "center";
+    ctx.font = "30px Arial sans-serif";
+	ctx.imageSmoothingEnabled = false;
+    for (let u of usersWithData) {
+        ctx.save();
+        ctx.translate(canvas.width/2,canvas.height/2);
+        ctx.rotate(u.rotation);
+        ctx.fillText(u.user.name, 0,u.radius * .95);
+        u.textDimensions = ctx.measureText(u.user.name);
+        ctx.restore();
+    }
+	ctx.globalCompositeOperation = 'destination-over';
+	for (let i = 0; i < extraCardsSize;i++) {
+        ctx.drawImage(backImage,canvas.width/2 - backImage.width/2,canvas.height/2-backImage.height/2+i,backImage.width,backImage.height);
+    }
+    //displays all the cards
+    for (let u of usersWithData) {
+        ctx.save();
+        ctx.translate(canvas.width/2,canvas.height/2);
+        ctx.rotate(u.rotation);
+        for (let h = 0; h < u.handSize; h++) {
+            //if drawing the current user then draw the client's hand otherwise draw everyone else's card using the back card texture
+            if (u.user != user) {
+                ctx.drawImage(backImage,h*(backImage.width/2) - (u.handSize*(backImage.width))/2 + backImage.width/2,u.radius * .95 - (backImage.width*1.7),backImage.width,backImage.height);
+            } else {
+                let card = getCard(hand[h]);
+                let cardImage = card.image;
+                cardImage.width = cardWidth;
+                cardImage.height = cardHeight;
+                ctx.drawImage(cardImage,h*(cardImage.width * 1.05) - (u.handSize*cardImage.width)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height);
+            }
+        }
+		for (let c = 0; c < u.visibleCards.length; c++) {
+			let card = getCard(u.visibleCards[c]);
+			let cardImage = card.image;
+			cardImage.width = cardWidth;
+			cardImage.height = cardHeight;
+			ctx.drawImage(cardImage,c*(cardImage.width * 1.05) - (u.visibleCards.length*cardImage.width)/2,u.radius * .95 - (cardImage.width*3.2),cardImage.width,cardImage.height);
+		}
+        ctx.restore();
+    }
+	const TIME_TO_FLIP = 1000;
+	ctx.save();
+	let topPileCardImage = getCard(topPileCard).image;
+    topPileCardImage.width = cardWidth;
+    topPileCardImage.height = cardHeight;
+	ctx.setTransform(1,timestamp/TIME_TO_FLIP,timestamp/TIME_TO_FLIP,1,0,0);
+    ctx.drawImage(topPileCardImage,canvas.width/2 - topPileCardImage.width*2,canvas.height/2 - topPileCardImage.height/2,topPileCardImage.width,topPileCardImage.height);
+	ctx.restore();
+	if (timestamp > TIME_TO_FLIP) {
+		ctx.clearRect(0,0,canvas.width,canvas.height);
 		drawCanvas();
 	}
+	window.requestAnimationFrame(animateCardFlip);
 }
 function drawCanvas() {
     //draws usernames
