@@ -198,8 +198,9 @@ function animateCardFlip(siteTimestamp) {
 	if (timestamp > TIME_TO_FLIP) {
 		ctx.clearRect(0,0,canvas.width,canvas.height);
 		drawCanvas();
+	} else {
+	    window.requestAnimationFrame(animateCardFlip);
 	}
-	window.requestAnimationFrame(animateCardFlip);
 }
 function drawCanvas() {
     //draws usernames
