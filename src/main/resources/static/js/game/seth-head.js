@@ -187,19 +187,26 @@ function animateCardFlip(siteTimestamp) {
 		}
         ctx.restore();
     }
-	const TIME_TO_FLIP = 1000;
+	const TIME_TO_FLIP = 2000;
+
+	let image;
+	if (timestamp < TIME_TO_FLIP/2) {
+		image = backImage;
+	} else {
+		image = getCard(topPileCard).image;
+	}
+    image.width = cardWidth;
+    image.height = cardHeight;
 	ctx.save();
-	let topPileCardImage = getCard(topPileCard).image;
-    topPileCardImage.width = cardWidth;
-    topPileCardImage.height = cardHeight;
-	ctx.setTransform(1,timestamp/TIME_TO_FLIP,timestamp/TIME_TO_FLIP,1,0,0);
-    ctx.drawImage(topPileCardImage,canvas.width/2 - topPileCardImage.width*2,canvas.height/2 - topPileCardImage.height/2,topPileCardImage.width,topPileCardImage.height);
+	//ctx.translate(canvas.width/2 - image.width/2,canvas.height/2 - image.width/2);
+	ctx.setTransform(new DOMMatrix().rotate(0,(timestamp/TIME_TO_FLIP) * 100));
+	ctx.drawImage(image,canvas.width/2 - image.width/2,canvas.height/2 - image.height/2,image.width,image.height);
 	ctx.restore();
 	if (timestamp > TIME_TO_FLIP) {
 		ctx.clearRect(0,0,canvas.width,canvas.height);
 		drawCanvas();
 	} else {
-	    window.requestAnimationFrame(animateCardFlip);
+		window.requestAnimationFrame(animateCardFlip);
 	}
 }
 function drawCanvas() {
