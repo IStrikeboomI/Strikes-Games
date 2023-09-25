@@ -24,6 +24,7 @@ function init() {
     }
 	canvas.width *= window.devicePixelRatio;
     //add client first
+    //using polar coordinates to display cards because its much easier and looks nicer
     usersWithData.push({user: user, rotation:0, radius: canvas.height/2});
     //add all the other users after
     for (let i = 0;i < getOtherUsers().length;i++) {
@@ -50,6 +51,7 @@ function init() {
 let cardsHandedOut = 0;
 let startTimestamp;
 let stillDealing = true;
+//animates cards coming into frame and dealing
 function animate(siteTimestamp) {
     if (startTimestamp === undefined) {
         startTimestamp = siteTimestamp;
@@ -114,6 +116,7 @@ function animate(siteTimestamp) {
 					ctx.drawImage(cardImage,h*(cardImage.width * 1.05) - (Math.min(cardsDealt,u.handSize)*cardImage.width)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height);
 				}
 			}
+			//if the amount of cards already dealt is larger than the size of the hand, that means visible cards are being dealt
 			if (cardsDealt > u.handSize) {
 				for (let c = 0; c < Math.min(cardsDealt - u.handSize, u.visibleCards.length); c++) {
 					let card = getCard(u.visibleCards[c]);
@@ -138,6 +141,7 @@ function animate(siteTimestamp) {
 	}
 }
 let cardFlipStartTimestamp;
+//an entirely different animate function for flipping the top card over
 function animateCardFlip(siteTimestamp) {
 	if (cardFlipStartTimestamp === undefined) {
         cardFlipStartTimestamp = siteTimestamp;
@@ -166,6 +170,7 @@ function animateCardFlip(siteTimestamp) {
         ctx.save();
         ctx.translate(canvas.width/2,canvas.height/2);
         ctx.rotate(u.rotation);
+        //draw cards in hand
         for (let h = 0; h < u.handSize; h++) {
             //if drawing the current user then draw the client's hand otherwise draw everyone else's card using the back card texture
             if (u.user != user) {
@@ -178,6 +183,7 @@ function animateCardFlip(siteTimestamp) {
                 ctx.drawImage(cardImage,h*(cardImage.width * 1.05) - (u.handSize*cardImage.width)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height);
             }
         }
+        //draw visible cards
 		for (let c = 0; c < u.visibleCards.length; c++) {
 			let card = getCard(u.visibleCards[c]);
 			let cardImage = card.image;
@@ -306,6 +312,7 @@ function onCanvasHover(e) {
     }
 }
 function onCanvasClick(e) {
+    //cancel dealing on click so you don't have to see each time you refresh
 	if (stillDealing) {
 		stillDealing = false;
 	}
