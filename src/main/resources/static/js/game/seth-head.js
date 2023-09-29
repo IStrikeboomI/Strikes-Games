@@ -193,27 +193,31 @@ function animateCardFlip(siteTimestamp) {
 		}
         ctx.restore();
     }
-	const TIME_TO_FLIP = 2000;
+	const TIME_TO_FLIP = 500;
+    	//where card starts at
+    	const CARD_SOURCE = canvas.width/2 - cardWidth/2;
+    	//where card ends up
+    	const CARD_DESTINATION = canvas.width/2 - cardWidth*2;
 
-	let image;
-	if (timestamp < TIME_TO_FLIP/2) {
-		image = backImage;
-	} else {
-		image = getCard(topPileCard).image;
-	}
-    image.width = cardWidth;
-    image.height = cardHeight;
-	ctx.save();
-	//ctx.translate(canvas.width/2 - image.width/2,canvas.height/2 - image.width/2);
-	ctx.setTransform(new DOMMatrix().rotate(0,(timestamp/TIME_TO_FLIP) * 100));
-	ctx.drawImage(image,canvas.width/2 - image.width/2,canvas.height/2 - image.height/2,image.width,image.height);
-	ctx.restore();
-	if (timestamp > TIME_TO_FLIP) {
-		ctx.clearRect(0,0,canvas.width,canvas.height);
-		drawCanvas();
-	} else {
-		window.requestAnimationFrame(animateCardFlip);
-	}
+    	let image;
+    	if (timestamp < TIME_TO_FLIP/2) {
+    		image = backImage;
+    	} else {
+    		image = getCard(topPileCard).image;
+    	}
+        image.width = cardWidth;
+        image.height = cardHeight;
+    	ctx.save();
+    	//ctx.translate(canvas.width/2 - image.width/2,canvas.height/2 - image.width/2);
+    	//ctx.setTransform(new DOMMatrix().rotate(0,(timestamp/TIME_TO_FLIP) * 100));
+    	ctx.drawImage(image,CARD_SOURCE + ((CARD_DESTINATION-CARD_SOURCE)/TIME_TO_FLIP)*timestamp,canvas.height/2 - image.height/2,image.width,image.height);
+    	ctx.restore();
+    	if (timestamp > TIME_TO_FLIP) {
+    		ctx.clearRect(0,0,canvas.width,canvas.height);
+    		drawCanvas();
+    	} else {
+    		window.requestAnimationFrame(animateCardFlip);
+    	}
 }
 function drawCanvas() {
     //draws usernames
