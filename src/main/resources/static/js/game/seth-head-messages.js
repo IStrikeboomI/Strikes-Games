@@ -5,7 +5,7 @@ const gameMessageHandlers = [
 function getGameData(message) {
     extraCardsSize = message.extraCardsSize;
     topPileCard = message.topPileCard;
-    playerOnTurn = lobby.users.find(u => u.separationId===message.playerOnTurn);
+    usersWithData.find(u => u.user.separationId===message.playerOnTurn).onTurn = true;
     for (let u of usersWithData) {
         u.handSize = message.handsSize[Object.keys(message.handsSize).find(id => id===u.user.separationId)] || message.hand.length;
         u.visibleCards = message.visibleCards[Object.keys(message.visibleCards).find(id => id===u.user.separationId)];

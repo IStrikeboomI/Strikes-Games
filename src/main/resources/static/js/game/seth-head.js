@@ -9,7 +9,6 @@ let hand = [];
 let visibleCards = [];
 let extraCardsSize;
 let topPileCard;
-let playerOnTurn;
 //stores users along with additional data like where they are on canvas and what their cards are
 let usersWithData = [];
 function init() {
@@ -25,7 +24,7 @@ function init() {
 	canvas.width *= window.devicePixelRatio;
     //add client first
     //using polar coordinates to display cards because its much easier and looks nicer
-    usersWithData.push({user: user, rotation:0, radius: canvas.height/2});
+    usersWithData.push({user: user, rotation:0, radius: canvas.height/2, onTurn: false});
     //add all the other users after
     for (let i = 0;i < getOtherUsers().length;i++) {
         let u = getOtherUsers()[i];
@@ -43,6 +42,7 @@ function init() {
                 userWithData.radius = canvas.width/2;
             }
         }
+		userWithData.onTurn = false;
         usersWithData.push(userWithData);
     }
     ctx = canvas.getContext("2d");
@@ -65,6 +65,7 @@ function animate(siteTimestamp) {
         ctx.save();
         ctx.translate(canvas.width/2,canvas.height/2);
         ctx.rotate(u.rotation);
+		ctx.fillStyle = u.onTurn ? "black" : "darkGray";
         ctx.fillText(u.user.name, 0,u.radius * .95);
         u.textDimensions = ctx.measureText(u.user.name);
         ctx.restore();
@@ -157,8 +158,8 @@ function animateCardFlip(siteTimestamp) {
         ctx.save();
         ctx.translate(canvas.width/2,canvas.height/2);
         ctx.rotate(u.rotation);
+		ctx.fillStyle = u.onTurn ? "black" : "darkGray";
         ctx.fillText(u.user.name, 0,u.radius * .95);
-        u.textDimensions = ctx.measureText(u.user.name);
         ctx.restore();
     }
 	ctx.globalCompositeOperation = 'destination-over';
@@ -194,30 +195,30 @@ function animateCardFlip(siteTimestamp) {
         ctx.restore();
     }
 	const TIME_TO_FLIP = 500;
-    	//where card starts at
-    	const CARD_SOURCE = canvas.width/2 - cardWidth/2;
-    	//where card ends up
-    	const CARD_DESTINATION = canvas.width/2 - cardWidth*2;
+	//where card starts at
+	const CARD_SOURCE = canvas.width/2 - cardWidth/2;
+	//where card ends up
+	const CARD_DESTINATION = canvas.width/2 - cardWidth*2;
 
-    	let image;
-    	if (timestamp < TIME_TO_FLIP/2) {
-    		image = backImage;
-    	} else {
-    		image = getCard(topPileCard).image;
-    	}
-        image.width = cardWidth;
-        image.height = cardHeight;
-    	ctx.save();
-    	//ctx.translate(canvas.width/2 - image.width/2,canvas.height/2 - image.width/2);
-    	//ctx.setTransform(new DOMMatrix().rotate(0,(timestamp/TIME_TO_FLIP) * 100));
-    	ctx.drawImage(image,CARD_SOURCE + ((CARD_DESTINATION-CARD_SOURCE)/TIME_TO_FLIP)*timestamp,canvas.height/2 - image.height/2,image.width,image.height);
-    	ctx.restore();
-    	if (timestamp > TIME_TO_FLIP) {
-    		ctx.clearRect(0,0,canvas.width,canvas.height);
-    		drawCanvas();
-    	} else {
-    		window.requestAnimationFrame(animateCardFlip);
-    	}
+	let image;
+	if (timestamp < TIME_TO_FLIP/2) {
+		image = backImage;
+	} else {
+		image = getCard(topPileCard).image;
+	}
+    image.width = cardWidth;
+    image.height = cardHeight;
+	ctx.save();
+	//ctx.translate(canvas.width/2 - image.width/2,canvas.height/2 - image.width/2);
+	//ctx.setTransform(new DOMMatrix().rotate(0,(timestamp/TIME_TO_FLIP) * 100));
+	ctx.drawImage(image,CARD_SOURCE + ((CARD_DESTINATION-CARD_SOURCE)/TIME_TO_FLIP)*timestamp,canvas.height/2 - image.height/2,image.width,image.height);
+	ctx.restore();
+	if (timestamp > TIME_TO_FLIP) {
+		ctx.clearRect(0,0,canvas.width,canvas.height);
+		drawCanvas();
+	} else {
+		window.requestAnimationFrame(animateCardFlip);
+	}
 }
 function drawCanvas() {
     //draws usernames
@@ -228,11 +229,10 @@ function drawCanvas() {
         ctx.save();
         ctx.translate(canvas.width/2,canvas.height/2);
         ctx.rotate(u.rotation);
+		ctx.fillStyle = u.onTurn ? "black" : "darkGray";
         ctx.fillText(u.user.name, 0,u.radius * .95);
-        u.textDimensions = ctx.measureText(u.user.name);
         ctx.restore();
     }
-
     let topPileCardImage = getCard(topPileCard).image;
     topPileCardImage.width = cardWidth;
     topPileCardImage.height = cardHeight;
