@@ -92,6 +92,20 @@ public class SethHead extends TurnBasedGame {
         return gameEndedData;
     }
 
+    /**
+     * Draws a card from the top and recycles deck if empty
+     * @return card drawn
+     */
+    public Card draw() {
+        Card card = extraCards.pop();
+        if (extraCards.size() == 0) {
+            Card topOfPile = pile.pop();
+            extraCards = pile.shuffle();
+            pile.clear();
+            pile.addCard(topOfPile);
+        }
+        return card;
+    }
     @Override
     public void onGameEnded(GameEndedData data) {
         sendMessageToAll(new ClientBoundGameMessage("gameEnded",data.data));

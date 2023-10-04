@@ -88,7 +88,10 @@ public class Deck {
         Collections.sort(cards);
         return this;
     }
-
+    public Deck clear() {
+        cards.clear();
+        return this;
+    }
     /**
      * Split off n cards into a separate deck and removes from original
      * @param n how many cards to split off, must be positive
