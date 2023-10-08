@@ -14,13 +14,15 @@ public abstract class TurnBasedGame extends Game {
     }
     /**
      * changes player on turn to be the next player
+     * @return player on turn after cycling
      */
-    public void cycleTurn() {
+    public User cycleTurn() {
         int positionOfCurrentPlayer = getLobby().getUsers().indexOf(playerOnTurn);
         if (positionOfCurrentPlayer != getLobby().getUsers().size()-1) {
             playerOnTurn = getLobby().getUsers().get(positionOfCurrentPlayer + 1);
         } else {
             playerOnTurn = getLobby().getUsers().get(0);
         }
+        return playerOnTurn;
     }
 }

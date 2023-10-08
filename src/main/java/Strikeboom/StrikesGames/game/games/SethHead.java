@@ -106,6 +106,9 @@ public class SethHead extends TurnBasedGame {
         }
         return card;
     }
+    public void addCard(Card card, User user) {
+
+    }
     @Override
     public void onGameEnded(GameEndedData data) {
         sendMessageToAll(new ClientBoundGameMessage("gameEnded",data.data));

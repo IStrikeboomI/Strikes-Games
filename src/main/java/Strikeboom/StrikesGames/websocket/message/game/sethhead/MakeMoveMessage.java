@@ -42,6 +42,10 @@ public class MakeMoveMessage extends GameMessageHandler<SethHead> {
                         }
                     }
                     game.pile.addCard(card);
+                    //change suit
+                    if (card.value.equals(Card.Value.JACK) || card.value.equals(Card.Value.JOKER)) {
+
+                    }
                     return true;
                 }
             }
@@ -61,7 +65,19 @@ public class MakeMoveMessage extends GameMessageHandler<SethHead> {
             Card card = Card.fromString((String) getData().get("card"));
             //only cycle turn if card is not queen
             if (!card.value.equals(Card.Value.QUEEN)) {
-                game.cycleTurn();
+                User cycledTo = game.cycleTurn();
+                //if joker then give next person 4 cards
+                if (card.value.equals(Card.Value.JOKER)) {
+                    for (int i = 0;i < 4;i++) {
+                        game.addCard(game.draw(),cycledTo);
+                    }
+                }
+                //if king then give next person 2 cards
+                if (card.value.equals(Card.Value.KING)) {
+                    for (int i = 0;i < 2;i++) {
+                        game.addCard(game.draw(),cycledTo);
+                    }
+                }
             }
         }
         game.checkForGameEnd();
