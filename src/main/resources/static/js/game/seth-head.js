@@ -268,6 +268,9 @@ function drawCanvas() {
         ctx.restore();
     }
 }
+function animateCard(card, x1, y1, x2, y2, time) {
+
+}
 function onCanvasHover(e) {
     let x = e.layerX;
     let y = e.layerY;
@@ -316,8 +319,29 @@ function onCanvasHover(e) {
     }
 }
 function onCanvasClick(e) {
+	let x = e.layerX;
+    let y = e.layerY;
     //cancel dealing on click so you don't have to see each time you refresh
 	if (stillDealing) {
 		stillDealing = false;
 	}
+	//if hovering over card in hand
+    for (let h = 0;h < hand.length;h++) {
+        let cardXStart = h * (cardWidth * 1.05) - (hand.length*cardWidth)/2 + canvas.width/2;
+        let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (cardWidth*1.7) + canvas.height/2;
+        if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
+            console.log(hand[h]);
+        }
+    }
+	//if hovering over visible cards
+	for (let c = 0;c < visibleCards.length;c++) {
+		let cardXStart = c*(cardWidth * 1.05) - (visibleCards.length*cardWidth)/2 + canvas.width/2;
+		let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (cardWidth*3.2) + canvas.height/2;
+		if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
+			console.log(visibleCards[c]);
+        }
+	}
+}
+function playCard() {
+
 }
