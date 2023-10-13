@@ -82,3 +82,11 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
   this.arcTo(x,   y,   x+w, y,   r);
   return this;
 }
+class Animation {
+	Animation() {
+
+	}
+	function draw(timestamp) {
+
+	}
+}

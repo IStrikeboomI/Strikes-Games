@@ -1,6 +1,7 @@
 //location of where users are as follows, bottom is always the client then the user order is top, right, then left
 let canvas;
 let ctx;
+let animations = [];
 
 let cardWidth = 100;
 let cardHeight = 140;
@@ -268,8 +269,15 @@ function drawCanvas() {
         ctx.restore();
     }
 }
-function animateCard(card, x1, y1, x2, y2, time) {
-
+function animateCard(card, rotation, radius, time) {
+	let cardImage = getCard(card).image;
+	cardImage.width = cardWidth;
+	cardImage.height = cardHeight;
+	ctx.save();
+	ctx.translate(canvas.width/2,canvas.height/2);
+	ctx.rotate(rotation);
+	ctx.drawImage(cardImage,0,radius,cardImage.width,cardImage.height);
+	ctx.restore();
 }
 function onCanvasHover(e) {
     let x = e.layerX;
@@ -330,7 +338,7 @@ function onCanvasClick(e) {
         let cardXStart = h * (cardWidth * 1.05) - (hand.length*cardWidth)/2 + canvas.width/2;
         let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (cardWidth*1.7) + canvas.height/2;
         if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
-            console.log(hand[h]);
+            playCard(usersWithData[0],hand[h]);
         }
     }
 	//if hovering over visible cards
@@ -342,6 +350,6 @@ function onCanvasClick(e) {
         }
 	}
 }
-function playCard() {
+function playCard(user, card) {
 
 }
