@@ -20,9 +20,7 @@ public class MakeMoveMessage extends GameMessageHandler<SethHead> {
                 Card card = Card.fromString((String) getData().get("card"));
                 //if card is valid then play
                 //if card is either same suit or value
-                if (card.suit.equals(game.pile.getLastCard().suit) || card.value.equals(game.pile.getLastCard().value)
-                        //or if card is wild (jack or joker)
-                    || card.value.equals(Card.Value.JACK) || card.value.equals(Card.Value.JOKER)) {
+                if (game.isCardValid(card)) {
                     //if card that's played is in hand then take from hand
                     if (game.hands.get(player).containsCard(card)) {
                         game.hands.get(player).removeCard(card);

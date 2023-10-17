@@ -109,6 +109,17 @@ public class SethHead extends TurnBasedGame {
     public void addCard(Card card, User user) {
 
     }
+
+    /**
+     * Checks if card provided is valid to play for top card on pile
+     * @param card card to be played
+     * @return if card is valid
+     */
+    public boolean isCardValid(Card card) {
+        return card.suit.equals(pile.getLastCard().suit) || card.value.equals(pile.getLastCard().value)
+                //or if card is wild (jack or joker)
+                || card.value.equals(Card.Value.JACK) || card.value.equals(Card.Value.JOKER);
+    }
     @Override
     public void onGameEnded(GameEndedData data) {
         sendMessageToAll(new ClientBoundGameMessage("gameEnded",data.data));
