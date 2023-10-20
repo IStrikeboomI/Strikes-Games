@@ -4,6 +4,8 @@ import Strikeboom.StrikesGames.exception.GameNotFoundException;
 import Strikeboom.StrikesGames.game.games.SethHead;
 import Strikeboom.StrikesGames.game.games.TicTacToe;
 import Strikeboom.StrikesGames.websocket.message.game.GameMessageHandler;
+import Strikeboom.StrikesGames.websocket.message.game.sethhead.DrawCardMessage;
+import Strikeboom.StrikesGames.websocket.message.game.sethhead.PlayDrawedCardMessage;
 import Strikeboom.StrikesGames.websocket.message.game.tictactoe.MakeMoveMessage;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -17,7 +19,7 @@ import java.util.Set;
 @Getter
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum GameInfo {
-    SETH_HEAD(SethHead.class,"Seth-Head",2,4,Map.of("makeMove", MakeMoveMessage.class),Set.of(new RangedIntegerSetting("playerTimer","Player Timer",30,15,60))),
+    SETH_HEAD(SethHead.class,"Seth-Head",2,4,Map.of("makeMove", MakeMoveMessage.class,"drawCard", DrawCardMessage.class,"playDrawedCard", PlayDrawedCardMessage.class),Set.of(new RangedIntegerSetting("playerTimer","Player Timer",30,15,60))),
     TIC_TAC_TOE(TicTacToe.class,"Tic-Tac-Toe",2,2,Map.of("makeMove", MakeMoveMessage.class),Set.of(new RangedIntegerSetting("playerTimer","Player Timer",30,15,60)));
 
     public static GameInfo getGame(String name) {
