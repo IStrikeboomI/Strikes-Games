@@ -30,7 +30,7 @@ for (let name of cardNames) {
     let suit = name.substring(0,1);
     let value = name.substring(1);
 	let image = new Image();
-	image.src = `/image/card/${name}.png`
+	image.src = `image/card/${name}.png`
     let card = {
         name: name,
         card: Object.entries(Suit).find((s) => s[1]===suit)[0],
@@ -42,7 +42,7 @@ for (let name of cardNames) {
 cards[52].value = "JOKER";
 cards[53].value = "JOKER";
 let backImage = new Image();
-backImage.src = "/image/card/back.png"
+backImage.src = "image/card/back.png"
 let back = {
     name: "back",
     card: null,
@@ -83,10 +83,18 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
   return this;
 }
 class Animation {
-	Animation() {
+	Animation(id, length) {
+		this.id = id;
+		this.length = length;
+		this.age = 0;
+	}
+	draw(canvas, timestamp) {
 
 	}
-	function draw(timestamp) {
+	tick() {
+		this.age++;
+		if (this.age >= this.length) {
 
+		}
 	}
 }

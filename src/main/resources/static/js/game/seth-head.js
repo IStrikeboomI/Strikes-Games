@@ -1,6 +1,7 @@
 //location of where users are as follows, bottom is always the client then the user order is top, right, then left
 let canvas;
 let ctx;
+let currentAnimationId;
 let animations = [];
 
 let cardWidth = 100;
@@ -221,7 +222,13 @@ function animateCardFlip(siteTimestamp) {
 		window.requestAnimationFrame(animateCardFlip);
 	}
 }
-function drawCanvas() {
+let animationTimestamp;
+function drawCanvas(siteTimestamp) {
+	if (animationTimestamp === undefined) {
+        animationTimestamp = siteTimestamp;
+    }
+    let timestamp = siteTimestamp - animationTimestamp;
+	ctx.clearRect(0,0,canvas.width,canvas.height);
     //draws usernames
     ctx.textAlign = "center";
     ctx.font = "30px Arial sans-serif";
@@ -268,6 +275,10 @@ function drawCanvas() {
 		}
         ctx.restore();
     }
+	for (let animation of animations) {
+		animation.draw(canvas, timestamp);
+	}
+	window.requestAnimationFrame(drawCanvas);
 }
 function animateCard(card, rotation, radius, time) {
 	let cardImage = getCard(card).image;
@@ -287,14 +298,7 @@ function onCanvasHover(e) {
         let cardXStart = h * (cardWidth * 1.05) - (hand.length*cardWidth)/2 + canvas.width/2;
         let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (cardWidth*1.7) + canvas.height/2;
         if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            drawCanvas();
-            ctx.globalCompositeOperation = 'destination-over';
-            ctx.strokeStyle = "rgba(201,188,6,1)";
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.roundRect(cardXStart,cardYStart,cardWidth,cardHeight,5);
-            ctx.stroke();
+
         }
     }
 	//if hovering over visible cards then draw outline
@@ -302,28 +306,14 @@ function onCanvasHover(e) {
 		let cardXStart = c*(cardWidth * 1.05) - (visibleCards.length*cardWidth)/2 + canvas.width/2;
 		let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (cardWidth*3.2) + canvas.height/2;
 		if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            drawCanvas();
-            ctx.globalCompositeOperation = 'destination-over';
-            ctx.strokeStyle = "rgba(201,188,6,1)";
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.roundRect(cardXStart,cardYStart,cardWidth,cardHeight,5);
-            ctx.stroke();
+
         }
 	}
     //if hovering over deck of cards (extra cards), then show outline
     let extraCardX = canvas.width/2 - backImage.width/2;
     let extraCardY = canvas.height/2 - backImage.height/2;
     if (x > extraCardX && x < extraCardX + cardWidth && y > extraCardY && y < extraCardY + cardHeight + extraCardsSize) {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        drawCanvas();
-        ctx.globalCompositeOperation = 'destination-over';
-        ctx.strokeStyle = "rgba(201,188,6,1)";
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.roundRect(extraCardX,extraCardY,cardWidth,cardHeight + extraCardsSize,5);
-        ctx.stroke();
+
     }
 }
 function onCanvasClick(e) {
@@ -349,6 +339,12 @@ function onCanvasClick(e) {
 			console.log(visibleCards[c]);
         }
 	}
+	//if hovering over deck of cards (extra cards)
+    let extraCardX = canvas.width/2 - backImage.width/2;
+    let extraCardY = canvas.height/2 - backImage.height/2;
+    if (x > extraCardX && x < extraCardX + cardWidth && y > extraCardY && y < extraCardY + cardHeight + extraCardsSize) {
+
+    }
 }
 function playCard(user, card) {
 
