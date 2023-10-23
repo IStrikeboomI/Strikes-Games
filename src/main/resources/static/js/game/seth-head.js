@@ -1,8 +1,5 @@
 //location of where users are as follows, bottom is always the client then the user order is top, right, then left
-let canvas;
-let ctx;
-let currentAnimationId;
-let animations = [];
+let animationManager = new AnimationManager();
 
 let cardWidth = 100;
 let cardHeight = 140;
@@ -14,16 +11,7 @@ let topPileCard;
 //stores users along with additional data like where they are on canvas and what their cards are
 let usersWithData = [];
 function init() {
-    canvas = document.createElement("canvas");
-    canvas.addEventListener('mousedown', (e) => onCanvasClick(e));
-    canvas.addEventListener('mousemove', (e) => onCanvasHover(e));
-    canvas.height = document.documentElement.clientHeight * window.devicePixelRatio;
-    if (document.documentElement.clientWidth <= 600) {
-        canvas.width = document.documentElement.clientWidth;
-    } else {
-        canvas.width = document.documentElement.clientWidth;
-    }
-	canvas.width *= window.devicePixelRatio;
+	create();
     //add client first
     //using polar coordinates to display cards because its much easier and looks nicer
     usersWithData.push({user: user, rotation:0, radius: canvas.height/2, onTurn: false});
@@ -47,8 +35,7 @@ function init() {
 		userWithData.onTurn = false;
         usersWithData.push(userWithData);
     }
-    ctx = canvas.getContext("2d");
-    document.body.appendChild(canvas);
+
 }
 let cardsHandedOut = 0;
 let startTimestamp;
@@ -217,6 +204,7 @@ function animateCardFlip(siteTimestamp) {
 	ctx.restore();
 	if (timestamp > TIME_TO_FLIP) {
 		ctx.clearRect(0,0,canvas.width,canvas.height);
+		initAnimations();
 		drawCanvas();
 	} else {
 		window.requestAnimationFrame(animateCardFlip);
@@ -275,9 +263,7 @@ function drawCanvas(siteTimestamp) {
 		}
         ctx.restore();
     }
-	for (let animation of animations) {
-		animation.draw(canvas, timestamp);
-	}
+	animationManager.drawAll(canvas,timestamp);
 	window.requestAnimationFrame(drawCanvas);
 }
 function animateCard(card, rotation, radius, time) {
@@ -289,32 +275,6 @@ function animateCard(card, rotation, radius, time) {
 	ctx.rotate(rotation);
 	ctx.drawImage(cardImage,0,radius,cardImage.width,cardImage.height);
 	ctx.restore();
-}
-function onCanvasHover(e) {
-    let x = e.layerX;
-    let y = e.layerY;
-    //if hovering over card in hand then draw outline
-    for (let h = 0;h < hand.length;h++) {
-        let cardXStart = h * (cardWidth * 1.05) - (hand.length*cardWidth)/2 + canvas.width/2;
-        let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (cardWidth*1.7) + canvas.height/2;
-        if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
-
-        }
-    }
-	//if hovering over visible cards then draw outline
-	for (let c = 0;c < visibleCards.length;c++) {
-		let cardXStart = c*(cardWidth * 1.05) - (visibleCards.length*cardWidth)/2 + canvas.width/2;
-		let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (cardWidth*3.2) + canvas.height/2;
-		if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
-
-        }
-	}
-    //if hovering over deck of cards (extra cards), then show outline
-    let extraCardX = canvas.width/2 - backImage.width/2;
-    let extraCardY = canvas.height/2 - backImage.height/2;
-    if (x > extraCardX && x < extraCardX + cardWidth && y > extraCardY && y < extraCardY + cardHeight + extraCardsSize) {
-
-    }
 }
 function onCanvasClick(e) {
 	let x = e.layerX;
@@ -348,4 +308,50 @@ function onCanvasClick(e) {
 }
 function playCard(user, card) {
 
+}
+function initAnimations() {
+	let cardHoverAnimation = new Animation();
+	cardHoverAnimation.draw = (canvas, timestamp) => {
+		//if hovering over card in hand then draw outline
+		for (let h = 0;h < hand.length;h++) {
+			let cardXStart = h * (cardWidth * 1.05) - (hand.length*cardWidth)/2 + canvas.width/2;
+			let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (cardWidth*1.7) + canvas.height/2;
+			if (KeyData.mouseX > cardXStart && KeyData.mouseX < cardXStart + cardWidth && KeyData.mouseY > cardYStart && KeyData.mouseY < cardYStart + cardHeight) {
+				let ctx = canvas.getContext("2d");
+				ctx.globalCompositeOperation = 'destination-over';
+				ctx.strokeStyle = "rgba(201,188,6,1)";
+				ctx.lineWidth = 4;
+				ctx.beginPath();
+				ctx.roundRect(cardXStart,cardYStart,cardWidth,cardHeight,5);
+				ctx.stroke();
+			}
+		}
+		//if hovering over visible cards then draw outline
+		for (let c = 0;c < visibleCards.length;c++) {
+			let cardXStart = c*(cardWidth * 1.05) - (visibleCards.length*cardWidth)/2 + canvas.width/2;
+			let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (cardWidth*3.2) + canvas.height/2;
+			if (KeyData.mouseX > cardXStart && KeyData.mouseX < cardXStart + cardWidth && KeyData.mouseY > cardYStart && KeyData.mouseY < cardYStart + cardHeight) {
+				let ctx = canvas.getContext("2d");
+				ctx.globalCompositeOperation = 'destination-over';
+				ctx.strokeStyle = "rgba(201,188,6,1)";
+				ctx.lineWidth = 4;
+				ctx.beginPath();
+				ctx.roundRect(cardXStart,cardYStart,cardWidth,cardHeight,5);
+				ctx.stroke();
+			}
+		}
+		//if hovering over deck of cards (extra cards), then show outline
+		let extraCardX = canvas.width/2 - backImage.width/2;
+		let extraCardY = canvas.height/2 - backImage.height/2;
+		if (KeyData.mouseX > extraCardX && KeyData.mouseX < extraCardX + cardWidth && KeyData.mouseY > extraCardY && KeyData.mouseY < extraCardY + cardHeight + extraCardsSize) {
+			let ctx = canvas.getContext("2d");
+			ctx.globalCompositeOperation = 'destination-over';
+			ctx.strokeStyle = "rgba(201,188,6,1)";
+			ctx.lineWidth = 4;
+			ctx.beginPath();
+			ctx.roundRect(extraCardX,extraCardY,cardWidth,cardHeight + extraCardsSize,5);
+			ctx.stroke();
+		}
+	};
+	animationManager.addAnimation(cardHoverAnimation);
 }

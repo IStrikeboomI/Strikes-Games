@@ -82,19 +82,44 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
   this.arcTo(x,   y,   x+w, y,   r);
   return this;
 }
+//used for user input
+const KeyData = class {
+	mouseX = 0;
+	mouseY = 0;
+}
+class AnimationManager {
+	constructor() {
+		this.animations = new Set();
+		this.currentId = 0;
+	}
+	addAnimation(animation) {
+		animation.setId(this.currentId++);
+		this.animations.add(animation);
+	}
+	drawAll(canvas, timestamp) {
+		for (let animation of this.animations) {
+			animation.draw(canvas, timestamp);
+			if (animation.length > 0) {
+				animation.age++;
+				if (animation.age >= animation.length) {
+					animation.onEnd();
+					this.animations.delete(animation);
+				}
+			}
+		}
+	}
+}
 class Animation {
-	Animation(id, length) {
-		this.id = id;
+	//If length < 0 then animation lingers until removed
+	constructor(length = -1) {
 		this.length = length;
 		this.age = 0;
 	}
 	draw(canvas, timestamp) {
 
 	}
-	tick() {
-		this.age++;
-		if (this.age >= this.length) {
-
-		}
+	setId(id) {
+		this.id = id;
 	}
+	onEnd() {}
 }
