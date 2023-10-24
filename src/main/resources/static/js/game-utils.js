@@ -96,11 +96,11 @@ class AnimationManager {
 		animation.setId(this.currentId++);
 		this.animations.add(animation);
 	}
-	drawAll(canvas, timestamp) {
+	drawAll(canvas, timestamp, lastTimestamp) {
 		for (let animation of this.animations) {
 			animation.draw(canvas, timestamp);
 			if (animation.length > 0) {
-				animation.age++;
+				animation.age += lastTimestamp;
 				if (animation.age >= animation.length) {
 					animation.onEnd();
 					this.animations.delete(animation);
@@ -111,6 +111,7 @@ class AnimationManager {
 }
 class Animation {
 	//If length < 0 then animation lingers until removed
+	//length is in miliseconds
 	constructor(length = -1) {
 		this.length = length;
 		this.age = 0;

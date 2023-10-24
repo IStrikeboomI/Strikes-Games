@@ -127,95 +127,18 @@ function animate(siteTimestamp) {
 		window.requestAnimationFrame(animate);
 	} else {
 		ctx.clearRect(0,0,canvas.width,canvas.height);
-		window.requestAnimationFrame(animateCardFlip);
-	}
-}
-let cardFlipStartTimestamp;
-//an entirely different animate function for flipping the top card over
-function animateCardFlip(siteTimestamp) {
-	if (cardFlipStartTimestamp === undefined) {
-        cardFlipStartTimestamp = siteTimestamp;
-    }
-    let timestamp = siteTimestamp - cardFlipStartTimestamp;
-	ctx.clearRect(0,0,canvas.width,canvas.height);
-	//copied from drawCanvas()
-	//draws usernames
-    ctx.textAlign = "center";
-    ctx.font = "30px Arial sans-serif";
-	ctx.imageSmoothingEnabled = false;
-    for (let u of usersWithData) {
-        ctx.save();
-        ctx.translate(canvas.width/2,canvas.height/2);
-        ctx.rotate(u.rotation);
-		ctx.fillStyle = u.onTurn ? "black" : "darkGray";
-        ctx.fillText(u.user.name, 0,u.radius * .95);
-        ctx.restore();
-    }
-	ctx.globalCompositeOperation = 'destination-over';
-	for (let i = 0; i < extraCardsSize;i++) {
-        ctx.drawImage(backImage,canvas.width/2 - backImage.width/2,canvas.height/2-backImage.height/2+i,backImage.width,backImage.height);
-    }
-    //displays all the cards
-    for (let u of usersWithData) {
-        ctx.save();
-        ctx.translate(canvas.width/2,canvas.height/2);
-        ctx.rotate(u.rotation);
-        //draw cards in hand
-        for (let h = 0; h < u.handSize; h++) {
-            //if drawing the current user then draw the client's hand otherwise draw everyone else's card using the back card texture
-            if (u.user != user) {
-                ctx.drawImage(backImage,h*(backImage.width/2) - (u.handSize*(backImage.width))/2 + backImage.width/2,u.radius * .95 - (backImage.width*1.7),backImage.width,backImage.height);
-            } else {
-                let card = getCard(hand[h]);
-                let cardImage = card.image;
-                cardImage.width = cardWidth;
-                cardImage.height = cardHeight;
-                ctx.drawImage(cardImage,h*(cardImage.width * 1.05) - (u.handSize*cardImage.width)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height);
-            }
-        }
-        //draw visible cards
-		for (let c = 0; c < u.visibleCards.length; c++) {
-			let card = getCard(u.visibleCards[c]);
-			let cardImage = card.image;
-			cardImage.width = cardWidth;
-			cardImage.height = cardHeight;
-			ctx.drawImage(cardImage,c*(cardImage.width * 1.05) - (u.visibleCards.length*cardImage.width)/2,u.radius * .95 - (cardImage.width*3.2),cardImage.width,cardImage.height);
-		}
-        ctx.restore();
-    }
-	const TIME_TO_FLIP = 500;
-	//where card starts at
-	const CARD_SOURCE = canvas.width/2 - cardWidth/2;
-	//where card ends up
-	const CARD_DESTINATION = canvas.width/2 - cardWidth*2;
-
-	let image;
-	if (timestamp < TIME_TO_FLIP/2) {
-		image = backImage;
-	} else {
-		image = getCard(topPileCard).image;
-	}
-    image.width = cardWidth;
-    image.height = cardHeight;
-	ctx.save();
-	//ctx.translate(canvas.width/2 - image.width/2,canvas.height/2 - image.width/2);
-	//ctx.setTransform(new DOMMatrix().rotate(0,(timestamp/TIME_TO_FLIP) * 100));
-	ctx.drawImage(image,CARD_SOURCE + ((CARD_DESTINATION-CARD_SOURCE)/TIME_TO_FLIP)*timestamp,canvas.height/2 - image.height/2,image.width,image.height);
-	ctx.restore();
-	if (timestamp > TIME_TO_FLIP) {
-		ctx.clearRect(0,0,canvas.width,canvas.height);
 		initAnimations();
 		drawCanvas();
-	} else {
-		window.requestAnimationFrame(animateCardFlip);
 	}
 }
 let animationTimestamp;
+//timestamp of previous animation frame
+let lastTimestamp = 0;
 function drawCanvas(siteTimestamp) {
 	if (animationTimestamp === undefined) {
         animationTimestamp = siteTimestamp;
     }
-    let timestamp = siteTimestamp - animationTimestamp;
+    let timestamp = siteTimestamp - animationTimestamp || 0;
 	ctx.clearRect(0,0,canvas.width,canvas.height);
     //draws usernames
     ctx.textAlign = "center";
@@ -229,14 +152,10 @@ function drawCanvas(siteTimestamp) {
         ctx.fillText(u.user.name, 0,u.radius * .95);
         ctx.restore();
     }
-    let topPileCardImage = getCard(topPileCard).image;
-    topPileCardImage.width = cardWidth;
-    topPileCardImage.height = cardHeight;
-    ctx.drawImage(topPileCardImage,canvas.width/2 - topPileCardImage.width*2,canvas.height/2 - topPileCardImage.height/2,topPileCardImage.width,topPileCardImage.height);
 	ctx.globalCompositeOperation = 'destination-over';
 	for (let i = 0; i < extraCardsSize;i++) {
-        ctx.drawImage(backImage,canvas.width/2 - backImage.width/2,canvas.height/2-backImage.height/2+i,backImage.width,backImage.height);
-    }
+		ctx.drawImage(backImage,canvas.width/2 - backImage.width/2,canvas.height/2-backImage.height/2+i,backImage.width,backImage.height);
+	}
     //displays all the cards
     for (let u of usersWithData) {
         ctx.save();
@@ -263,7 +182,8 @@ function drawCanvas(siteTimestamp) {
 		}
         ctx.restore();
     }
-	animationManager.drawAll(canvas,timestamp);
+	animationManager.drawAll(canvas,timestamp, timestamp - lastTimestamp);
+	lastTimestamp = timestamp;
 	window.requestAnimationFrame(drawCanvas);
 }
 function animateCard(card, rotation, radius, time) {
@@ -310,6 +230,38 @@ function playCard(user, card) {
 
 }
 function initAnimations() {
+	let cardFlipAnimation = new Animation(1000);
+	cardFlipAnimation.draw = (canvas, timestamp) => {
+		//where card starts at
+		const CARD_SOURCE = canvas.width/2 - cardWidth/2;
+		//where card ends up
+		const CARD_DESTINATION = canvas.width/2 - cardWidth*2;
+		let image;
+		if (timestamp < cardFlipAnimation.length/2) {
+			image = backImage;
+		} else {
+			image = getCard(topPileCard).image;
+		}
+		image.width = cardWidth;
+		image.height = cardHeight;
+		ctx.save();
+		//ctx.translate(canvas.width/2 - image.width/2,canvas.height/2 - image.width/2);
+		//ctx.setTransform(new DOMMatrix().rotate(0,(timestamp/TIME_TO_FLIP) * 100));
+		ctx.drawImage(image,CARD_SOURCE + ((CARD_DESTINATION-CARD_SOURCE)/cardFlipAnimation.length)*timestamp,canvas.height/2 - image.height/2,image.width,image.height);
+		ctx.restore();
+	}
+	cardFlipAnimation.onEnd = () => {
+		let topCardAnimation = new Animation();
+		topCardAnimation.draw = (canvas, timestamp) => {
+			let topPileCardImage = getCard(topPileCard).image;
+			topPileCardImage.width = cardWidth;
+			topPileCardImage.height = cardHeight;
+			ctx.drawImage(topPileCardImage,canvas.width/2 - topPileCardImage.width*2,canvas.height/2 - topPileCardImage.height/2,topPileCardImage.width,topPileCardImage.height);
+		}
+		animationManager.addAnimation(topCardAnimation);
+	}
+	animationManager.addAnimation(cardFlipAnimation);
+
 	let cardHoverAnimation = new Animation();
 	cardHoverAnimation.draw = (canvas, timestamp) => {
 		//if hovering over card in hand then draw outline
