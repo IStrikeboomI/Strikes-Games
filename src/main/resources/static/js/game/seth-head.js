@@ -38,9 +38,6 @@ function init() {
 	initAnimations();
 }
 
-let cardsHandedOut = 0;
-let startTimestamp;
-let stillDealing = true;
 let animationTimestamp;
 //timestamp of previous animation frame
 let lastTimestamp = 0;
@@ -53,16 +50,6 @@ function drawCanvas(siteTimestamp) {
 	animationManager.drawAll(canvas,timestamp, timestamp - lastTimestamp);
 	lastTimestamp = timestamp;
 	window.requestAnimationFrame(drawCanvas);
-}
-function animateCard(card, rotation, radius, time) {
-	let cardImage = getCard(card).image;
-	cardImage.width = cardWidth;
-	cardImage.height = cardHeight;
-	ctx.save();
-	ctx.translate(canvas.width/2,canvas.height/2);
-	ctx.rotate(rotation);
-	ctx.drawImage(cardImage,0,radius,cardImage.width,cardImage.height);
-	ctx.restore();
 }
 function onCanvasClick(e) {
 	let x = e.layerX;
@@ -97,6 +84,7 @@ function onCanvasClick(e) {
 function playCard(user, card) {
 
 }
+let stillDealing = true;
 function initAnimations() {
 	backImage.width = cardWidth;
     backImage.height = cardHeight;
@@ -127,12 +115,16 @@ function initAnimations() {
             ctx.drawImage(backImage,imageX,canvas.height/2-backImage.height/2+i,backImage.width,backImage.height);
         }
         ctx.restore();
+		if (!stillDealing) {
+			animationManager.cancelAnimation(extraCardSpinAnimation);
+		}
 	}
 	extraCardSpinAnimation.onEnd = () => {
-		let dealAnimation = new Animation(canvas.width/4);
+		let dealAnimation = new Animation();
 		dealAnimation.draw = (canvas, timestamp) => {
+			const TIME_TO_DEAL = 500;
 			let dealTimestamp = timestamp - (canvas.width / 2 - backImage.width/2);
-			let cardsDealt = Math.floor(dealTimestamp / dealAnimation.length);
+			let cardsDealt = Math.floor(dealTimestamp / TIME_TO_DEAL);
 			let largestCardAmount = 0;
 			ctx.globalCompositeOperation = 'destination-over';
 			for (let i = 0; i < extraCardsSize;i++) {
@@ -144,7 +136,7 @@ function initAnimations() {
 					ctx.save();
 					ctx.translate(canvas.width/2,canvas.height/2);
 					ctx.rotate(u.rotation);
-					ctx.drawImage(backImage, -backImage.width/2, u.radius * ((dealTimestamp % dealAnimation.length) / dealAnimation.length),backImage.width,backImage.height);
+					ctx.drawImage(backImage, -backImage.width/2, u.radius * ((dealTimestamp % TIME_TO_DEAL) / TIME_TO_DEAL),backImage.width,backImage.height);
 					ctx.restore();
 				}
 				ctx.save();
@@ -176,11 +168,27 @@ function initAnimations() {
 				if (cardsDealt > largestCardAmount) {
 					stillDealing = false;
 				}
+				if (!stillDealing) {
+					animationManager.cancelAnimation(dealAnimation);
+				}
 			}
 		}
 		dealAnimation.onEnd = () => {
+			let extraCardAnimation = new Animation();
+			extraCardAnimation.draw = (canvas, timestamp) => {
+				ctx.globalCompositeOperation = 'destination-over';
+				for (let i = 0; i < extraCardsSize;i++) {
+					ctx.drawImage(backImage,canvas.width/2 - backImage.width/2,canvas.height/2-backImage.height/2+i,backImage.width,backImage.height);
+				}
+			}
+			animationManager.addAnimation(extraCardAnimation);
+			let cardFlipTimestampStart;
 			let cardFlipAnimation = new Animation(1000);
 			cardFlipAnimation.draw = (canvas, timestamp) => {
+				if (cardFlipTimestampStart === undefined) {
+					cardFlipTimestampStart = timestamp;
+				}
+				let cardFlipTimestamp = cardFlipTimestampStart - timestamp;
 				//where card starts at
 				const CARD_SOURCE = canvas.width/2 - cardWidth/2;
 				//where card ends up
@@ -196,7 +204,7 @@ function initAnimations() {
 				ctx.save();
 				//ctx.translate(canvas.width/2 - image.width/2,canvas.height/2 - image.width/2);
 				//ctx.setTransform(new DOMMatrix().rotate(0,(timestamp/TIME_TO_FLIP) * 100));
-				ctx.drawImage(image,CARD_SOURCE + ((CARD_DESTINATION-CARD_SOURCE)/cardFlipAnimation.length)*timestamp,canvas.height/2 - image.height/2,image.width,image.height);
+				ctx.drawImage(image,CARD_SOURCE + ((CARD_DESTINATION-CARD_SOURCE)/cardFlipAnimation.length)*-cardFlipTimestamp,canvas.height/2 - image.height/2,image.width,image.height);
 				ctx.restore();
 			}
 			cardFlipAnimation.onEnd = () => {

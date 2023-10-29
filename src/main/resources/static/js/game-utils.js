@@ -96,14 +96,24 @@ class AnimationManager {
 		animation.setId(this.currentId++);
 		this.animations.add(animation);
 	}
+	cancelAnimation(animation) {
+		animation.onEnd();
+		this.animations.delete(animation);
+	}
+	getAnimationFromId(id) {
+		for (let animation of this.animations) {
+			if (animation.id === id) {
+				return animation;
+			}
+		}
+	}
 	drawAll(canvas, timestamp, lastTimestamp) {
 		for (let animation of this.animations) {
 			animation.draw(canvas, timestamp);
 			if (animation.length > 0) {
 				animation.age += lastTimestamp;
 				if (animation.age >= animation.length) {
-					animation.onEnd();
-					this.animations.delete(animation);
+					this.cancelAnimation(animation);
 				}
 			}
 		}
