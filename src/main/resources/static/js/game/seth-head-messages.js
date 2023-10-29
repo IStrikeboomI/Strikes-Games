@@ -12,7 +12,7 @@ function getGameData(message) {
     }
     hand = message.hand;
     visibleCards = message.visibleCards[user.separationId]
-    window.requestAnimationFrame(animate);
+    window.requestAnimationFrame(drawCanvas);
 }
 function makeMove(message) {
 
