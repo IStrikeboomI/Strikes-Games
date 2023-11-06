@@ -71,7 +71,7 @@ function onCanvasClick(e) {
 		let cardXStart = c*(cardWidth * 1.05) - (visibleCards.length*cardWidth)/2 + canvas.width/2;
 		let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (cardWidth*3.2) + canvas.height/2;
 		if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
-			console.log(visibleCards[c]);
+			playCard(usersWithData[0],visibleCards[c]);
         }
 	}
 	//if hovering over deck of cards (extra cards)
@@ -82,6 +82,9 @@ function onCanvasClick(e) {
     }
 }
 function playCard(user, card) {
+
+}
+function drawCard(user, card) {
 
 }
 let stillDealing = true;
