@@ -71,6 +71,9 @@ function randomInt(min, max) {
 function randomBoolean() {
     return randomInt(0,1) === 0;
 }
+function randomCard() {
+	return cards[randomInt(0,54)];
+}
 //Some browsers might not support roundRect so a manual implement
 CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
   if (w < 2 * r) r = w / 2;
@@ -89,16 +92,20 @@ const KeyData = class {
 }
 class AnimationManager {
 	constructor() {
-		this.animations = new Set();
+		this.animations = [];
 		this.currentId = 0;
 	}
-	addAnimation(animation) {
+	addAnimation(animation, toStart = false) {
 		animation.setId(this.currentId++);
-		this.animations.add(animation);
+		if (toStart) {
+			this.animations.unshift(animation);
+		} else {
+			this.animations.push(animation);
+		}
 	}
 	cancelAnimation(animation) {
 		animation.onEnd();
-		this.animations.delete(animation);
+		this.animations = this.animations.filter(a => a !== animation);
 	}
 	getAnimationFromId(id) {
 		for (let animation of this.animations) {

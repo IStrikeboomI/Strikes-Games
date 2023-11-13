@@ -78,14 +78,35 @@ function onCanvasClick(e) {
     let extraCardX = canvas.width/2 - backImage.width/2;
     let extraCardY = canvas.height/2 - backImage.height/2;
     if (x > extraCardX && x < extraCardX + cardWidth && y > extraCardY && y < extraCardY + cardHeight + extraCardsSize) {
-
+		drawCard(usersWithData[0],randomCard().name, randomBoolean());
     }
 }
 function playCard(user, card) {
 
 }
-function drawCard(user, card) {
-
+function drawCard(userToDraw, card, toHand) {
+	let drawCardAnimation = new Animation(500);
+	drawCardAnimation.draw = (canvas, timestamp) => {
+		ctx.save();
+		ctx.translate(canvas.width/2,canvas.height/2);
+		ctx.rotate(userToDraw.rotation);
+		let cardImage = getCard(card).image;
+		cardImage.width = cardWidth;
+		cardImage.height = cardHeight;
+		ctx.drawImage(cardImage,-backImage.width/2, userToDraw.radius * (drawCardAnimation.age / drawCardAnimation.length),cardImage.width,cardImage.height);
+		ctx.restore();
+	}
+	drawCardAnimation.onEnd = () => {
+		if (toHand) {
+			userToDraw.handSize++;
+			if (userToDraw.user === user) {
+				hand.push(card);
+			}
+		} else {
+			userToDraw.visibleCards.push(card);
+		}
+	}
+	animationManager.addAnimation(drawCardAnimation,true);
 }
 let stillDealing = true;
 function initAnimations() {
