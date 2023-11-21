@@ -4,8 +4,6 @@ let animationManager = new AnimationManager();
 let cardWidth = 100;
 let cardHeight = 140;
 
-let hand = [];
-let visibleCards = [];
 let extraCardsSize;
 let topPileCard;
 //stores users along with additional data like where they are on canvas and what their cards are
@@ -59,19 +57,19 @@ function onCanvasClick(e) {
 		stillDealing = false;
 	}
 	//if hovering over card in hand
-    for (let h = 0;h < hand.length;h++) {
-        let cardXStart = h * (cardWidth * 1.05) - (hand.length*cardWidth)/2 + canvas.width/2;
-        let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (cardWidth*1.7) + canvas.height/2;
+    for (let h = 0;h < usersWithData[0].hand.length;h++) {
+        let cardXStart = h * (cardWidth * 1.05) - (usersWithData[0].hand.length*cardWidth)/2 + canvas.width/2;
+        let cardYStart = usersWithData[0].radius * .95 - (cardWidth*1.7) + canvas.height/2;
         if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
-            playCard(usersWithData[0],hand[h]);
+            playCard(usersWithData[0],usersWithData[0].hand[h]);
         }
     }
 	//if hovering over visible cards
-	for (let c = 0;c < visibleCards.length;c++) {
-		let cardXStart = c*(cardWidth * 1.05) - (visibleCards.length*cardWidth)/2 + canvas.width/2;
-		let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (cardWidth*3.2) + canvas.height/2;
+	for (let c = 0;c < usersWithData[0].visibleCards.length;c++) {
+		let cardXStart = c*(cardWidth * 1.05) - (usersWithData[0].visibleCards.length*cardWidth)/2 + canvas.width/2;
+		let cardYStart = usersWithData[0].radius * .95 - (cardWidth*3.2) + canvas.height/2;
 		if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
-			playCard(usersWithData[0],visibleCards[c]);
+			playCard(usersWithData[0],usersWithData[0].visibleCards[c]);
         }
 	}
 	//if hovering over deck of cards (extra cards)
@@ -81,8 +79,57 @@ function onCanvasClick(e) {
 		drawCard(usersWithData[0],randomCard().name, randomBoolean());
     }
 }
-function playCard(user, card) {
+function playCard(userToPlay, card) {
+	let visibleIndex = userToPlay.visibleCards.indexOf(card);
+	if (visibleIndex === -1) {
+		userToPlay.handSize--;
+	} else {
+		userToPlay.visibleCards.splice(visibleIndex,1);
+	}
+	//only in use if user playing card is local player
+	let handIndex;
+	if (userToPlay.user === user) {
+		handIndex = usersWithData[0].hand.indexOf(card);
+		if (handIndex >= 0) {
+			usersWithData[0].hand.splice(handIndex,1);
+		}
+	}
 
+	let playCardAnimation = new Animation(500);
+	playCardAnimation.draw = (canvas, timestamp) => {
+		ctx.save();
+		ctx.rotate(userToPlay.rotation);
+		let cardImage = getCard(card).image;
+		cardImage.width = cardWidth;
+		cardImage.height = cardHeight;
+
+		//where card ends up
+		const CARD_DESTINATION_X = canvas.width/2 - cardWidth*2;
+		const CARD_DESTINATION_Y = canvas.height/2 - cardHeight/2;
+
+		//where card starts
+		let card_source_x;
+		let card_source_y;
+
+		//means card comes from visible deck
+		if (visibleIndex >= 0) {
+			card_source_x = visibleIndex*(cardWidth * 1.05) - (userToPlay.visibleCards.length*cardWidth)/2 + canvas.width/2;
+			card_source_y = (userToPlay.radius) * .95 - (cardWidth*3.2) + canvas.height/2;
+		} else {
+			card_source_x = canvas.width/2 - cardWidth/2;
+			if (userToPlay.user === user && handIndex) {
+				card_source_x = handIndex * (cardWidth * 1.05) - (usersWithData[0].hand.length*cardWidth)/2 + canvas.width/2;
+			}
+		    card_source_y = (userToPlay.radius) * .95 - (cardWidth*1.7) + canvas.height/2;
+		}
+		ctx.drawImage(cardImage,card_source_x + ((CARD_DESTINATION_X-card_source_x)/playCardAnimation.length)*playCardAnimation.age,
+								card_source_y + ((CARD_DESTINATION_Y-card_source_y)/playCardAnimation.length)*playCardAnimation.age,cardImage.width,cardImage.height);
+		ctx.restore();
+	}
+	playCardAnimation.onEnd = () => {
+		topPileCard = card;
+	}
+	animationManager.addAnimation(playCardAnimation,true);
 }
 function drawCard(userToDraw, card, toHand) {
 	let drawCardAnimation = new Animation(500);
@@ -100,7 +147,7 @@ function drawCard(userToDraw, card, toHand) {
 		if (toHand) {
 			userToDraw.handSize++;
 			if (userToDraw.user === user) {
-				hand.push(card);
+				usersWithData[0].hand.push(card);
 			}
 		} else {
 			userToDraw.visibleCards.push(card);
@@ -171,7 +218,7 @@ function initAnimations() {
 					if (u.user != user) {
 						ctx.drawImage(backImage,h*(backImage.width * .5) - (Math.min(cardsDealt,u.handSize)*backImage.width)/2 + backImage.width/2,u.radius * .95 - (backImage.width*1.7),backImage.width,backImage.height);
 					} else {
-						let card = getCard(hand[h]);
+						let card = getCard(usersWithData[0].hand[h]);
 						let cardImage = card.image;
 						cardImage.width = cardWidth;
 						cardImage.height = cardHeight;
@@ -206,13 +253,8 @@ function initAnimations() {
 				}
 			}
 			animationManager.addAnimation(extraCardAnimation);
-			let cardFlipTimestampStart;
 			let cardFlipAnimation = new Animation(1000);
 			cardFlipAnimation.draw = (canvas, timestamp) => {
-				if (cardFlipTimestampStart === undefined) {
-					cardFlipTimestampStart = timestamp;
-				}
-				let cardFlipTimestamp = cardFlipTimestampStart - timestamp;
 				//where card starts at
 				const CARD_SOURCE = canvas.width/2 - cardWidth/2;
 				//where card ends up
@@ -228,7 +270,7 @@ function initAnimations() {
 				ctx.save();
 				//ctx.translate(canvas.width/2 - image.width/2,canvas.height/2 - image.width/2);
 				//ctx.setTransform(new DOMMatrix().rotate(0,(timestamp/TIME_TO_FLIP) * 100));
-				ctx.drawImage(image,CARD_SOURCE + ((CARD_DESTINATION-CARD_SOURCE)/cardFlipAnimation.length)*-cardFlipTimestamp,canvas.height/2 - image.height/2,image.width,image.height);
+				ctx.drawImage(image,CARD_SOURCE + ((CARD_DESTINATION-CARD_SOURCE)/cardFlipAnimation.length)*cardFlipAnimation.age,canvas.height/2 - image.height/2,image.width,image.height);
 				ctx.restore();
 			}
 			cardFlipAnimation.onEnd = () => {
@@ -246,9 +288,9 @@ function initAnimations() {
 			let cardHoverAnimation = new Animation();
 			cardHoverAnimation.draw = (canvas, timestamp) => {
 				//if hovering over card in hand then draw outline
-				for (let h = 0;h < hand.length;h++) {
-					let cardXStart = h * (cardWidth * 1.05) - (hand.length*cardWidth)/2 + canvas.width/2;
-					let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (cardWidth*1.7) + canvas.height/2;
+				for (let h = 0;h < usersWithData[0].hand.length;h++) {
+					let cardXStart = h * (cardWidth * 1.05) - (usersWithData[0].hand.length*cardWidth)/2 + canvas.width/2;
+					let cardYStart = usersWithData[0].radius * .95 - (cardWidth*1.7) + canvas.height/2;
 					if (KeyData.mouseX > cardXStart && KeyData.mouseX < cardXStart + cardWidth && KeyData.mouseY > cardYStart && KeyData.mouseY < cardYStart + cardHeight) {
 						let ctx = canvas.getContext("2d");
 						ctx.globalCompositeOperation = 'destination-over';
@@ -260,9 +302,9 @@ function initAnimations() {
 					}
 				}
 				//if hovering over visible cards then draw outline
-				for (let c = 0;c < visibleCards.length;c++) {
-					let cardXStart = c*(cardWidth * 1.05) - (visibleCards.length*cardWidth)/2 + canvas.width/2;
-					let cardYStart = usersWithData.find(u => u.user===user).radius * .95 - (cardWidth*3.2) + canvas.height/2;
+				for (let c = 0;c < usersWithData[0].visibleCards.length;c++) {
+					let cardXStart = c*(cardWidth * 1.05) - (usersWithData[0].visibleCards.length*cardWidth)/2 + canvas.width/2;
+					let cardYStart = usersWithData[0].radius * .95 - (cardWidth*3.2) + canvas.height/2;
 					if (KeyData.mouseX > cardXStart && KeyData.mouseX < cardXStart + cardWidth && KeyData.mouseY > cardYStart && KeyData.mouseY < cardYStart + cardHeight) {
 						let ctx = canvas.getContext("2d");
 						ctx.globalCompositeOperation = 'destination-over';
@@ -299,7 +341,7 @@ function initAnimations() {
 						if (u.user != user) {
 							ctx.drawImage(backImage,h*(backImage.width/2) - (u.handSize*(backImage.width))/2 + backImage.width/2,u.radius * .95 - (backImage.width*1.7),backImage.width,backImage.height);
 						} else {
-							let card = getCard(hand[h]);
+							let card = getCard(usersWithData[0].hand[h]);
 							let cardImage = card.image;
 							cardImage.width = cardWidth;
 							cardImage.height = cardHeight;

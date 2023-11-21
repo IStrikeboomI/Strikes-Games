@@ -5,13 +5,14 @@ const gameMessageHandlers = [
 function getGameData(message) {
     extraCardsSize = message.extraCardsSize;
     topPileCard = message.topPileCard;
-    usersWithData.find(u => u.user.separationId===message.playerOnTurn).onTurn = true;
+	let player = usersWithData[0];
+    player.onTurn = true;
     for (let u of usersWithData) {
         u.handSize = message.handsSize[Object.keys(message.handsSize).find(id => id===u.user.separationId)] || message.hand.length;
         u.visibleCards = message.visibleCards[Object.keys(message.visibleCards).find(id => id===u.user.separationId)];
     }
-    hand = message.hand;
-    visibleCards = message.visibleCards[user.separationId]
+    player.hand = message.hand;
+    player.visibleCards = message.visibleCards[user.separationId]
     window.requestAnimationFrame(drawCanvas);
 }
 function makeMove(message) {
