@@ -97,35 +97,37 @@ function playCard(userToPlay, card) {
 
 	let playCardAnimation = new Animation(500);
 	playCardAnimation.draw = (canvas, timestamp) => {
-		ctx.save();
-		ctx.rotate(userToPlay.rotation);
-		let cardImage = getCard(card).image;
-		cardImage.width = cardWidth;
-		cardImage.height = cardHeight;
+    		ctx.save();
+    		let cardImage = getCard(card).image;
+    		cardImage.width = cardWidth;
+    		cardImage.height = cardHeight;
 
-		//where card ends up
-		const CARD_DESTINATION_X = canvas.width/2 - cardWidth*2;
-		const CARD_DESTINATION_Y = canvas.height/2 - cardHeight/2;
+    		//where card ends up
+    		const CARD_DESTINATION_X = canvas.width/2 - cardWidth*2;
+    		const CARD_DESTINATION_Y = canvas.height/2 - cardHeight/2;
 
-		//where card starts
-		let card_source_x;
-		let card_source_y;
+    		//where card starts
+    		let card_source_x;
+    		let card_source_y;
 
-		//means card comes from visible deck
-		if (visibleIndex >= 0) {
-			card_source_x = visibleIndex*(cardWidth * 1.05) - (userToPlay.visibleCards.length*cardWidth)/2 + canvas.width/2;
-			card_source_y = (userToPlay.radius) * .95 - (cardWidth*3.2) + canvas.height/2;
-		} else {
-			card_source_x = canvas.width/2 - cardWidth/2;
-			if (userToPlay.user === user && handIndex) {
-				card_source_x = handIndex * (cardWidth * 1.05) - (usersWithData[0].hand.length*cardWidth)/2 + canvas.width/2;
-			}
-		    card_source_y = (userToPlay.radius) * .95 - (cardWidth*1.7) + canvas.height/2;
-		}
-		ctx.drawImage(cardImage,card_source_x + ((CARD_DESTINATION_X-card_source_x)/playCardAnimation.length)*playCardAnimation.age,
-								card_source_y + ((CARD_DESTINATION_Y-card_source_y)/playCardAnimation.length)*playCardAnimation.age,cardImage.width,cardImage.height);
-		ctx.restore();
-	}
+    		//means card comes from visible deck
+    		if (visibleIndex >= 0) {
+    			card_source_x = ((Math.sin(userToPlay.rotation) * -userToPlay.radius) + visibleIndex*(cardWidth * 1.05) - (userToPlay.visibleCards.length*cardWidth)/2 + canvas.width/2);
+    			card_source_y = (Math.cos(userToPlay.rotation) * userToPlay.radius) * .95 - (cardWidth*3.2) + canvas.height/2;
+    		} else {
+    			card_source_x = (Math.sin(userToPlay.rotation) * -userToPlay.radius) + canvas.width/2 - cardWidth/2;
+    			if (userToPlay.user === user && handIndex) {
+    				card_source_x = handIndex * (cardWidth * 1.05) - (usersWithData[0].hand.length*cardWidth)/2 + canvas.width/2;
+    			}
+    		    card_source_y = (Math.cos(userToPlay.rotation) * userToPlay.radius) * .95 - (cardWidth*1.7) + canvas.height/2;
+    		}
+    		ctx.translate(card_source_x + ((CARD_DESTINATION_X-card_source_x)/playCardAnimation.length)*playCardAnimation.age + cardWidth/2,
+    					  card_source_y + ((CARD_DESTINATION_Y-card_source_y)/playCardAnimation.length)*playCardAnimation.age + cardHeight/2);
+    		ctx.rotate((userToPlay.rotation/playCardAnimation.length) * (playCardAnimation.length - playCardAnimation.age));
+    		ctx.drawImage(cardImage,-cardImage.width/2,
+    								-cardImage.height/2,cardImage.width,cardImage.height);
+    		ctx.restore();
+    	}
 	playCardAnimation.onEnd = () => {
 		topPileCard = card;
 	}
