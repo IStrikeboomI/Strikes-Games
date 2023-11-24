@@ -1,4 +1,3 @@
-//location of where users are as follows, bottom is always the client then the user order is top, right, then left
 let animationManager = new AnimationManager();
 
 let cardWidth = 100;
@@ -7,6 +6,7 @@ let cardHeight = 140;
 let extraCardsSize;
 let topPileCard;
 //stores users along with additional data like where they are on canvas and what their cards are
+//location of where users are as follows, bottom is always the client then the user order is top, right, then left
 let usersWithData = [];
 function init() {
 	create();
@@ -44,7 +44,7 @@ function drawCanvas(siteTimestamp) {
         animationTimestamp = siteTimestamp;
     }
     let timestamp = siteTimestamp - animationTimestamp || 0;
-	ctx.clearRect(0,0,canvas.width,canvas.height);
+	ctx.clearRect(0,0,canvas.width,canvas.height);    
 	animationManager.drawAll(canvas,timestamp, timestamp - lastTimestamp);
 	lastTimestamp = timestamp;
 	window.requestAnimationFrame(drawCanvas);
@@ -56,7 +56,7 @@ function onCanvasClick(e) {
 	if (stillDealing) {
 		stillDealing = false;
 	}
-	//if hovering over card in hand
+	//if hovering over card in hand 
     for (let h = 0;h < usersWithData[0].hand.length;h++) {
         let cardXStart = h * (cardWidth * 1.05) - (usersWithData[0].hand.length*cardWidth)/2 + canvas.width/2;
         let cardYStart = usersWithData[0].radius * .95 - (cardWidth*1.7) + canvas.height/2;
@@ -64,7 +64,7 @@ function onCanvasClick(e) {
             playCard(usersWithData[0],usersWithData[0].hand[h]);
         }
     }
-	//if hovering over visible cards
+	//if hovering over visible cards 
 	for (let c = 0;c < usersWithData[0].visibleCards.length;c++) {
 		let cardXStart = c*(cardWidth * 1.05) - (usersWithData[0].visibleCards.length*cardWidth)/2 + canvas.width/2;
 		let cardYStart = usersWithData[0].radius * .95 - (cardWidth*3.2) + canvas.height/2;
@@ -80,54 +80,36 @@ function onCanvasClick(e) {
     }
 }
 function playCard(userToPlay, card) {
-	let visibleIndex = userToPlay.visibleCards.indexOf(card);
-	if (visibleIndex === -1) {
+	let visibleCardsSizeBefore = userToPlay.visibleCards.length;
+	userToPlay.visibleCards = userToPlay.visibleCards.filter(c => c!==card);
+	if (visibleCardsSizeBefore === userToPlay.visibleCards.length) {
 		userToPlay.handSize--;
-	} else {
-		userToPlay.visibleCards.splice(visibleIndex,1);
 	}
-	//only in use if user playing card is local player
-	let handIndex;
 	if (userToPlay.user === user) {
-		handIndex = usersWithData[0].hand.indexOf(card);
-		if (handIndex >= 0) {
-			usersWithData[0].hand.splice(handIndex,1);
-		}
+		usersWithData[0].hand = usersWithData[0].hand.filter(c => c!==card);
 	}
-
-	let playCardAnimation = new Animation(500);
+	
+	let playCardAnimation = new Animation(1000);
 	playCardAnimation.draw = (canvas, timestamp) => {
-    		ctx.save();
-    		let cardImage = getCard(card).image;
-    		cardImage.width = cardWidth;
-    		cardImage.height = cardHeight;
-
-    		//where card ends up
-    		const CARD_DESTINATION_X = canvas.width/2 - cardWidth*2;
-    		const CARD_DESTINATION_Y = canvas.height/2 - cardHeight/2;
-
-    		//where card starts
-    		let card_source_x;
-    		let card_source_y;
-
-    		//means card comes from visible deck
-    		if (visibleIndex >= 0) {
-    			card_source_x = ((Math.sin(userToPlay.rotation) * -userToPlay.radius) + visibleIndex*(cardWidth * 1.05) - (userToPlay.visibleCards.length*cardWidth)/2 + canvas.width/2);
-    			card_source_y = (Math.cos(userToPlay.rotation) * userToPlay.radius) * .95 - (cardWidth*3.2) + canvas.height/2;
-    		} else {
-    			card_source_x = (Math.sin(userToPlay.rotation) * -userToPlay.radius) + canvas.width/2 - cardWidth/2;
-    			if (userToPlay.user === user && handIndex) {
-    				card_source_x = handIndex * (cardWidth * 1.05) - (usersWithData[0].hand.length*cardWidth)/2 + canvas.width/2;
-    			}
-    		    card_source_y = (Math.cos(userToPlay.rotation) * userToPlay.radius) * .95 - (cardWidth*1.7) + canvas.height/2;
-    		}
-    		ctx.translate(card_source_x + ((CARD_DESTINATION_X-card_source_x)/playCardAnimation.length)*playCardAnimation.age + cardWidth/2,
-    					  card_source_y + ((CARD_DESTINATION_Y-card_source_y)/playCardAnimation.length)*playCardAnimation.age + cardHeight/2);
-    		ctx.rotate((userToPlay.rotation/playCardAnimation.length) * (playCardAnimation.length - playCardAnimation.age));
-    		ctx.drawImage(cardImage,-cardImage.width/2,
-    								-cardImage.height/2,cardImage.width,cardImage.height);
-    		ctx.restore();
-    	}
+		ctx.save();
+		let cardImage = getCard(card).image;
+		cardImage.width = cardWidth;
+		cardImage.height = cardHeight;
+		
+		//where card ends up
+		const CARD_DESTINATION_X = canvas.width/2 - cardWidth*2;
+		const CARD_DESTINATION_Y = canvas.height/2 - cardHeight/2;
+		
+		let card_source_x = (Math.sin(userToPlay.rotation) * userToPlay.radius) * .75 + canvas.width/2 - cardImage.width/2;
+		let card_source_y = (Math.cos(userToPlay.rotation) * userToPlay.radius) * .75 + canvas.height/2 - cardImage.height/2;
+		
+		ctx.translate(card_source_x + ((CARD_DESTINATION_X-card_source_x)/playCardAnimation.length)*playCardAnimation.age + cardWidth/2,
+					  card_source_y + ((CARD_DESTINATION_Y-card_source_y)/playCardAnimation.length)*playCardAnimation.age + cardHeight/2);
+		ctx.rotate((userToPlay.rotation/playCardAnimation.length) * (playCardAnimation.length - playCardAnimation.age));
+		ctx.drawImage(cardImage,-cardImage.width/2,
+								-cardImage.height/2,cardImage.width,cardImage.height);
+		ctx.restore();
+	}
 	playCardAnimation.onEnd = () => {
 		topPileCard = card;
 	}
@@ -286,7 +268,7 @@ function initAnimations() {
 				animationManager.addAnimation(topCardAnimation);
 			}
 			animationManager.addAnimation(cardFlipAnimation);
-
+			
 			let cardHoverAnimation = new Animation();
 			cardHoverAnimation.draw = (canvas, timestamp) => {
 				//if hovering over card in hand then draw outline
@@ -331,7 +313,7 @@ function initAnimations() {
 				}
 			};
 			animationManager.addAnimation(cardHoverAnimation);
-
+			
 			let cardsInHandAnimation = new Animation();
 			cardsInHandAnimation.draw = (canvas, timestamp) => {
 				for (let u of usersWithData) {
@@ -366,3 +348,4 @@ function initAnimations() {
 	}
 	animationManager.addAnimation(extraCardSpinAnimation);
 }
+init();
