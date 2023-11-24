@@ -117,12 +117,10 @@ class AnimationManager {
 	drawAll(canvas, timestamp, lastTimestamp) {
 		for (let animation of this.animations) {
 			animation.draw(canvas, timestamp);
-			if (animation.length > 0) {
-				animation.age += lastTimestamp;
-				if (animation.age >= animation.length) {
-					this.cancelAnimation(animation);
-				}
-			}
+			animation.age += lastTimestamp;
+            if (animation.length > 0 && animation.age >= animation.length) {
+                this.cancelAnimation(animation);
+            }
 		}
 	}
 }
