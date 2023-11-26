@@ -22,6 +22,3 @@ function onCanvasHover(e) {
 	KeyData.mouseX = x;
 	KeyData.mouseY = y;
 }
-function onCanvasClick(e) {
-	
-}

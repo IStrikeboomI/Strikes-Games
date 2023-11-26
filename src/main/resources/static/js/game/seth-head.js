@@ -1,4 +1,5 @@
 let animationManager = new AnimationManager();
+let guiManager = new GuiManager(animationManager);
 
 let cardWidth = 100;
 let cardHeight = 140;
@@ -44,7 +45,7 @@ function drawCanvas(siteTimestamp) {
         animationTimestamp = siteTimestamp;
     }
     let timestamp = siteTimestamp - animationTimestamp || 0;
-	ctx.clearRect(0,0,canvas.width,canvas.height);    
+	ctx.clearRect(0,0,canvas.width,canvas.height);
 	animationManager.drawAll(canvas,timestamp, timestamp - lastTimestamp);
 	lastTimestamp = timestamp;
 	window.requestAnimationFrame(drawCanvas);
@@ -56,7 +57,8 @@ function onCanvasClick(e) {
 	if (stillDealing) {
 		stillDealing = false;
 	}
-	//if hovering over card in hand 
+	guiManager.onClick(e);
+	//if hovering over card in hand
     for (let h = 0;h < usersWithData[0].hand.length;h++) {
         let cardXStart = h * (cardWidth * 1.05) - (usersWithData[0].hand.length*cardWidth)/2 + canvas.width/2;
         let cardYStart = usersWithData[0].radius * .95 - (cardWidth*1.7) + canvas.height/2;
@@ -64,7 +66,7 @@ function onCanvasClick(e) {
             playCard(usersWithData[0],usersWithData[0].hand[h]);
         }
     }
-	//if hovering over visible cards 
+	//if hovering over visible cards
 	for (let c = 0;c < usersWithData[0].visibleCards.length;c++) {
 		let cardXStart = c*(cardWidth * 1.05) - (usersWithData[0].visibleCards.length*cardWidth)/2 + canvas.width/2;
 		let cardYStart = usersWithData[0].radius * .95 - (cardWidth*3.2) + canvas.height/2;
@@ -88,21 +90,21 @@ function playCard(userToPlay, card) {
 	if (userToPlay.user === user) {
 		usersWithData[0].hand = usersWithData[0].hand.filter(c => c!==card);
 	}
-	
+
 	let playCardAnimation = new Animation(1000);
 	playCardAnimation.draw = (canvas, timestamp) => {
 		ctx.save();
 		let cardImage = getCard(card).image;
 		cardImage.width = cardWidth;
 		cardImage.height = cardHeight;
-		
+
 		//where card ends up
 		const CARD_DESTINATION_X = canvas.width/2 - cardWidth*2;
 		const CARD_DESTINATION_Y = canvas.height/2 - cardHeight/2;
-		
+
 		let card_source_x = (Math.sin(userToPlay.rotation) * userToPlay.radius) * .75 + canvas.width/2 - cardImage.width/2;
 		let card_source_y = (Math.cos(userToPlay.rotation) * userToPlay.radius) * .75 + canvas.height/2 - cardImage.height/2;
-		
+
 		ctx.translate(card_source_x + ((CARD_DESTINATION_X-card_source_x)/playCardAnimation.length)*playCardAnimation.age + cardWidth/2,
 					  card_source_y + ((CARD_DESTINATION_Y-card_source_y)/playCardAnimation.length)*playCardAnimation.age + cardHeight/2);
 		ctx.rotate((userToPlay.rotation/playCardAnimation.length) * (playCardAnimation.length - playCardAnimation.age));
@@ -112,6 +114,21 @@ function playCard(userToPlay, card) {
 	}
 	playCardAnimation.onEnd = () => {
 		topPileCard = card;
+		let cardData = getCard(card);
+		if (cardData.value === "JACK" || cardData.value === "JOKER") {
+			let chooseSuitGui = new Gui(canvas.width/2 - 250, canvas.height/2 - 250, 500, 500);
+			let heartElement = new GuiElement(50,50,100,100);
+			heartElement.onClick = (e) => {
+				console.log("heart");
+			}
+			heartElement.draw = (ctx) => {
+				heartImage.width = 100;
+				heartImage.height = 100;
+				ctx.drawImage(heartImage,0,0,100,100);
+			}
+			chooseSuitGui.addElement(heartElement);
+			guiManager.addGui(chooseSuitGui);
+		}
 	}
 	animationManager.addAnimation(playCardAnimation,true);
 }
@@ -268,7 +285,7 @@ function initAnimations() {
 				animationManager.addAnimation(topCardAnimation);
 			}
 			animationManager.addAnimation(cardFlipAnimation);
-			
+
 			let cardHoverAnimation = new Animation();
 			cardHoverAnimation.draw = (canvas, timestamp) => {
 				//if hovering over card in hand then draw outline
@@ -313,7 +330,7 @@ function initAnimations() {
 				}
 			};
 			animationManager.addAnimation(cardHoverAnimation);
-			
+
 			let cardsInHandAnimation = new Animation();
 			cardsInHandAnimation.draw = (canvas, timestamp) => {
 				for (let u of usersWithData) {
@@ -348,4 +365,3 @@ function initAnimations() {
 	}
 	animationManager.addAnimation(extraCardSpinAnimation);
 }
-init();
