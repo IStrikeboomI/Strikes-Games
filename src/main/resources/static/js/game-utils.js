@@ -93,6 +93,31 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
   this.arcTo(x,   y,   x+w, y,   r);
   return this;
 }
+/**
+Generates a rotation matrix using pitch, yaw, and roll
+x and y can be passed on as optional arguments to offset the origin of rotation
+
+Matrix is generated from the product of the pitch, yaw, and roll matrices
+*/
+DOMMatrix.rotationMatrix = (pitch,yaw,roll,x=0,y=0) => {
+	let matrix = new DOMMatrix();
+	//rotations based on multiplying the pitch, yaw, and roll matrices together
+	//search up euler angles
+	matrix.m11 = Math.cos(yaw)*Math.cos(pitch);
+	matrix.m12 = -Math.cos(roll)*Math.sin(pitch) + Math.sin(roll)*Math.sin(yaw)*Math.cos(pitch);
+	matrix.m13 = Math.sin(roll)*Math.sin(pitch) + Math.cos(roll)*Math.sin(yaw)*Math.cos(pitch);
+	matrix.m21 = Math.cos(yaw)*Math.sin(pitch);
+	matrix.m22 = Math.cos(roll)*Math.cos(pitch) + Math.sin(roll)*Math.sin(yaw)*Math.sin(pitch);
+	matrix.m23 = -Math.sin(roll)*Math.cos(pitch) + Math.cos(roll)*Math.sin(yaw)*Math.sin(pitch);
+	matrix.m31 = -Math.sin(yaw);
+	matrix.m32 = Math.sin(roll)*Math.cos(yaw);
+	matrix.m33 = Math.cos(roll)*Math.cos(yaw);
+
+	//translating to rotate along (x,y) instead of default which is the origin of (0,0)
+	matrix.e = x;
+	matrix.f = y;
+	return matrix;
+}
 //used for user input
 const KeyData = class {
 	mouseX = 0;
