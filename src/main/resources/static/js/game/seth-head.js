@@ -45,7 +45,7 @@ function drawCanvas(siteTimestamp) {
         animationTimestamp = siteTimestamp;
     }
     let timestamp = siteTimestamp - animationTimestamp || 0;
-	ctx.clearRect(0,0,canvas.width,canvas.height);
+	canvas.getContext("2d").clearRect(0,0,canvas.width,canvas.height);
 	animationManager.drawAll(canvas,timestamp, timestamp - lastTimestamp);
 	lastTimestamp = timestamp;
 	window.requestAnimationFrame(drawCanvas);
@@ -58,28 +58,98 @@ function onCanvasClick(e) {
 		stillDealing = false;
 	}
 	guiManager.onClick(e);
-	//if hovering over card in hand
-    for (let h = 0;h < usersWithData[0].hand.length;h++) {
-        let cardXStart = h * (cardWidth * 1.05) - (usersWithData[0].hand.length*cardWidth)/2 + canvas.width/2;
-        let cardYStart = usersWithData[0].radius * .95 - (cardWidth*1.7) + canvas.height/2;
-        if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
-            playCard(usersWithData[0],usersWithData[0].hand[h]);
-        }
-    }
-	//if hovering over visible cards
-	for (let c = 0;c < usersWithData[0].visibleCards.length;c++) {
-		let cardXStart = c*(cardWidth * 1.05) - (usersWithData[0].visibleCards.length*cardWidth)/2 + canvas.width/2;
-		let cardYStart = usersWithData[0].radius * .95 - (cardWidth*3.2) + canvas.height/2;
-		if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
-			playCard(usersWithData[0],usersWithData[0].visibleCards[c]);
-        }
+	if (usersWithData[0].onTurn) {
+		//if hovering over card in hand
+		for (let h = 0;h < usersWithData[0].hand.length;h++) {
+			let cardXStart = h * (cardWidth * 1.05) - (usersWithData[0].hand.length*cardWidth)/2 + canvas.width/2;
+			let cardYStart = usersWithData[0].radius * .95 - (cardWidth*1.7) + canvas.height/2;
+			if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
+				userPlayCard(usersWithData[0].hand[h])
+			}
+		}
+		//if hovering over visible cards
+		for (let c = 0;c < usersWithData[0].visibleCards.length;c++) {
+			let cardXStart = c*(cardWidth * 1.05) - (usersWithData[0].visibleCards.length*cardWidth)/2 + canvas.width/2;
+			let cardYStart = usersWithData[0].radius * .95 - (cardWidth*3.2) + canvas.height/2;
+			if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
+				userPlayCard(usersWithData[0].visibleCards[c]);
+			}
+		}
+		//if hovering over deck of cards (extra cards)
+		let extraCardX = canvas.width/2 - backImage.width/2;
+		let extraCardY = canvas.height/2 - backImage.height/2;
+		if (x > extraCardX && x < extraCardX + cardWidth && y > extraCardY && y < extraCardY + cardHeight + extraCardsSize) {
+			drawCard(usersWithData[0],randomCard().name, randomBoolean());
+		}
 	}
-	//if hovering over deck of cards (extra cards)
-    let extraCardX = canvas.width/2 - backImage.width/2;
-    let extraCardY = canvas.height/2 - backImage.height/2;
-    if (x > extraCardX && x < extraCardX + cardWidth && y > extraCardY && y < extraCardY + cardHeight + extraCardsSize) {
-		drawCard(usersWithData[0],randomCard().name, randomBoolean());
-    }
+}
+function userPlayCard(card) {
+	let cardData = getCard(card);
+	if (cardData.value === "JACK" || cardData.value === "JOKER") {
+		let chooseSuitGui = new Gui(canvas.width/2 - 250, canvas.height/2 - 250, 500, 500);
+		let chooseSuitTextElement = new GuiElement(chooseSuitGui.width/2,0);
+		chooseSuitTextElement.draw = (ctx) => {
+			const TEXT = "Choose Suit";
+			ctx.textAlign = "center";
+			ctx.font = "40px Arial sans-serif";
+			ctx.fillStyle = "black";
+			let chooseSuitMeasurements = ctx.measureText(TEXT);
+			ctx.fillText(TEXT,0,chooseSuitMeasurements.actualBoundingBoxAscent + 5);
+		}
+		let suitWidth = 175;
+		let suitHeight = 175;
+		let heartElement = new GuiElement(chooseSuitGui.width/4 - suitWidth/2,chooseSuitGui.height/4 - suitHeight/2,suitWidth,suitHeight);
+		heartElement.onClick = (e) => {
+			console.log("heart");
+		}
+		heartElement.draw = (ctx) => {
+			heartImage.width = heartElement.width;
+			heartImage.height = heartElement.height;
+			ctx.drawImage(heartImage,0,0,heartImage.width,heartImage.height);
+		}
+
+		let spadeElement = new GuiElement(chooseSuitGui.width*3/4 - suitWidth/2,chooseSuitGui.height/4 - suitHeight/2,suitWidth,suitHeight);
+		spadeElement.onClick = (e) => {
+			console.log("spade");
+		}
+		spadeElement.draw = (ctx) => {
+			spadeImage.width = spadeElement.width;
+			spadeImage.height = spadeElement.height;
+			ctx.drawImage(spadeImage,0,0,spadeImage.width,spadeImage.height);
+		}
+
+		let diamondElement = new GuiElement(chooseSuitGui.width/4 - suitWidth/2,chooseSuitGui.height*3/4 - suitHeight/2,suitWidth,suitHeight);
+		diamondElement.onClick = (e) => {
+			console.log("diamond");
+		}
+		diamondElement.draw = (ctx) => {
+			diamondImage.width = diamondElement.width;
+			diamondImage.height = diamondElement.height;
+			ctx.drawImage(diamondImage,0,0,diamondImage.width,diamondImage.height);
+		}
+
+		let clubElement = new GuiElement(chooseSuitGui.width*3/4 - suitWidth/2,chooseSuitGui.height*3/4 - suitHeight/2,suitWidth,suitHeight);
+		clubElement.onClick = (e) => {
+			console.log("club");
+		}
+		clubElement.draw = (ctx) => {
+			clubImage.width = clubElement.width;
+			clubImage.height = clubElement.height;
+			ctx.drawImage(clubImage,0,0,clubImage.width,clubImage.height);
+		}
+		chooseSuitGui.onEnd = () => {
+			playCard(usersWithData[0],card);
+		}
+		chooseSuitGui.addElement(chooseSuitTextElement);
+		chooseSuitGui.addElement(heartElement);
+		chooseSuitGui.addElement(spadeElement);
+		chooseSuitGui.addElement(diamondElement);
+		chooseSuitGui.addElement(clubElement);
+		guiManager.addGui(chooseSuitGui);
+	}
+	if (!guiManager.isGuiPresent) {
+		playCard(usersWithData[0],card);
+	}
 }
 function playCard(userToPlay, card) {
 	let visibleCardsSizeBefore = userToPlay.visibleCards.length;
@@ -93,6 +163,7 @@ function playCard(userToPlay, card) {
 
 	let playCardAnimation = new Animation(1000);
 	playCardAnimation.draw = (canvas, timestamp) => {
+		let ctx = canvas.getContext("2d");
 		ctx.save();
 		let cardImage = getCard(card).image;
 		cardImage.width = cardWidth;
@@ -115,26 +186,13 @@ function playCard(userToPlay, card) {
 	playCardAnimation.onEnd = () => {
 		topPileCard = card;
 		let cardData = getCard(card);
-		if (cardData.value === "JACK" || cardData.value === "JOKER") {
-			let chooseSuitGui = new Gui(canvas.width/2 - 250, canvas.height/2 - 250, 500, 500);
-			let heartElement = new GuiElement(50,50,100,100);
-			heartElement.onClick = (e) => {
-				console.log("heart");
-			}
-			heartElement.draw = (ctx) => {
-				heartImage.width = 100;
-				heartImage.height = 100;
-				ctx.drawImage(heartImage,0,0,100,100);
-			}
-			chooseSuitGui.addElement(heartElement);
-			guiManager.addGui(chooseSuitGui);
-		}
 	}
 	animationManager.addAnimation(playCardAnimation,true);
 }
 function drawCard(userToDraw, card, toHand) {
 	let drawCardAnimation = new Animation(500);
 	drawCardAnimation.draw = (canvas, timestamp) => {
+		let ctx = canvas.getContext("2d");
 		ctx.save();
 		ctx.translate(canvas.width/2,canvas.height/2);
 		ctx.rotate(userToDraw.rotation);
@@ -162,6 +220,7 @@ function initAnimations() {
     backImage.height = cardHeight;
 	let usernameAnimation = new Animation();
 	usernameAnimation.draw = (canvas, timestamp) => {
+		let ctx = canvas.getContext("2d");
 		ctx.textAlign = "center";
 		ctx.font = "30px Arial sans-serif";
 		ctx.imageSmoothingEnabled = false;
@@ -177,6 +236,7 @@ function initAnimations() {
 	animationManager.addAnimation(usernameAnimation);
 	let extraCardSpinAnimation = new Animation(1000);
 	extraCardSpinAnimation.draw = (canvas, timestamp) => {
+		let ctx = canvas.getContext("2d");
 		ctx.save();
         let imageX = canvas.width - backImage.width/2 - timestamp;
         ctx.translate(imageX,canvas.height/2-backImage.height/2);
@@ -194,6 +254,7 @@ function initAnimations() {
 	extraCardSpinAnimation.onEnd = () => {
 		let dealAnimation = new Animation();
 		dealAnimation.draw = (canvas, timestamp) => {
+			let ctx = canvas.getContext("2d");
 			const TIME_TO_DEAL = 500;
 			let dealTimestamp = timestamp - (canvas.width / 2 - backImage.width/2);
 			let cardsDealt = Math.floor(dealTimestamp / TIME_TO_DEAL);
@@ -248,6 +309,7 @@ function initAnimations() {
 		dealAnimation.onEnd = () => {
 			let extraCardAnimation = new Animation();
 			extraCardAnimation.draw = (canvas, timestamp) => {
+				let ctx = canvas.getContext("2d");
 				ctx.globalCompositeOperation = 'destination-over';
 				for (let i = 0; i < extraCardsSize;i++) {
 					ctx.drawImage(backImage,canvas.width/2 - backImage.width/2,canvas.height/2-backImage.height/2+i,backImage.width,backImage.height);
@@ -256,6 +318,7 @@ function initAnimations() {
 			animationManager.addAnimation(extraCardAnimation);
 			let cardFlipAnimation = new Animation(1000);
 			cardFlipAnimation.draw = (canvas, timestamp) => {
+				let ctx = canvas.getContext("2d");
 				//where card starts at
 				const CARD_SOURCE = canvas.width/2 - cardWidth/2;
 				//where card ends up
@@ -277,6 +340,7 @@ function initAnimations() {
 			cardFlipAnimation.onEnd = () => {
 				let topCardAnimation = new Animation();
 				topCardAnimation.draw = (canvas, timestamp) => {
+					let ctx = canvas.getContext("2d");
 					let topPileCardImage = getCard(topPileCard).image;
 					topPileCardImage.width = cardWidth;
 					topPileCardImage.height = cardHeight;
@@ -288,51 +352,57 @@ function initAnimations() {
 
 			let cardHoverAnimation = new Animation();
 			cardHoverAnimation.draw = (canvas, timestamp) => {
-				//if hovering over card in hand then draw outline
-				for (let h = 0;h < usersWithData[0].hand.length;h++) {
-					let cardXStart = h * (cardWidth * 1.05) - (usersWithData[0].hand.length*cardWidth)/2 + canvas.width/2;
-					let cardYStart = usersWithData[0].radius * .95 - (cardWidth*1.7) + canvas.height/2;
-					if (KeyData.mouseX > cardXStart && KeyData.mouseX < cardXStart + cardWidth && KeyData.mouseY > cardYStart && KeyData.mouseY < cardYStart + cardHeight) {
+				let ctx = canvas.getContext("2d");
+				ctx.save();
+				if (!guiManager.isGuiPresent) {
+					//if hovering over card in hand then draw outline
+					for (let h = 0;h < usersWithData[0].hand.length;h++) {
+						let cardXStart = h * (cardWidth * 1.05) - (usersWithData[0].hand.length*cardWidth)/2 + canvas.width/2;
+						let cardYStart = usersWithData[0].radius * .95 - (cardWidth*1.7) + canvas.height/2;
+						if (KeyData.mouseX > cardXStart && KeyData.mouseX < cardXStart + cardWidth && KeyData.mouseY > cardYStart && KeyData.mouseY < cardYStart + cardHeight) {
+							let ctx = canvas.getContext("2d");
+							ctx.globalCompositeOperation = 'destination-over';
+							ctx.strokeStyle = "rgba(201,188,6,1)";
+							ctx.lineWidth = 4;
+							ctx.beginPath();
+							ctx.roundRect(cardXStart,cardYStart,cardWidth,cardHeight,5);
+							ctx.stroke();
+						}
+					}
+					//if hovering over visible cards then draw outline
+					for (let c = 0;c < usersWithData[0].visibleCards.length;c++) {
+						let cardXStart = c*(cardWidth * 1.05) - (usersWithData[0].visibleCards.length*cardWidth)/2 + canvas.width/2;
+						let cardYStart = usersWithData[0].radius * .95 - (cardWidth*3.2) + canvas.height/2;
+						if (KeyData.mouseX > cardXStart && KeyData.mouseX < cardXStart + cardWidth && KeyData.mouseY > cardYStart && KeyData.mouseY < cardYStart + cardHeight) {
+							let ctx = canvas.getContext("2d");
+							ctx.globalCompositeOperation = 'destination-over';
+							ctx.strokeStyle = "rgba(201,188,6,1)";
+							ctx.lineWidth = 4;
+							ctx.beginPath();
+							ctx.roundRect(cardXStart,cardYStart,cardWidth,cardHeight,5);
+							ctx.stroke();
+						}
+					}
+					//if hovering over deck of cards (extra cards), then show outline
+					let extraCardX = canvas.width/2 - backImage.width/2;
+					let extraCardY = canvas.height/2 - backImage.height/2;
+					if (KeyData.mouseX > extraCardX && KeyData.mouseX < extraCardX + cardWidth && KeyData.mouseY > extraCardY && KeyData.mouseY < extraCardY + cardHeight + extraCardsSize) {
 						let ctx = canvas.getContext("2d");
 						ctx.globalCompositeOperation = 'destination-over';
 						ctx.strokeStyle = "rgba(201,188,6,1)";
 						ctx.lineWidth = 4;
 						ctx.beginPath();
-						ctx.roundRect(cardXStart,cardYStart,cardWidth,cardHeight,5);
+						ctx.roundRect(extraCardX,extraCardY,cardWidth,cardHeight + extraCardsSize,5);
 						ctx.stroke();
 					}
 				}
-				//if hovering over visible cards then draw outline
-				for (let c = 0;c < usersWithData[0].visibleCards.length;c++) {
-					let cardXStart = c*(cardWidth * 1.05) - (usersWithData[0].visibleCards.length*cardWidth)/2 + canvas.width/2;
-					let cardYStart = usersWithData[0].radius * .95 - (cardWidth*3.2) + canvas.height/2;
-					if (KeyData.mouseX > cardXStart && KeyData.mouseX < cardXStart + cardWidth && KeyData.mouseY > cardYStart && KeyData.mouseY < cardYStart + cardHeight) {
-						let ctx = canvas.getContext("2d");
-						ctx.globalCompositeOperation = 'destination-over';
-						ctx.strokeStyle = "rgba(201,188,6,1)";
-						ctx.lineWidth = 4;
-						ctx.beginPath();
-						ctx.roundRect(cardXStart,cardYStart,cardWidth,cardHeight,5);
-						ctx.stroke();
-					}
-				}
-				//if hovering over deck of cards (extra cards), then show outline
-				let extraCardX = canvas.width/2 - backImage.width/2;
-				let extraCardY = canvas.height/2 - backImage.height/2;
-				if (KeyData.mouseX > extraCardX && KeyData.mouseX < extraCardX + cardWidth && KeyData.mouseY > extraCardY && KeyData.mouseY < extraCardY + cardHeight + extraCardsSize) {
-					let ctx = canvas.getContext("2d");
-					ctx.globalCompositeOperation = 'destination-over';
-					ctx.strokeStyle = "rgba(201,188,6,1)";
-					ctx.lineWidth = 4;
-					ctx.beginPath();
-					ctx.roundRect(extraCardX,extraCardY,cardWidth,cardHeight + extraCardsSize,5);
-					ctx.stroke();
-				}
+				ctx.restore();
 			};
 			animationManager.addAnimation(cardHoverAnimation);
 
 			let cardsInHandAnimation = new Animation();
 			cardsInHandAnimation.draw = (canvas, timestamp) => {
+				let ctx = canvas.getContext("2d");
 				for (let u of usersWithData) {
 					ctx.save();
 					ctx.translate(canvas.width/2,canvas.height/2);

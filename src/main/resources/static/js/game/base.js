@@ -1,6 +1,5 @@
 let canvas;
-let ctx;
-function create() {	
+function create() {
     canvas = document.createElement("canvas");
     canvas.addEventListener('mousedown', (e) => onCanvasClick(e));
     canvas.addEventListener('mousemove', (e) => onCanvasHover(e));
@@ -11,8 +10,7 @@ function create() {
         canvas.width = document.documentElement.clientWidth;
     }
 	canvas.width *= window.devicePixelRatio;
-	
-	ctx = canvas.getContext("2d");
+
     document.body.appendChild(canvas);
 }
 function onCanvasHover(e) {

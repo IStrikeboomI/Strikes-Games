@@ -200,6 +200,9 @@ class GuiManager {
 			}
 		}
 	}
+	get isGuiPresent() {
+		return this.guis.length > 0;
+	}
 }
 class Gui extends Animation {
 	constructor(x,y,width,height) {
@@ -225,6 +228,7 @@ class Gui extends Animation {
 	}
 	draw(canvas, timestamp) {
 		let ctx = canvas.getContext("2d");
+		ctx.save();
 		for (let element of this.elements) {
 			ctx.save();
 			ctx.translate(this.x + element.x,this.y + element.y);
@@ -232,11 +236,14 @@ class Gui extends Animation {
 			ctx.restore();
 		}
 		ctx.fillStyle = this.backgroundColor;
-		ctx.fillRect(this.x,this.y,this.width,this.height);
+		ctx.beginPath();
+		ctx.roundRect(this.x,this.y,this.width,this.height,25);
+		ctx.fill();
+		ctx.restore();
 	}
 }
 class GuiElement {
-	constructor(x,y,width,height) {
+	constructor(x,y,width=0,height=0) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
