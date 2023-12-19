@@ -180,6 +180,7 @@ class GuiManager {
 	}
 	addGui(gui, toStart = false) {
 		gui.setId(this.currentId++);
+		gui.manager = this;
 		if (toStart) {
 			this.guis.unshift(gui);
 		} else {
@@ -213,6 +214,41 @@ class Gui extends Animation {
 		this.height = height;
 		this.elements = [];
 		this.backgroundColor = "#eac888";
+
+		//X button in the top right corner, clicking on this will call onExit() AND onEnd()
+		let xButton = new GuiElement(width - width * .1,0,width * .1, height * .1);
+		xButton.draw = (ctx) => {
+			ctx.save();
+			ctx.lineWidth = 2;
+			if (KeyData.mouseX >= (x + xButton.x) && KeyData.mouseX <= (x + xButton.x + xButton.width)
+			 && KeyData.mouseY >= (y + xButton.y) && KeyData.mouseY <= (y + xButton.y + xButton.height)) {
+				ctx.fillStyle = "#FF0000";
+				ctx.strokeStyle = "#FF0000";
+			} else {
+				ctx.fillStyle = "#424242";
+				ctx.strokeStyle = "#424242";
+			}
+			ctx.beginPath();
+			ctx.arc(xButton.width/2,xButton.height/2,xButton.width/2,0,Math.PI*2);
+			ctx.stroke();
+
+			ctx.beginPath();
+			ctx.translate(xButton.width/2,xButton.height/2);
+			ctx.rotate(Math.PI / 4);
+			ctx.translate(-xButton.width/2,-xButton.height/2);
+			ctx.roundRect(xButton.width/2 - xButton.width/20,xButton.height/2 - xButton.height * .25,xButton.width/10,xButton.height * .5,25);
+			ctx.translate(xButton.width/2,xButton.height/2);
+			ctx.rotate(Math.PI / 2);
+			ctx.translate(-xButton.width/2,-xButton.height/2);
+			ctx.roundRect(xButton.width/2 - xButton.width/20,xButton.height/2 - xButton.height * .25,xButton.width/10,xButton.height * .5,25);
+			ctx.fill();
+			ctx.restore();
+		}
+		xButton.onClick = (e) => {
+			this.manager.cancelGui(this);
+			this.onExit();
+		}
+		this.elements.push(xButton);
 	}
 	addElement(element) {
 		this.elements.push(element);
@@ -226,6 +262,8 @@ class Gui extends Animation {
 			}
 		}
 	}
+	//unlike onEnd(), this method gets called if the x in the top right corner gets clicked
+	onExit() {}
 	draw(canvas, timestamp) {
 		let ctx = canvas.getContext("2d");
 		ctx.save();

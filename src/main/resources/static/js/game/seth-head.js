@@ -86,7 +86,9 @@ function onCanvasClick(e) {
 function userPlayCard(card) {
 	let cardData = getCard(card);
 	if (cardData.value === "JACK" || cardData.value === "JOKER") {
+		let chosenSuit;
 		let chooseSuitGui = new Gui(canvas.width/2 - 250, canvas.height/2 - 250, 500, 500);
+
 		let chooseSuitTextElement = new GuiElement(chooseSuitGui.width/2,0);
 		chooseSuitTextElement.draw = (ctx) => {
 			const TEXT = "Choose Suit";
@@ -96,49 +98,96 @@ function userPlayCard(card) {
 			let chooseSuitMeasurements = ctx.measureText(TEXT);
 			ctx.fillText(TEXT,0,chooseSuitMeasurements.actualBoundingBoxAscent + 5);
 		}
+
 		let suitWidth = 175;
 		let suitHeight = 175;
-		let heartElement = new GuiElement(chooseSuitGui.width/4 - suitWidth/2,chooseSuitGui.height/4 - suitHeight/2,suitWidth,suitHeight);
+		let heartElement = new GuiElement(chooseSuitGui.width/4 - suitWidth/2,chooseSuitGui.height/4 - suitHeight/2.5,suitWidth,suitHeight);
 		heartElement.onClick = (e) => {
-			console.log("heart");
+			chosenSuit = Suit.HEARTS;
+			guiManager.cancelGui(chooseSuitGui);
 		}
 		heartElement.draw = (ctx) => {
 			heartImage.width = heartElement.width;
 			heartImage.height = heartElement.height;
 			ctx.drawImage(heartImage,0,0,heartImage.width,heartImage.height);
+
+			if (KeyData.mouseX >= (chooseSuitGui.x + heartElement.x) && KeyData.mouseX <= (chooseSuitGui.x + heartElement.x + heartElement.width)
+			 && KeyData.mouseY >= (chooseSuitGui.y + heartElement.y) && KeyData.mouseY <= (chooseSuitGui.y + heartElement.y + heartElement.height)) {
+				ctx.globalCompositeOperation = 'destination-over';
+				ctx.strokeStyle = "rgba(201,188,6,1)";
+				ctx.lineWidth = 4;
+				ctx.beginPath();
+				ctx.roundRect(0,0,heartElement.width,heartElement.height,5);
+				ctx.stroke();
+			}
 		}
 
-		let spadeElement = new GuiElement(chooseSuitGui.width*3/4 - suitWidth/2,chooseSuitGui.height/4 - suitHeight/2,suitWidth,suitHeight);
+		let spadeElement = new GuiElement(chooseSuitGui.width*3/4 - suitWidth/2,chooseSuitGui.height/4 - suitHeight/2.5,suitWidth,suitHeight);
 		spadeElement.onClick = (e) => {
-			console.log("spade");
+			chosenSuit = Suit.SPADES;
+			guiManager.cancelGui(chooseSuitGui);
 		}
 		spadeElement.draw = (ctx) => {
 			spadeImage.width = spadeElement.width;
 			spadeImage.height = spadeElement.height;
 			ctx.drawImage(spadeImage,0,0,spadeImage.width,spadeImage.height);
+
+			if (KeyData.mouseX >= (chooseSuitGui.x + spadeElement.x) && KeyData.mouseX <= (chooseSuitGui.x + spadeElement.x + spadeElement.width)
+			 && KeyData.mouseY >= (chooseSuitGui.y + spadeElement.y) && KeyData.mouseY <= (chooseSuitGui.y + spadeElement.y + spadeElement.height)) {
+				ctx.globalCompositeOperation = 'destination-over';
+				ctx.strokeStyle = "rgba(201,188,6,1)";
+				ctx.lineWidth = 4;
+				ctx.beginPath();
+				ctx.roundRect(0,0,spadeElement.width,spadeElement.height,5);
+				ctx.stroke();
+			}
 		}
 
 		let diamondElement = new GuiElement(chooseSuitGui.width/4 - suitWidth/2,chooseSuitGui.height*3/4 - suitHeight/2,suitWidth,suitHeight);
 		diamondElement.onClick = (e) => {
-			console.log("diamond");
+			chosenSuit = Suit.DIAMONDS;
+			guiManager.cancelGui(chooseSuitGui);
 		}
 		diamondElement.draw = (ctx) => {
 			diamondImage.width = diamondElement.width;
 			diamondImage.height = diamondElement.height;
 			ctx.drawImage(diamondImage,0,0,diamondImage.width,diamondImage.height);
+
+			if (KeyData.mouseX >= (chooseSuitGui.x + diamondElement.x) && KeyData.mouseX <= (chooseSuitGui.x + diamondElement.x + diamondElement.width)
+			 && KeyData.mouseY >= (chooseSuitGui.y + diamondElement.y) && KeyData.mouseY <= (chooseSuitGui.y + diamondElement.y + diamondElement.height)) {
+				ctx.globalCompositeOperation = 'destination-over';
+				ctx.strokeStyle = "rgba(201,188,6,1)";
+				ctx.lineWidth = 4;
+				ctx.beginPath();
+				ctx.roundRect(0,0,diamondElement.width,diamondElement.height,5);
+				ctx.stroke();
+			}
 		}
 
 		let clubElement = new GuiElement(chooseSuitGui.width*3/4 - suitWidth/2,chooseSuitGui.height*3/4 - suitHeight/2,suitWidth,suitHeight);
 		clubElement.onClick = (e) => {
-			console.log("club");
+			chosenSuit = Suit.CLUBS;
+			guiManager.cancelGui(chooseSuitGui);
 		}
 		clubElement.draw = (ctx) => {
 			clubImage.width = clubElement.width;
 			clubImage.height = clubElement.height;
 			ctx.drawImage(clubImage,0,0,clubImage.width,clubImage.height);
+
+			if (KeyData.mouseX >= (chooseSuitGui.x + clubElement.x) && KeyData.mouseX <= (chooseSuitGui.x + clubElement.x + clubElement.width)
+			 && KeyData.mouseY >= (chooseSuitGui.y + clubElement.y) && KeyData.mouseY <= (chooseSuitGui.y + clubElement.y + clubElement.height)) {
+				ctx.globalCompositeOperation = 'destination-over';
+				ctx.strokeStyle = "rgba(201,188,6,1)";
+				ctx.lineWidth = 4;
+				ctx.beginPath();
+				ctx.roundRect(0,0,clubElement.width,clubElement.height,5);
+				ctx.stroke();
+			}
 		}
 		chooseSuitGui.onEnd = () => {
-			playCard(usersWithData[0],card);
+			if (chosenSuit !== undefined) {
+				playCard(usersWithData[0],card);
+			}
 		}
 		chooseSuitGui.addElement(chooseSuitTextElement);
 		chooseSuitGui.addElement(heartElement);
