@@ -57,8 +57,7 @@ function onCanvasClick(e) {
 	if (stillDealing) {
 		stillDealing = false;
 	}
-	guiManager.onClick(e);
-	if (usersWithData[0].onTurn) {
+	if (usersWithData[0].onTurn && !guiManager.isGuiPresent) {
 		//if hovering over card in hand
 		for (let h = 0;h < usersWithData[0].hand.length;h++) {
 			let cardXStart = h * (cardWidth * 1.05) - (usersWithData[0].hand.length*cardWidth)/2 + canvas.width/2;
@@ -82,6 +81,7 @@ function onCanvasClick(e) {
 			drawCard(usersWithData[0],randomCard().name, randomBoolean());
 		}
 	}
+	guiManager.onClick(e);
 }
 function userPlayCard(card) {
 	let cardData = getCard(card);
