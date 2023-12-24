@@ -1,6 +1,3 @@
-let animationManager = new AnimationManager();
-let guiManager = new GuiManager(animationManager);
-
 let cardWidth = 100;
 let cardHeight = 140;
 
@@ -46,7 +43,7 @@ function drawCanvas(siteTimestamp) {
     }
     let timestamp = siteTimestamp - animationTimestamp || 0;
 	canvas.getContext("2d").clearRect(0,0,canvas.width,canvas.height);
-	animationManager.drawAll(canvas,timestamp, timestamp - lastTimestamp);
+	animationManager.drawAll(timestamp, timestamp - lastTimestamp);
 	lastTimestamp = timestamp;
 	window.requestAnimationFrame(drawCanvas);
 }
@@ -56,32 +53,33 @@ function onCanvasClick(e) {
     //cancel dealing on click so you don't have to see each time you refresh
 	if (stillDealing) {
 		stillDealing = false;
-	}
-	if (usersWithData[0].onTurn && !guiManager.isGuiPresent) {
-		//if hovering over card in hand
-		for (let h = 0;h < usersWithData[0].hand.length;h++) {
-			let cardXStart = h * (cardWidth * 1.05) - (usersWithData[0].hand.length*cardWidth)/2 + canvas.width/2;
-			let cardYStart = usersWithData[0].radius * .95 - (cardWidth*1.7) + canvas.height/2;
-			if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
-				userPlayCard(usersWithData[0].hand[h])
+	} else {
+		if (usersWithData[0].onTurn && !guiManager.isGuiPresent) {
+			//if hovering over card in hand
+			for (let h = 0;h < usersWithData[0].hand.length;h++) {
+				let cardXStart = h * (cardWidth * 1.05) - (usersWithData[0].hand.length*cardWidth)/2 + canvas.width/2;
+				let cardYStart = usersWithData[0].radius * .95 - (cardWidth*1.7) + canvas.height/2;
+				if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
+					userPlayCard(usersWithData[0].hand[h])
+				}
+			}
+			//if hovering over visible cards
+			for (let c = 0;c < usersWithData[0].visibleCards.length;c++) {
+				let cardXStart = c*(cardWidth * 1.05) - (usersWithData[0].visibleCards.length*cardWidth)/2 + canvas.width/2;
+				let cardYStart = usersWithData[0].radius * .95 - (cardWidth*3.2) + canvas.height/2;
+				if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
+					userPlayCard(usersWithData[0].visibleCards[c]);
+				}
+			}
+			//if hovering over deck of cards (extra cards)
+			let extraCardX = canvas.width/2 - backImage.width/2;
+			let extraCardY = canvas.height/2 - backImage.height/2;
+			if (x > extraCardX && x < extraCardX + cardWidth && y > extraCardY && y < extraCardY + cardHeight + extraCardsSize) {
+				userDrawCard(randomCard().name);
 			}
 		}
-		//if hovering over visible cards
-		for (let c = 0;c < usersWithData[0].visibleCards.length;c++) {
-			let cardXStart = c*(cardWidth * 1.05) - (usersWithData[0].visibleCards.length*cardWidth)/2 + canvas.width/2;
-			let cardYStart = usersWithData[0].radius * .95 - (cardWidth*3.2) + canvas.height/2;
-			if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight) {
-				userPlayCard(usersWithData[0].visibleCards[c]);
-			}
-		}
-		//if hovering over deck of cards (extra cards)
-		let extraCardX = canvas.width/2 - backImage.width/2;
-		let extraCardY = canvas.height/2 - backImage.height/2;
-		if (x > extraCardX && x < extraCardX + cardWidth && y > extraCardY && y < extraCardY + cardHeight + extraCardsSize) {
-			drawCard(usersWithData[0],randomCard().name, randomBoolean());
-		}
+		guiManager.onClick(e);
 	}
-	guiManager.onClick(e);
 }
 function userPlayCard(card) {
 	let cardData = getCard(card);
@@ -202,12 +200,12 @@ function userPlayCard(card) {
 }
 function playCard(userToPlay, card) {
 	let visibleCardsSizeBefore = userToPlay.visibleCards.length;
-	userToPlay.visibleCards = userToPlay.visibleCards.filter(c => c!==card);
+	userToPlay.visibleCards.remove(card);
 	if (visibleCardsSizeBefore === userToPlay.visibleCards.length) {
 		userToPlay.handSize--;
 	}
 	if (userToPlay.user === user) {
-		usersWithData[0].hand = usersWithData[0].hand.filter(c => c!==card);
+		usersWithData[0].hand.remove(card);
 	}
 
 	let playCardAnimation = new Animation(1000);
@@ -237,6 +235,81 @@ function playCard(userToPlay, card) {
 		let cardData = getCard(card);
 	}
 	animationManager.addAnimation(playCardAnimation,true);
+}
+//called when the client draws a card
+function userDrawCard(card) {
+	let canCardBePlayed = isCardValid(card);
+	let playOrKeepGui = new Gui(canvas.width/2 - 200, canvas.height/2 - 300, 400, 600,false);
+
+	let titleElement = new GuiElement(playOrKeepGui.width/2,0);
+	titleElement.draw = (ctx) => {
+		const TEXT = canCardBePlayed ? "Play or Keep Card" : "Keep Card";
+		ctx.textAlign = "center";
+		ctx.font = "40px Arial sans-serif";
+		ctx.fillStyle = "black";
+		let titleMeasurements = ctx.measureText(TEXT);
+		ctx.fillText(TEXT,0,titleMeasurements.actualBoundingBoxAscent + 5);
+	}
+	playOrKeepGui.addElement(titleElement);
+
+	let cardElement = new GuiElement(playOrKeepGui.width - cardWidth,playOrKeepGui.height/2,cardWidth*2,cardHeight*2);
+	cardElement.draw = (ctx) => {
+		let cardImage = getCard(card).image;
+		cardImage.width = cardWidth;
+		cardImage.height = cardHeight;
+		ctx.drawImage(cardImage,-cardImage.width,-cardImage.height,cardElement.width,cardElement.height);
+
+		const TEXT = "Drawn Card:";
+		ctx.textAlign = "center";
+		ctx.font = "30px Arial sans-serif";
+		ctx.fillStyle = "black";
+		let textMeasurements = ctx.measureText(TEXT);
+		ctx.fillText(TEXT,0,-cardElement.height/2 - 10);
+	}
+	playOrKeepGui.addElement(cardElement);
+
+	let topCardElement = new GuiElement(playOrKeepGui.width,playOrKeepGui.height,cardWidth,cardHeight);
+	topCardElement.draw = (ctx) => {
+		let cardImage = getCard(topPileCard).image;
+		cardImage.width = cardWidth;
+		cardImage.height = cardHeight;
+		ctx.drawImage(cardImage,-cardImage.width,-cardImage.height,topCardElement.width,topCardElement.height);
+
+		const TEXT = "Top Card:";
+		ctx.textAlign = "center";
+		ctx.font = "20px Arial sans-serif";
+		ctx.fillStyle = "black";
+		let textMeasurements = ctx.measureText(TEXT);
+		ctx.fillText(TEXT,-cardImage.width - topCardElement.width/2,-topCardElement.height/2);
+	}
+	playOrKeepGui.addElement(topCardElement);
+
+	let keepHandButton = new GuiButton(playOrKeepGui.width *.01,playOrKeepGui.height/4,"Keep In Hand");
+	keepHandButton.onClick = (e) => {
+		drawCard(usersWithData[0], card, true);
+		guiManager.cancelGui(playOrKeepGui);
+	}
+	playOrKeepGui.addElement(keepHandButton);
+
+	let keepVisibleButton = new GuiButton(playOrKeepGui.width * .01,playOrKeepGui.height/2,"Keep In Visible Hand");
+	keepVisibleButton.onClick = (e) => {
+		drawCard(usersWithData[0], card, false);
+		guiManager.cancelGui(playOrKeepGui);
+	}
+	playOrKeepGui.addElement(keepVisibleButton);
+
+	if (canCardBePlayed) {
+		let playCardButton = new GuiButton(playOrKeepGui.width * .01,playOrKeepGui.height * (3/4),"Play Card");
+		playCardButton.onClick = (e) => {
+			usersWithData[0].hand.push(card);
+			usersWithData[0].handSize++;
+			playCard(usersWithData[0], card);
+			guiManager.cancelGui(playOrKeepGui);
+		}
+		playOrKeepGui.addElement(playCardButton);
+	}
+
+	guiManager.addGui(playOrKeepGui);
 }
 function drawCard(userToDraw, card, toHand) {
 	let drawCardAnimation = new Animation(500);
@@ -483,4 +556,14 @@ function initAnimations() {
 		animationManager.addAnimation(dealAnimation);
 	}
 	animationManager.addAnimation(extraCardSpinAnimation);
+}
+//Used to check if card is valid to play with the top pile card
+//the card has to match either suit or value of the top pile card
+//jokers and jacks are wild cards so they always valid to play
+function isCardValid(card) {
+	let cardData = getCard(card);
+	let topCardData = getCard(topPileCard);
+	//if card is valid for play then they could eitehr play or keep the card they just drawed
+	return cardData.suit === topCardData.suit || cardData.value === topCardData.value
+		|| cardData.value === "JACK" || cardData.value === "JOKER";
 }

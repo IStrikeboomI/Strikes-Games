@@ -1,4 +1,6 @@
 let canvas;
+let animationManager;
+let guiManager;
 function create() {
     canvas = document.createElement("canvas");
     canvas.addEventListener('mousedown', (e) => onCanvasClick(e));
@@ -12,6 +14,9 @@ function create() {
 	canvas.width *= window.devicePixelRatio;
 
     document.body.appendChild(canvas);
+
+	animationManager = new AnimationManager(canvas);
+	guiManager = new GuiManager(animationManager);
 }
 function onCanvasHover(e) {
 	let x = e.layerX;
