@@ -77,6 +77,7 @@ function onCanvasClick(e) {
 			if (x > extraCardX && x < extraCardX + cardWidth && y > extraCardY && y < extraCardY + cardHeight + extraCardsSize) {
 				userDrawCard(randomCard().name);
 			}
+			return;
 		}
 		guiManager.onClick(e);
 	}
