@@ -221,7 +221,7 @@ function playCard(userToPlay, card) {
 		const CARD_DESTINATION_X = canvas.width/2 - cardWidth*2;
 		const CARD_DESTINATION_Y = canvas.height/2 - cardHeight/2;
 
-		let card_source_x = (Math.sin(userToPlay.rotation) * userToPlay.radius) * .75 + canvas.width/2 - cardImage.width/2;
+		let card_source_x = (-Math.sin(userToPlay.rotation) * userToPlay.radius) * .75 + canvas.width/2 - cardImage.width/2;
 		let card_source_y = (Math.cos(userToPlay.rotation) * userToPlay.radius) * .75 + canvas.height/2 - cardImage.height/2;
 
 		ctx.translate(card_source_x + ((CARD_DESTINATION_X-card_source_x)/playCardAnimation.length)*playCardAnimation.age + cardWidth/2,
