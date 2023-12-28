@@ -239,6 +239,7 @@ class Gui extends Animation {
 		this.canExit = canExit;
 		this.elements = [];
 		this.backgroundColor = "#eac888";
+		this.canClick = false;
 
 		//X button in the top right corner, clicking on this will call onExit() AND onEnd()
 		if (this.canExit) {
@@ -287,11 +288,13 @@ class Gui extends Animation {
 		this.elements.push(element);
 	}
 	onClick(e) {
-		let x = e.layerX - this.x;
-		let y = e.layerY - this.y;
-		for (let element of this.elements) {
-			if (x >= element.x && x <= element.x + element.width && y >= element.y && y <= element.y + element.height) {
-				element.onClick(e);
+		if (this.canClick) {
+			let x = e.layerX - this.x;
+			let y = e.layerY - this.y;
+			for (let element of this.elements) {
+				if (x >= element.x && x <= element.x + element.width && y >= element.y && y <= element.y + element.height) {
+					element.onClick(e);
+				}
 			}
 		}
 	}
@@ -300,6 +303,21 @@ class Gui extends Animation {
 	draw(canvas, timestamp) {
 		let ctx = canvas.getContext("2d");
 		ctx.save();
+
+		const EASE_IN_TIME = 1000;
+		if (this.age <= EASE_IN_TIME) {
+			const easingTime = this.age / EASE_IN_TIME;
+			/*
+			ease in/out algoritihm
+			1 - (x^2/(x^2+(1-x)^2)) 0 <= x <= 1
+			*/
+			let timeSquared = easingTime * easingTime;
+			let ease = 1 - (timeSquared/(2 * (timeSquared-easingTime)+1));
+			ctx.translate(0,-ease* (this.y+this.height));
+		} else {
+			this.canClick = true;
+		}
+
 		for (let element of this.elements) {
 			ctx.save();
 			ctx.translate(this.x + element.x,this.y + element.y);
