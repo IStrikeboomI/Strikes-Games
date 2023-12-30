@@ -162,8 +162,11 @@ class AnimationManager {
 		}
 	}
 	drawAll(timestamp, lastTimestamp) {
+		let ctx = this.canvas.getContext("2d");
 		for (let animation of this.animations) {
-			animation.draw(this.canvas, timestamp);
+			ctx.save();
+			animation.draw(ctx, timestamp);
+			ctx.restore();
 			animation.age += lastTimestamp;
 			if (animation.length > 0 && animation.age >= animation.length) {
 				this.cancelAnimation(animation);
@@ -186,7 +189,7 @@ class Animation {
 		this.length = length;
 		this.age = 0;
 	}
-	draw(canvas, timestamp) {
+	draw(ctx, timestamp) {
 
 	}
 	setId(id) {
@@ -210,7 +213,7 @@ class GuiManager {
 		} else {
 			this.guis.push(gui);
 		}
-		this.animationManager.addAnimation(gui,true);
+		this.animationManager.addAnimation(gui);
 	}
 	cancelGui(gui) {
 		this.guis = this.guis.filter(g => g !== gui);
@@ -300,10 +303,8 @@ class Gui extends Animation {
 	}
 	//unlike onEnd(), this method gets called if the x in the top right corner gets clicked
 	onExit() {}
-	draw(canvas, timestamp) {
-		let ctx = canvas.getContext("2d");
-		ctx.save();
-
+	draw(ctx, timestamp) {
+		ctx.globalCompositeOperation = 'source-over';
 		const EASE_IN_TIME = 1000;
 		if (this.age <= EASE_IN_TIME) {
 			const easingTime = this.age / EASE_IN_TIME;
@@ -317,18 +318,16 @@ class Gui extends Animation {
 		} else {
 			this.canClick = true;
 		}
-
+		ctx.fillStyle = this.backgroundColor;
+		ctx.beginPath();
+		ctx.roundRect(this.x,this.y,this.width,this.height,25);
+		ctx.fill();
 		for (let element of this.elements) {
 			ctx.save();
 			ctx.translate(this.x + element.x,this.y + element.y);
 			element.draw(ctx);
 			ctx.restore();
 		}
-		ctx.fillStyle = this.backgroundColor;
-		ctx.beginPath();
-		ctx.roundRect(this.x,this.y,this.width,this.height,25);
-		ctx.fill();
-		ctx.restore();
 	}
 }
 class GuiElement {
@@ -356,11 +355,6 @@ class GuiButton extends GuiElement {
 	}
 	onClick(e) {}
 	draw(ctx) {
-		ctx.textAlign = "center";
-		ctx.font = this.font;
-		ctx.fillStyle = "black";
-		ctx.fillText(this.text,this.width/2,this.height/1.5);
-
 		ctx.strokeStyle = "black";
 		if (KeyData.mouseX >= (this.gui.x + this.x) && KeyData.mouseX <= (this.gui.x + this.x + this.width)
 			 && KeyData.mouseY >= (this.gui.y + this.y) && KeyData.mouseY <= (this.gui.y + this.y + this.height)) {
@@ -374,5 +368,9 @@ class GuiButton extends GuiElement {
 		ctx.fill();
 		ctx.stroke();
 
+		ctx.textAlign = "center";
+		ctx.font = this.font;
+		ctx.fillStyle = "black";
+		ctx.fillText(this.text,this.width/2,this.height/1.5);
 	}
 }
