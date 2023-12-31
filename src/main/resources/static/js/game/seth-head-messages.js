@@ -5,6 +5,7 @@ const gameMessageHandlers = [
 function getGameData(message) {
     extraCardsSize = message.extraCardsSize;
     topPileCard = message.topPileCard;
+	currentSuit = Object.entries(Suit).find((s) => s[0]===message.currentSuit)[0];
 	let player = usersWithData[0];
     player.onTurn = true;
     for (let u of usersWithData) {
@@ -12,7 +13,7 @@ function getGameData(message) {
         u.visibleCards = message.visibleCards[Object.keys(message.visibleCards).find(id => id===u.user.separationId)];
     }
     player.hand = message.hand;
-    player.visibleCards = message.visibleCards[user.separationId]
+    player.visibleCards = message.visibleCards[user.separationId];
     window.requestAnimationFrame(drawCanvas);
 }
 function makeMove(message) {

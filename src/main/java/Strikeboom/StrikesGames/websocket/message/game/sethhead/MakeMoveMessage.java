@@ -40,9 +40,10 @@ public class MakeMoveMessage extends GameMessageHandler<SethHead> {
                         }
                     }
                     game.pile.addCard(card);
+                    game.currentSuit = card.suit;
                     //change suit
                     if (card.value.equals(Card.Value.JACK) || card.value.equals(Card.Value.JOKER)) {
-
+                        game.currentSuit = Card.Suit.valueOf((String) getData().get("suit"));
                     }
                     return true;
                 }

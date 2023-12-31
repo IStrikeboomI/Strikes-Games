@@ -10,13 +10,13 @@ heartImage.src = "image/card/suit/heart.png";
 let diamondImage = new Image();
 diamondImage.src = "image/card/suit/diamond.png";
 const Suit = Object.freeze({
-    SPADES: "S",
-    CLUBS: "C",
-    HEARTS : "H",
-    DIAMONDS: "D",
+    SPADES: {name: "S",image: spadeImage, symbol:true},
+    CLUBS: {name: "C",image: clubImage, symbol:true},
+    HEARTS : {name: "H",image: heartImage, symbol:true},
+    DIAMONDS: {name: "D",image: diamondImage, symbol:true},
     //used for jokers
-    RED: "R",
-    BLACK: "B"
+    RED: {name: "R", symbol:false},
+    BLACK: {name: "B", symbol:false}
 });
 const Value = Object.freeze({
     ONE: "1",
@@ -41,7 +41,7 @@ for (let name of cardNames) {
 	image.src = `image/card/${name}.png`
     let card = {
         name: name,
-        suit: Object.entries(Suit).find((s) => s[1]===suit)[0],
+        suit: Object.entries(Suit).find((s) => s[1].name===suit)[0],
 		value: Object.entries(Value).find((s) => s[1]===value)[0],
 		image: image
     }
@@ -69,7 +69,7 @@ function getCard(name) {
     if (name === "BJ") {
         return cards[53];
     }
-    let suit = Object.values(Suit).indexOf(name.substring(0,1));
+    let suit = Object.values(Suit).findIndex(s => s.name===name.substring(0,1));
     let value = Object.values(Value).indexOf(name.substring(1));
 	return cards[suit * 13+ value];
 }

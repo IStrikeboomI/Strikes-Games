@@ -26,6 +26,7 @@ public class SethHead extends TurnBasedGame {
             hands,
             //At least three cards which are visible to all players, needs to be replenished from the player's hand when used
             visibleCards;
+    public Card.Suit currentSuit;
     public SethHead(Lobby lobby, SimpMessagingTemplate template) {
         super(lobby,template);
         extraCards = Deck.standard54Deck().shuffle();
@@ -36,6 +37,7 @@ public class SethHead extends TurnBasedGame {
             }
             topValidCard = extraCards.cards.get(i);
         }
+        currentSuit = topValidCard.suit;
         extraCards.removeCard(topValidCard);
         pile = new Deck().addCard(topValidCard);
         hands = new HashMap<>();
@@ -56,6 +58,7 @@ public class SethHead extends TurnBasedGame {
         Map<String, Object> data = new HashMap<>();
         data.put("extraCardsSize",extraCards.size());
         data.put("topPileCard",pile.getLastCard());
+        data.put("currentSuit",currentSuit);
         for (User u : hands.keySet()) {
             if (user.equals(u)) {
                 data.put("hand",hands.get(u));
