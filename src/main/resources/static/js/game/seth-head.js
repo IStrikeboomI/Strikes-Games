@@ -405,6 +405,15 @@ function initAnimations() {
 					ctx.drawImage(topPileCardImage,ctx.canvas.width/2 - topPileCardImage.width*2,ctx.canvas.height/2 - topPileCardImage.height/2,topPileCardImage.width,topPileCardImage.height);
 				}
 				animationManager.addAnimation(topCardAnimation);
+
+				let currentSuitAnimation = new Animation();
+                currentSuitAnimation.draw = (ctx, timestamp) => {
+                    let currentSuitImage = Suit[currentSuit].image;
+                    currentSuitImage.width = 50;
+                    currentSuitImage.height = 50;
+                    ctx.drawImage(currentSuitImage,ctx.canvas.width/2 - cardWidth*2 + cardWidth/4,ctx.canvas.height/2 - cardHeight/2 - currentSuitImage.height - 5,currentSuitImage.width,currentSuitImage.height);
+                }
+                animationManager.addAnimation(currentSuitAnimation);
 			}
 			animationManager.addAnimation(cardFlipAnimation);
 
