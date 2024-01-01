@@ -133,6 +133,10 @@ Array.prototype.remove = function(element) {
 const KeyData = class {
 	mouseX = 0;
 	mouseY = 0;
+	static mouseIn(x,y,width,height) {
+		return KeyData.mouseX >= x && KeyData.mouseX <= x + width
+					 && KeyData.mouseY >= y && KeyData.mouseY <= y + height;
+	}
 }
 class AnimationManager {
 	constructor(canvas) {
@@ -242,6 +246,8 @@ class Gui extends Animation {
 		this.canExit = canExit;
 		this.elements = [];
 		this.backgroundColor = "#eac888";
+		this.borderColor = "black";
+		this.borderWidth = 4;
 		this.canClick = false;
 
 		//X button in the top right corner, clicking on this will call onExit() AND onEnd()
@@ -318,6 +324,7 @@ class Gui extends Animation {
 		} else {
 			this.canClick = true;
 		}
+
 		ctx.fillStyle = this.backgroundColor;
 		ctx.beginPath();
 		ctx.roundRect(this.x,this.y,this.width,this.height,25);
@@ -328,6 +335,11 @@ class Gui extends Animation {
 			element.draw(ctx);
 			ctx.restore();
 		}
+		ctx.strokeStyle = this.borderColor;
+		ctx.lineWidth = this.borderWidth;
+		ctx.beginPath();
+		ctx.roundRect(this.x,this.y,this.width,this.height,25);
+		ctx.stroke();
 	}
 }
 class GuiElement {
