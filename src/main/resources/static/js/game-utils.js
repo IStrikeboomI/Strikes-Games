@@ -129,6 +129,23 @@ Array.prototype.remove = function(element) {
   }
   return this;
 }
+Math.isPrime = (n) => {
+    if (n <= 1) {
+        return false;
+	}
+    if (n == 2 || n == 3) {
+        return true;
+	}
+    if (n % 2 == 0 || n % 3 == 0) {
+        return false;
+	}
+    for (let i = 5; i <= Math.sqrt(n); i = i + 6) {
+        if (n % i == 0 || n % (i + 2) == 0) {
+            return false;
+		}
+	}
+    return true;
+}
 //used for user input
 const KeyData = class {
 	mouseX = 0;
@@ -249,6 +266,7 @@ class Gui extends Animation {
 		this.borderColor = "black";
 		this.borderWidth = 4;
 		this.canClick = false;
+		this.easeIn = true;
 
 		//X button in the top right corner, clicking on this will call onExit() AND onEnd()
 		if (this.canExit) {
@@ -311,16 +329,20 @@ class Gui extends Animation {
 	onExit() {}
 	draw(ctx, timestamp) {
 		ctx.globalCompositeOperation = 'source-over';
-		const EASE_IN_TIME = 1000;
-		if (this.age <= EASE_IN_TIME) {
-			const easingTime = this.age / EASE_IN_TIME;
-			/*
-			ease in/out algoritihm
-			1 - (x^2/(x^2+(1-x)^2)) 0 <= x <= 1
-			*/
-			let timeSquared = easingTime * easingTime;
-			let ease = 1 - (timeSquared/(2 * (timeSquared-easingTime)+1));
-			ctx.translate(0,-ease* (this.y+this.height));
+		if (this.easeIn) {
+			const EASE_IN_TIME = 1000;
+			if (this.age <= EASE_IN_TIME) {
+				const easingTime = this.age / EASE_IN_TIME;
+				/*
+				ease in/out algoritihm
+				1 - (x^2/(x^2+(1-x)^2)) 0 <= x <= 1
+				*/
+				let timeSquared = easingTime * easingTime;
+				let ease = 1 - (timeSquared/(2 * (timeSquared-easingTime)+1));
+				ctx.translate(0,-ease* (this.y+this.height));
+			} else {
+				this.canClick = true;
+			}
 		} else {
 			this.canClick = true;
 		}

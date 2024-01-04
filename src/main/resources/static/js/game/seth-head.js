@@ -127,11 +127,31 @@ function userPlayCard(card) {
 		}
 		chooseSuitGui.onEnd = () => {
 			if (chosenSuit !== undefined) {
-				playCard(usersWithData[0],card);
+				//playCard(usersWithData[0],card);
 			}
 		}
 		chooseSuitGui.addElement(chooseSuitTextElement);
 		guiManager.addGui(chooseSuitGui);
+	}
+	if (usersWithData[0].visibleCards.findIndex(c => c==card) != -1 && usersWithData[0].handSize > 0) {
+		let visibleCardReplaceGui = new Gui(0, 0, canvas.width, canvas.height,false);
+		visibleCardReplaceGui.backgroundColor = "#00000000";
+		visibleCardReplaceGui.borderColor = "#00000000";
+		visibleCardReplaceGui.easeIn = false;
+		let visibleCardReplaceTextElement = new GuiElement(visibleCardReplaceGui.width/2,0);
+		visibleCardReplaceTextElement.draw = (ctx) => {
+			const TEXT = "Replace Visible Card From Hand";
+			ctx.textAlign = "center";
+			ctx.font = "40px Arial sans-serif";
+			ctx.fillStyle = "black";
+			let visibleCardReplaceMeasurements = ctx.measureText(TEXT);
+			ctx.fillText(TEXT,0,visibleCardReplaceMeasurements.actualBoundingBoxAscent + 5);
+		}
+		visibleCardReplaceGui.addElement(visibleCardReplaceTextElement);
+		
+		let cardGridArea = usersWithData[0].handSize;
+		
+		guiManager.addGui(visibleCardReplaceGui);
 	}
 	if (!guiManager.isGuiPresent) {
 		playCard(usersWithData[0],card);
@@ -176,7 +196,7 @@ function playCard(userToPlay, card) {
 //called when the client draws a card
 function userDrawCard(card) {
 	let canCardBePlayed = isCardValid(card);
-	//if (canCardBePlayed) {
+	if (canCardBePlayed) {
 		let playOrKeepGui = new Gui(canvas.width/2 - 200, canvas.height/2 - 300, 400, 500,false);
 
 		let titleElement = new GuiElement(playOrKeepGui.width/2,0);
@@ -242,36 +262,34 @@ function userDrawCard(card) {
 			guiManager.cancelGui(playOrKeepGui);
 		}
 		playOrKeepGui.addElement(keepHandButton);
-
-		//if (canCardBePlayed) {
-			let playCardButton = new GuiElement(playOrKeepGui.width / 2,playOrKeepGui.height * 2/3,playOrKeepGui.width / 2,playOrKeepGui.height/ 3);
-			playCardButton.draw = (ctx) => {
-				ctx.fillStyle = KeyData.mouseIn(playOrKeepGui.x + playCardButton.x,playOrKeepGui.y + playCardButton.y,playCardButton.width,playCardButton.height) ? "#c1af8d" : "#eac888";
-				ctx.globalCompositeOperation = "source-atop";
-				ctx.beginPath();
-				ctx.rect(0,0,playCardButton.width,playCardButton.height);
-				ctx.fill();
-				
-				const TEXT = "Play";
-				ctx.textAlign = "center";
-				ctx.font = "40px Arial sans-serif";
-				ctx.fillStyle = "black";
-				let textMeasurements = ctx.measureText(TEXT);
-				ctx.fillText(TEXT,playCardButton.width/2,playCardButton.height/2);
-			}
-			playCardButton.onClick = (e) => {
-				usersWithData[0].hand.push(card);
-				usersWithData[0].handSize++;
-				playCard(usersWithData[0], card);
-				guiManager.cancelGui(playOrKeepGui);
-			}
-			playOrKeepGui.addElement(playCardButton);
-		//}
-
+		
+		let playCardButton = new GuiElement(playOrKeepGui.width / 2,playOrKeepGui.height * 2/3,playOrKeepGui.width / 2,playOrKeepGui.height/ 3);
+		playCardButton.draw = (ctx) => {
+			ctx.fillStyle = KeyData.mouseIn(playOrKeepGui.x + playCardButton.x,playOrKeepGui.y + playCardButton.y,playCardButton.width,playCardButton.height) ? "#c1af8d" : "#eac888";
+			ctx.globalCompositeOperation = "source-atop";
+			ctx.beginPath();
+			ctx.rect(0,0,playCardButton.width,playCardButton.height);
+			ctx.fill();
+			
+			const TEXT = "Play";
+			ctx.textAlign = "center";
+			ctx.font = "40px Arial sans-serif";
+			ctx.fillStyle = "black";
+			let textMeasurements = ctx.measureText(TEXT);
+			ctx.fillText(TEXT,playCardButton.width/2,playCardButton.height/2);
+		}
+		playCardButton.onClick = (e) => {
+			usersWithData[0].hand.push(card);
+			usersWithData[0].handSize++;
+			playCard(usersWithData[0], card);
+			guiManager.cancelGui(playOrKeepGui);
+		}
+		playOrKeepGui.addElement(playCardButton);
+		
 		guiManager.addGui(playOrKeepGui);
-	//} else {
-	//	drawCard(usersWithData[0], card);
-	//}
+	} else {
+		drawCard(usersWithData[0], card);
+	}
 }
 function drawCard(userToDraw, card) {
 	let drawCardAnimation = new Animation(500);
@@ -354,7 +372,7 @@ function initAnimations() {
 				for (let h = 0; h < Math.min(cardsDealt,u.handSize); h++) {
 					//if drawing the current user then draw the client's hand otherwise draw everyone else's card using the back card texture
 					if (u.user != user) {
-						ctx.drawImage(backImage,h*(backImage.width * .5) - (Math.min(cardsDealt,u.handSize)*backImage.width)/2 + backImage.width/2,u.radius * .95 - (backImage.width*1.7),backImage.width,backImage.height);
+						ctx.drawImage(backImage,-(h*backImage.width/2) + ((u.handSize+ 1) * backImage.width/2)/2 - backImage.width,u.radius * .95 - (backImage.width*1.7),backImage.width,backImage.height);
 					} else {
 						let card = getCard(usersWithData[0].hand[h]);
 						let cardImage = card.image;
@@ -485,10 +503,10 @@ function initAnimations() {
 					ctx.save();
 					ctx.translate(ctx.canvas.width/2,ctx.canvas.height/2);
 					ctx.rotate(u.rotation);
-					ctx.globalCompositeOperation = 'destination-over';
 					for (let h = 0; h < u.handSize; h++) {
 						//if drawing the current user then draw the client's hand otherwise draw everyone else's card using the back card texture
 						if (u.user != user) {
+							ctx.globalCompositeOperation = 'destination-over';
 							ctx.drawImage(backImage,-(h*backImage.width/2) + ((u.handSize+ 1) * backImage.width/2)/2 - backImage.width,u.radius * .95 - (backImage.width*1.7),backImage.width,backImage.height);
 						} else {
 							let card = getCard(usersWithData[0].hand[h]);
@@ -502,7 +520,6 @@ function initAnimations() {
 								ctx.beginPath();
 								ctx.roundRect(h*(cardImage.width * 1.05) - (u.handSize*cardImage.width)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height,20);
 								ctx.fill();
-								
 							}
 						}
 					}
