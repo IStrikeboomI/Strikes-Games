@@ -58,9 +58,9 @@ function onCanvasClick(e) {
 		if (usersWithData[0].onTurn && !guiManager.isGuiPresent) {
 			//if hovering over card in hand
 			for (let h = 0;h < usersWithData[0].hand.length;h++) {
-				let cardXStart = h * (cardWidth * 1.05) - (usersWithData[0].hand.length*cardWidth)/2 + canvas.width/2;
+				let cardXStart = (h*cardWidth/2.5) - ((usersWithData[0].hand.length+ 1) * cardWidth/2.5)/2 + canvas.width/2 + cardWidth/2;
 				let cardYStart = usersWithData[0].radius * .95 - (cardWidth*1.7) + canvas.height/2;
-				if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight && isCardValid(usersWithData[0].hand[h])) {
+				if (KeyData.mouseIn(cardXStart,cardYStart,cardWidth/2,cardHeight) && isCardValid(usersWithData[0].hand[h])) {
 					userPlayCard(usersWithData[0].hand[h])
 				}
 			}
@@ -68,14 +68,14 @@ function onCanvasClick(e) {
 			for (let c = 0;c < usersWithData[0].visibleCards.length;c++) {
 				let cardXStart = c*(cardWidth * 1.05) - (usersWithData[0].visibleCards.length*cardWidth)/2 + canvas.width/2;
 				let cardYStart = usersWithData[0].radius * .95 - (cardWidth*3.2) + canvas.height/2;
-				if (x > cardXStart && x < cardXStart + cardWidth && y > cardYStart && y < cardYStart + cardHeight && isCardValid(usersWithData[0].visibleCards[c])) {
+				if (KeyData.mouseIn(cardXStart,cardYStart,cardWidth,cardHeight) && isCardValid(usersWithData[0].visibleCards[c])) {
 					userPlayCard(usersWithData[0].visibleCards[c]);
 				}
 			}
 			//if hovering over deck of cards (extra cards)
 			let extraCardX = canvas.width/2 - backImage.width/2;
 			let extraCardY = canvas.height/2 - backImage.height/2;
-			if (x > extraCardX && x < extraCardX + cardWidth && y > extraCardY && y < extraCardY + cardHeight + extraCardsSize) {
+			if (KeyData.mouseIn(extraCardX,extraCardY,cardWidth,cardHeight + extraCardsSize)) {
 				userDrawCard(randomCard().name);
 			}
 			return;
@@ -457,15 +457,14 @@ function initAnimations() {
 				if (!guiManager.isGuiPresent) {
 					//if hovering over card in hand then draw outline
 					for (let h = 0;h < usersWithData[0].hand.length;h++) {
-						let cardXStart = h * (cardWidth * 1.05) - (usersWithData[0].hand.length*cardWidth)/2 + ctx.canvas.width/2;
+						let cardXStart = (h*backImage.width/2.5) - ((usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + ctx.canvas.width/2 + cardWidth/2;
 						let cardYStart = usersWithData[0].radius * .95 - (cardWidth*1.7) + ctx.canvas.height/2;
-						KeyData.mouseIn(cardXStart,cardYStart,cardWidth,cardHeight)
-						if (KeyData.mouseIn(cardXStart,cardYStart,cardWidth,cardHeight) && isCardValid(usersWithData[0].hand[h])) {
+						if (KeyData.mouseIn(cardXStart,cardYStart,cardWidth/2,cardHeight) && isCardValid(usersWithData[0].hand[h])) {
 							ctx.globalCompositeOperation = 'destination-over';
 							ctx.strokeStyle = "rgba(201,188,6,1)";
 							ctx.lineWidth = 4;
 							ctx.beginPath();
-							ctx.roundRect(cardXStart,cardYStart,cardWidth,cardHeight,5);
+							ctx.roundRect(cardXStart,cardYStart,cardWidth/2,cardHeight,5);
 							ctx.stroke();
 						}
 					}
@@ -513,29 +512,29 @@ function initAnimations() {
 							let cardImage = card.image;
 							cardImage.width = cardWidth;
 							cardImage.height = cardHeight;
-							ctx.globalCompositeOperation = 'source-over';
-							ctx.drawImage(cardImage,h*(cardImage.width * 1.05) - (u.handSize*cardImage.width)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height);
+							ctx.globalCompositeOperation = 'destination-over';
 							if (!isCardValid(usersWithData[0].hand[h])) {
 								ctx.fillStyle = "#72717277";
 								ctx.beginPath();
-								ctx.roundRect(h*(cardImage.width * 1.05) - (u.handSize*cardImage.width)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height,20);
+								ctx.roundRect((h*backImage.width/2.5) - ((u.handSize+ 1) * backImage.width/2.5)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height,20);
 								ctx.fill();
 							}
+							ctx.drawImage(cardImage,(h*backImage.width/2.5) - ((u.handSize+ 1) * backImage.width/2.5)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height);
 						}
 					}
 					for (let c = 0; c < u.visibleCards.length; c++) {
 						let card = getCard(u.visibleCards[c]);
 						let cardImage = card.image;
 						cardImage.width = cardWidth;
-						cardImage.height = cardHeight;
-						ctx.drawImage(cardImage,c*(cardImage.width * 1.05) - (u.visibleCards.length*cardImage.width)/2,u.radius * .95 - (cardImage.width*3.2),cardImage.width,cardImage.height);
+						cardImage.height = cardHeight;	
 						if (!isCardValid(usersWithData[0].visibleCards[c]) && u.user === user) {
 							ctx.fillStyle = "#72717277";
-							ctx.globalCompositeOperation = 'source-over';
+							ctx.globalCompositeOperation = 'destination-over-over';
 							ctx.beginPath();
 							ctx.roundRect(c*(cardImage.width * 1.05) - (u.visibleCards.length*cardImage.width)/2,u.radius * .95 - (cardImage.width*3.2),cardImage.width,cardImage.height,20);
 							ctx.fill();
 						}
+						ctx.drawImage(cardImage,c*(cardImage.width * 1.05) - (u.visibleCards.length*cardImage.width)/2,u.radius * .95 - (cardImage.width*3.2),cardImage.width,cardImage.height);
 					}
 					ctx.restore();
 				}
