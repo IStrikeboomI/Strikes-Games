@@ -85,6 +85,31 @@ function onCanvasClick(e) {
 }
 function userPlayCard(card) {
 	let cardData = getCard(card);
+	
+	let visibleCardReplaceGui = new Gui(0, 0, canvas.width, canvas.height,false);
+	visibleCardReplaceGui.backgroundColor = "#00000000";
+	visibleCardReplaceGui.borderColor = "#00000000";
+	visibleCardReplaceGui.easeIn = false;
+	let visibleCardReplaceTextElement = new GuiElement(visibleCardReplaceGui.width/2,0);
+	visibleCardReplaceTextElement.draw = (ctx) => {
+		const TEXT = "Replace Visible Card From Hand";
+		ctx.textAlign = "center";
+		ctx.font = "40px Arial sans-serif";
+		ctx.fillStyle = "black";
+		let visibleCardReplaceMeasurements = ctx.measureText(TEXT);
+		ctx.fillText(TEXT,0,visibleCardReplaceMeasurements.actualBoundingBoxAscent + 5);
+	}
+	visibleCardReplaceGui.addElement(visibleCardReplaceTextElement);
+	let handCardsBox = new GuiElement(-((usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + canvas.width/2,usersWithData[0].radius * .95 - (cardWidth*1.7) + canvas.height/2,100,cardHeight);
+	handCardsBox.draw = (ctx) => {
+		ctx.strokeStyle = "green";
+		ctx.lineWidth = 5;
+		ctx.beginPath();
+		ctx.roundRect(0,0,handCardsBox.width,handCardsBox.height,25);
+		ctx.stroke();
+	}
+	visibleCardReplaceGui.addElement(handCardsBox);
+	
 	if (cardData.value === "JACK" || cardData.value === "JOKER") {
 		let chosenSuit;
 		let chooseSuitGui = new Gui(canvas.width/2 - 250, canvas.height/2 - 250, 500, 500);
@@ -127,33 +152,18 @@ function userPlayCard(card) {
 		}
 		chooseSuitGui.onEnd = () => {
 			if (chosenSuit !== undefined) {
-				//playCard(usersWithData[0],card);
+				if (usersWithData[0].visibleCards.findIndex(c => c==card) != -1 && usersWithData[0].handSize > 0) {
+					guiManager.addGui(visibleCardReplaceGui);
+				}
 			}
 		}
 		chooseSuitGui.addElement(chooseSuitTextElement);
 		guiManager.addGui(chooseSuitGui);
+		guiManager.waitForGui(chooseSuitGui);
 	}
 	if (usersWithData[0].visibleCards.findIndex(c => c==card) != -1 && usersWithData[0].handSize > 0) {
-		let visibleCardReplaceGui = new Gui(0, 0, canvas.width, canvas.height,false);
-		visibleCardReplaceGui.backgroundColor = "#00000000";
-		visibleCardReplaceGui.borderColor = "#00000000";
-		visibleCardReplaceGui.easeIn = false;
-		let visibleCardReplaceTextElement = new GuiElement(visibleCardReplaceGui.width/2,0);
-		visibleCardReplaceTextElement.draw = (ctx) => {
-			const TEXT = "Replace Visible Card From Hand";
-			ctx.textAlign = "center";
-			ctx.font = "40px Arial sans-serif";
-			ctx.fillStyle = "black";
-			let visibleCardReplaceMeasurements = ctx.measureText(TEXT);
-			ctx.fillText(TEXT,0,visibleCardReplaceMeasurements.actualBoundingBoxAscent + 5);
-		}
-		visibleCardReplaceGui.addElement(visibleCardReplaceTextElement);
-		
-		let cardGridArea = usersWithData[0].handSize;
-		
 		guiManager.addGui(visibleCardReplaceGui);
-	}
-	if (!guiManager.isGuiPresent) {
+	} else {
 		playCard(usersWithData[0],card);
 	}
 }
