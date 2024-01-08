@@ -1,3 +1,53 @@
+var user = { name: "Anonymous", separationId: "e370c9d9-13a4-4442-990d-7fb36f6eec0b", creator: true };
+var lobby = {
+  "name": "124",
+  "game": {
+    "name": "Seth-Head",
+    "minPlayers": 2,
+    "maxPlayers": 4,
+    "defaultSettings": [
+      {
+        "key": "playerTimer",
+        "value": 30,
+        "name": "Player Timer",
+        "type": "INTEGER",
+        "min": 15,
+        "max": 60
+      }
+    ]
+  },
+  "maxPlayers": 4,
+  "created": "2023-12-26T18:55:11.199721Z",
+  "joinCode": "4fWli6i",
+  "users": [
+    user,
+    {
+      "name": "Anonymous1",
+      "separationId": "f5e66f67-202d-4384-ac92-992afa72a5fd",
+      "creator": false
+    },
+	{
+      "name": "Anonymous2",
+      "separationId": "f5e66f67-202d-4384-ac92-992afa72a5fe",
+      "creator": false
+    },
+	{
+      "name": "Anonymous3",
+      "separationId": "f5e66f67-202d-4384-ac92-992afa72a5ff",
+      "creator": false
+    }
+  ],
+  "gameStarted": true,
+  "messages": [],
+  "settings": [
+    {
+      "key": "playerTimer",
+      "value": 30
+    }
+  ],
+  "private": false
+};
+
 let cardWidth = 100;
 let cardHeight = 140;
 
@@ -32,6 +82,14 @@ function init() {
 		userWithData.onTurn = false;
         usersWithData.push(userWithData);
     }
+	getGameData({
+		"extraCardsSize":39,
+		"topPileCard":"S1",
+		"currentSuit":"SPADES",
+		"handsSize":{"f5e66f67-202d-4384-ac92-992afa72a5fd":3,"f5e66f67-202d-4384-ac92-992afa72a5fe":2,"f5e66f67-202d-4384-ac92-992afa72a5ff":1},
+		"visibleCards":{"e370c9d9-13a4-4442-990d-7fb36f6eec0b":["S10","H3","DJ"],"f5e66f67-202d-4384-ac92-992afa72a5fd":["SK","H7"],"f5e66f67-202d-4384-ac92-992afa72a5fe":["RJ"],"f5e66f67-202d-4384-ac92-992afa72a5ff":[]},
+		"hand":["S7","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","SJ"],
+		"playerOnTurn":"e370c9d9-13a4-4442-990d-7fb36f6eec0b"});
 	initAnimations();
 }
 
@@ -58,9 +116,10 @@ function onCanvasClick(e) {
 		if (usersWithData[0].onTurn && !guiManager.isGuiPresent) {
 			//if hovering over card in hand
 			for (let h = 0;h < usersWithData[0].hand.length;h++) {
-				let cardXStart = (h*cardWidth/2.5) - ((usersWithData[0].hand.length+ 1) * cardWidth/2.5)/2 + canvas.width/2 + cardWidth/2;
+				let isFirst = h == 0;
+				let cardXStart = (h*cardWidth/2.5) - ((usersWithData[0].hand.length+ 1) * cardWidth/2.5)/2 + canvas.width/2 + (isFirst ? 0 : cardWidth/2);
 				let cardYStart = usersWithData[0].radius * .95 - (cardWidth*1.7) + canvas.height/2;
-				if (KeyData.mouseIn(cardXStart,cardYStart,cardWidth/2,cardHeight) && isCardValid(usersWithData[0].hand[h])) {
+				if (KeyData.mouseIn(cardXStart,cardYStart,(isFirst ? cardWidth : cardWidth/2),cardHeight) && isCardValid(usersWithData[0].hand[h])) {
 					userPlayCard(usersWithData[0].hand[h])
 				}
 			}
@@ -159,7 +218,6 @@ function userPlayCard(card) {
 		}
 		chooseSuitGui.addElement(chooseSuitTextElement);
 		guiManager.addGui(chooseSuitGui);
-		guiManager.waitForGui(chooseSuitGui);
 	}
 	if (usersWithData[0].visibleCards.findIndex(c => c==card) != -1 && usersWithData[0].handSize > 0) {
 		guiManager.addGui(visibleCardReplaceGui);
@@ -326,6 +384,13 @@ function drawCard(userToDraw, card) {
 }
 let stillDealing = true;
 function initAnimations() {
+	let coordinatesAnimation = new Animation();
+	coordinatesAnimation.draw = (ctx, timestamp) => {
+		ctx.textAlign = "center";
+		ctx.font = "30px Arial sans-serif";
+		ctx.fillText("Mouse X: " + KeyData.mouseX + "\nMouse Y: " + KeyData.mouseY, 200,20);
+	}
+	animationManager.addAnimation(coordinatesAnimation);
 	backImage.width = cardWidth;
     backImage.height = cardHeight;
 	let usernameAnimation = new Animation();
@@ -467,14 +532,15 @@ function initAnimations() {
 				if (!guiManager.isGuiPresent) {
 					//if hovering over card in hand then draw outline
 					for (let h = 0;h < usersWithData[0].hand.length;h++) {
-						let cardXStart = (h*backImage.width/2.5) - ((usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + ctx.canvas.width/2 + cardWidth/2;
+						let isFirst = h == 0;
+						let cardXStart = (h*backImage.width/2.5) - ((usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + ctx.canvas.width/2 + (isFirst ? 0 :cardWidth/2);
 						let cardYStart = usersWithData[0].radius * .95 - (cardWidth*1.7) + ctx.canvas.height/2;
-						if (KeyData.mouseIn(cardXStart,cardYStart,cardWidth/2,cardHeight) && isCardValid(usersWithData[0].hand[h])) {
+						if (KeyData.mouseIn(cardXStart,cardYStart,isFirst ? cardWidth : cardWidth/2,cardHeight) && isCardValid(usersWithData[0].hand[h])) {
 							ctx.globalCompositeOperation = 'destination-over';
 							ctx.strokeStyle = "rgba(201,188,6,1)";
 							ctx.lineWidth = 4;
 							ctx.beginPath();
-							ctx.roundRect(cardXStart,cardYStart,cardWidth/2,cardHeight,5);
+							ctx.roundRect(cardXStart,cardYStart,isFirst ? cardWidth : cardWidth/2,cardHeight,5);
 							ctx.stroke();
 						}
 					}
@@ -526,7 +592,7 @@ function initAnimations() {
 							if (!isCardValid(usersWithData[0].hand[h])) {
 								ctx.fillStyle = "#72717277";
 								ctx.beginPath();
-								ctx.roundRect((h*backImage.width/2.5) - ((u.handSize+ 1) * backImage.width/2.5)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height,20);
+								ctx.roundRect((h*backImage.width/1) - ((u.handSize+ 1) * backImage.width/2.5)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height,20);
 								ctx.fill();
 							}
 							ctx.drawImage(cardImage,(h*backImage.width/2.5) - ((u.handSize+ 1) * backImage.width/2.5)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height);
@@ -565,3 +631,4 @@ function isCardValid(card) {
 	return cardData.suit === currentSuit || cardData.value === topCardData.value
 		|| cardData.value === "JACK" || cardData.value === "JOKER";
 }
+init();
