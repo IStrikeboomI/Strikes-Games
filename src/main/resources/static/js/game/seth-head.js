@@ -159,16 +159,38 @@ function userPlayCard(card) {
 		ctx.fillText(TEXT,0,visibleCardReplaceMeasurements.actualBoundingBoxAscent + 5);
 	}
 	visibleCardReplaceGui.addElement(visibleCardReplaceTextElement);
-	let handCardsBox = new GuiElement(-((usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + canvas.width/2,usersWithData[0].radius * .95 - (cardWidth*1.7) + canvas.height/2,100,cardHeight);
+	let handCardsBox = new GuiElement(-((usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + canvas.width/2,usersWithData[0].radius * .95 - (cardWidth*1.7) + canvas.height/2,cardWidth + (usersWithData[0].hand.length - 1)*(cardWidth/2.5),cardHeight);
 	handCardsBox.draw = (ctx) => {
 		ctx.strokeStyle = "green";
 		ctx.lineWidth = 5;
 		ctx.beginPath();
 		ctx.roundRect(0,0,handCardsBox.width,handCardsBox.height,25);
 		ctx.stroke();
+		for (let h = 0;h < usersWithData[0].hand.length;h++) {
+			let isFirst = h == 0;
+			let cardXStart = (h*backImage.width/2.5) + (isFirst ? 0 :cardWidth/2);
+			if (KeyData.mouseIn(cardXStart - ((usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + ctx.canvas.width/2,handCardsBox.y,isFirst ? cardWidth : cardWidth/2,cardHeight)) {
+				ctx.globalCompositeOperation = 'source-over';
+				ctx.strokeStyle = "rgba(201,188,6,1)";
+				ctx.lineWidth = 4;
+				ctx.beginPath();
+				ctx.roundRect(cardXStart,0,isFirst ? cardWidth : cardWidth/2,cardHeight,5);
+				ctx.stroke();
+			}
+		}
+	}
+	handCardsBox.onClick = (e) => {
+		for (let h = 0;h < usersWithData[0].hand.length;h++) {
+			let isFirst = h == 0;
+			let cardXStart = (h*backImage.width/2.5) + (isFirst ? 0 :cardWidth/2);
+			if (KeyData.mouseIn(cardXStart - ((usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + canvas.width/2 ,handCardsBox.y,(isFirst ? cardWidth : cardWidth/2),cardHeight)) {
+				console.log(usersWithData[0].hand[h])
+			}
+		}
+		guiManager.cancelGui(visibleCardReplaceGui);
 	}
 	visibleCardReplaceGui.addElement(handCardsBox);
-	
+
 	if (cardData.value === "JACK" || cardData.value === "JOKER") {
 		let chosenSuit;
 		let chooseSuitGui = new Gui(canvas.width/2 - 250, canvas.height/2 - 250, 500, 500);
@@ -293,7 +315,7 @@ function userDrawCard(card) {
 			ctx.fillText(TEXT,-cardImage.width/4,-cardImage.height - 15);
 		}
 		playOrKeepGui.addElement(cardElement);
-		
+
 		let topCardElement = new GuiElement(playOrKeepGui.width * 7/8,playOrKeepGui.height/2 + cardHeight/2,cardWidth,cardHeight);
 		topCardElement.draw = (ctx) => {
 			let cardImage = getCard(topPileCard).image;
@@ -317,7 +339,7 @@ function userDrawCard(card) {
 			ctx.beginPath();
 			ctx.rect(0,0,keepHandButton.width,keepHandButton.height);
 			ctx.fill();
-			
+
 			const TEXT = "Keep";
 			ctx.textAlign = "center";
 			ctx.font = "40px Arial sans-serif";
@@ -330,7 +352,7 @@ function userDrawCard(card) {
 			guiManager.cancelGui(playOrKeepGui);
 		}
 		playOrKeepGui.addElement(keepHandButton);
-		
+
 		let playCardButton = new GuiElement(playOrKeepGui.width / 2,playOrKeepGui.height * 2/3,playOrKeepGui.width / 2,playOrKeepGui.height/ 3);
 		playCardButton.draw = (ctx) => {
 			ctx.fillStyle = KeyData.mouseIn(playOrKeepGui.x + playCardButton.x,playOrKeepGui.y + playCardButton.y,playCardButton.width,playCardButton.height) ? "#c1af8d" : "#eac888";
@@ -338,7 +360,7 @@ function userDrawCard(card) {
 			ctx.beginPath();
 			ctx.rect(0,0,playCardButton.width,playCardButton.height);
 			ctx.fill();
-			
+
 			const TEXT = "Play";
 			ctx.textAlign = "center";
 			ctx.font = "40px Arial sans-serif";
@@ -353,7 +375,7 @@ function userDrawCard(card) {
 			guiManager.cancelGui(playOrKeepGui);
 		}
 		playOrKeepGui.addElement(playCardButton);
-		
+
 		guiManager.addGui(playOrKeepGui);
 	} else {
 		drawCard(usersWithData[0], card);
@@ -514,7 +536,7 @@ function initAnimations() {
 					ctx.drawImage(topPileCardImage,ctx.canvas.width/2 - topPileCardImage.width*2,ctx.canvas.height/2 - topPileCardImage.height/2,topPileCardImage.width,topPileCardImage.height);
 				}
 				animationManager.addAnimation(topCardAnimation);
-				
+
 				let currentSuitAnimation = new Animation();
 				currentSuitAnimation.draw = (ctx, timestamp) => {
 					let currentSuitImage = Suit[currentSuit].image;
@@ -602,10 +624,10 @@ function initAnimations() {
 						let card = getCard(u.visibleCards[c]);
 						let cardImage = card.image;
 						cardImage.width = cardWidth;
-						cardImage.height = cardHeight;	
+						cardImage.height = cardHeight;
 						if (!isCardValid(usersWithData[0].visibleCards[c]) && u.user === user) {
 							ctx.fillStyle = "#72717277";
-							ctx.globalCompositeOperation = 'destination-over-over';
+							ctx.globalCompositeOperation = 'destination-over';
 							ctx.beginPath();
 							ctx.roundRect(c*(cardImage.width * 1.05) - (u.visibleCards.length*cardImage.width)/2,u.radius * .95 - (cardImage.width*3.2),cardImage.width,cardImage.height,20);
 							ctx.fill();
