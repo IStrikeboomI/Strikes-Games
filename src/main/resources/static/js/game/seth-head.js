@@ -240,8 +240,7 @@ function userPlayCard(card) {
 		}
 		chooseSuitGui.addElement(chooseSuitTextElement);
 		guiManager.addGui(chooseSuitGui);
-	}
-	if (usersWithData[0].visibleCards.findIndex(c => c==card) != -1 && usersWithData[0].handSize > 0 && !guiManager.isGuiPresent()) {
+	} else if (usersWithData[0].visibleCards.findIndex(c => c==card) != -1 && usersWithData[0].handSize > 0 && !guiManager.isGuiPresent) {
 		guiManager.addGui(visibleCardReplaceGui);
 	} else {
 		playCard(usersWithData[0],card);
