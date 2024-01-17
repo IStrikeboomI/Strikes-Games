@@ -474,7 +474,7 @@ function initAnimations() {
 						let cardImage = card.image;
 						cardImage.width = cardWidth;
 						cardImage.height = cardHeight;
-						ctx.drawImage(cardImage,h*(cardImage.width * 1.05) - (Math.min(cardsDealt,u.handSize)*cardImage.width)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height);
+						ctx.drawImage(cardImage,(h*backImage.width/2.5) - ((Math.min(cardsDealt,u.handSize)+ 1) * backImage.width/2.5)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height);
 					}
 				}
 				//if the amount of cards already dealt is larger than the size of the hand, that means visible cards are being dealt
@@ -494,6 +494,20 @@ function initAnimations() {
 					animationManager.cancelAnimation(dealAnimation);
 				}
 				ctx.restore();
+			}
+			if (dealAnimation.age >= 1500) {
+				const text = "Click To Stop Deal Animation";
+				ctx.font = "50px Arial sans-serif";
+				let measurements = ctx.measureText(text);
+				ctx.globalCompositeOperation = 'source-over';
+				ctx.fillStyle = "#eac888";
+				ctx.beginPath();
+				ctx.roundRect(ctx.canvas.width/2 - measurements.width*1.25/2,(measurements.actualBoundingBoxAscent + measurements.actualBoundingBoxDescent) * 1.25,measurements.width * 1.25, (measurements.actualBoundingBoxAscent + measurements.actualBoundingBoxDescent) * 1.25,25);
+				ctx.fill();
+				ctx.textAlign = "center";
+
+				ctx.fillStyle = "black";
+				ctx.fillText(text,ctx.canvas.width/2,100);
 			}
 		}
 		dealAnimation.onEnd = () => {
