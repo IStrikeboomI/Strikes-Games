@@ -237,7 +237,7 @@ class GuiManager {
 		this.animationManager.addAnimation(gui);
 	}
 	cancelGui(gui) {
-		this.guis = this.guis.filter(g => g !== gui);
+		this.guis.remove(gui);
 		this.animationManager.cancelAnimation(gui);
 	}
 	onClick(e) {
