@@ -65,7 +65,7 @@ class SethHead extends Game {
 		this.stillDealing = true;
 		//add client first
 		//using polar coordinates to display cards because its much easier and looks nicer
-		this.usersWithData.push({user: user, rotation:0, radius: canvas.height/2, onTurn: false});
+		this.usersWithData.push({user: user, rotation:0, radius: this.canvas.height/2, onTurn: false});
 		//add all the other users after
 		for (let i = 0;i < getOtherUsers().length;i++) {
 			let u = getOtherUsers()[i];
@@ -73,18 +73,18 @@ class SethHead extends Game {
 			//first user goes on top
 			if (i == 0) {
 				userWithData.rotation = Math.PI;
-				userWithData.radius = canvas.height/2;
+				userWithData.radius = this.canvas.height/2;
 			} else {
 				if (i == 1) {
 					userWithData.rotation = 3*Math.PI/2;
-					userWithData.radius = canvas.width/2;
+					userWithData.radius = this.canvas.width/2;
 				} else {
 					userWithData.rotation = Math.PI/2;
-					userWithData.radius = canvas.width/2;
+					userWithData.radius = this.canvas.width/2;
 				}
 			}
 			userWithData.onTurn = false;
-			usersWithData.push(userWithData);
+			this.usersWithData.push(userWithData);
 		}
 		getGameData({
 			"extraCardsSize":39,
@@ -94,26 +94,26 @@ class SethHead extends Game {
 			"visibleCards":{"e370c9d9-13a4-4442-990d-7fb36f6eec0b":["S10","H3","DJ"],"f5e66f67-202d-4384-ac92-992afa72a5fd":["SK","H7"],"f5e66f67-202d-4384-ac92-992afa72a5fe":["RJ"],"f5e66f67-202d-4384-ac92-992afa72a5ff":[]},
 			"hand":["S7","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","SJ"],
 			"playerOnTurn":"e370c9d9-13a4-4442-990d-7fb36f6eec0b"});
-		initAnimations();
+		this.initAnimations();
 	}
 	drawCanvas(siteTimestamp) {
-		if (animationTimestamp === undefined) {
-			animationTimestamp = siteTimestamp;
+		if (this.animationTimestamp === undefined) {
+			this.animationTimestamp = siteTimestamp;
 		}
-		let timestamp = siteTimestamp - animationTimestamp || 0;
-		canvas.getContext("2d").clearRect(0,0,canvas.width,canvas.height);
-		animationManager.drawAll(timestamp, timestamp - lastTimestamp);
-		lastTimestamp = timestamp;
-		window.requestAnimationFrame(drawCanvas);
+		let timestamp = siteTimestamp - this.animationTimestamp || 0;
+		this.canvas.getContext("2d").clearRect(0,0,this.canvas.width,this.canvas.height);
+		this.animationManager.drawAll(timestamp, timestamp - this.lastTimestamp);
+		this.lastTimestamp = timestamp;
+		window.requestAnimationFrame(this.drawCanvas);
 	}
 	onCanvasClick(e) {
 		let x = e.layerX;
 		let y = e.layerY;
 		//cancel dealing on click so you don't have to see each time you refresh
-		if (stillDealing) {
-			stillDealing = false;
+		if (this.stillDealing) {
+			this.stillDealing = false;
 		} else {
-			if (usersWithData[0].onTurn && !guiManager.isGuiPresent) {
+			if (this.usersWithData[0].onTurn && !this.guiManager.isGuiPresent) {
 				//if hovering over card in hand
 				for (let h = 0;h < usersWithData[0].hand.length;h++) {
 					let isFirst = h == 0;
