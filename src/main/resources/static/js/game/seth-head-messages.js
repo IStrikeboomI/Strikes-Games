@@ -3,18 +3,18 @@ const gameMessageHandlers = [
     {"name": "makeMove","handler":makeMove}
 ]
 function getGameData(message) {
-    extraCardsSize = message.extraCardsSize;
-    topPileCard = message.topPileCard;
-	currentSuit = Object.entries(Suit).find((s) => s[0]===message.currentSuit)[0];
-	let player = usersWithData[0];
+    sethHead.extraCardsSize = message.extraCardsSize;
+    sethHead.topPileCard = message.topPileCard;
+	sethHead.currentSuit = Object.entries(Suit).find((s) => s[0]===message.currentSuit)[0];
+	let player = sethHead.usersWithData[0];
     player.onTurn = true;
-    for (let u of usersWithData) {
+    for (let u of sethHead.usersWithData) {
         u.handSize = message.handsSize[Object.keys(message.handsSize).find(id => id===u.user.separationId)] || message.hand.length;
         u.visibleCards = message.visibleCards[Object.keys(message.visibleCards).find(id => id===u.user.separationId)];
     }
     player.hand = message.hand;
     player.visibleCards = message.visibleCards[user.separationId];
-    window.requestAnimationFrame(drawCanvas);
+    window.requestAnimationFrame(sethHead.drawCanvas);
 }
 function makeMove(message) {
 

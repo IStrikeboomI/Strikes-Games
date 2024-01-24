@@ -59,6 +59,7 @@ class SethHead extends Game {
 		this.topPileCard;
 		this.currentSuit;
 		this.animationTimestamp;
+		this.currentSuit;
 		//timestamp of previous animation frame
 		this.lastTimestamp = 0;
 		this.forceLandscape = true;
@@ -86,25 +87,17 @@ class SethHead extends Game {
 			userWithData.onTurn = false;
 			this.usersWithData.push(userWithData);
 		}
-		getGameData({
-			"extraCardsSize":39,
-			"topPileCard":"S1",
-			"currentSuit":"SPADES",
-			"handsSize":{"f5e66f67-202d-4384-ac92-992afa72a5fd":3,"f5e66f67-202d-4384-ac92-992afa72a5fe":2,"f5e66f67-202d-4384-ac92-992afa72a5ff":1},
-			"visibleCards":{"e370c9d9-13a4-4442-990d-7fb36f6eec0b":["S10","H3","DJ"],"f5e66f67-202d-4384-ac92-992afa72a5fd":["SK","H7"],"f5e66f67-202d-4384-ac92-992afa72a5fe":["RJ"],"f5e66f67-202d-4384-ac92-992afa72a5ff":[]},
-			"hand":["S7","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","SJ"],
-			"playerOnTurn":"e370c9d9-13a4-4442-990d-7fb36f6eec0b"});
 		this.initAnimations();
 	}
 	drawCanvas(siteTimestamp) {
-		if (this.animationTimestamp === undefined) {
-			this.animationTimestamp = siteTimestamp;
+		if (sethHead.animationTimestamp === undefined) {
+			sethHead.animationTimestamp = siteTimestamp;
 		}
-		let timestamp = siteTimestamp - this.animationTimestamp || 0;
-		this.canvas.getContext("2d").clearRect(0,0,this.canvas.width,this.canvas.height);
-		this.animationManager.drawAll(timestamp, timestamp - this.lastTimestamp);
-		this.lastTimestamp = timestamp;
-		window.requestAnimationFrame(this.drawCanvas);
+		let timestamp = siteTimestamp - sethHead.animationTimestamp || 0;
+		sethHead.canvas.getContext("2d").clearRect(0,0,sethHead.canvas.width,sethHead.canvas.height);
+		sethHead.animationManager.drawAll(timestamp, timestamp - sethHead.lastTimestamp);
+		sethHead.lastTimestamp = timestamp;
+		window.requestAnimationFrame(sethHead.drawCanvas);
 	}
 	onCanvasClick(e) {
 		let x = e.layerX;
@@ -115,37 +108,36 @@ class SethHead extends Game {
 		} else {
 			if (this.usersWithData[0].onTurn && !this.guiManager.isGuiPresent) {
 				//if hovering over card in hand
-				for (let h = 0;h < usersWithData[0].hand.length;h++) {
+				for (let h = 0;h < this.usersWithData[0].hand.length;h++) {
 					let isFirst = h == 0;
-					let cardXStart = (h*cardWidth/2.5) - ((usersWithData[0].hand.length+ 1) * cardWidth/2.5)/2 + canvas.width/2 + (isFirst ? 0 : cardWidth/2);
-					let cardYStart = usersWithData[0].radius * .95 - (cardWidth*1.7) + canvas.height/2;
-					if (KeyData.mouseIn(cardXStart,cardYStart,(isFirst ? cardWidth : cardWidth/2),cardHeight) && isCardValid(usersWithData[0].hand[h])) {
-						userPlayCard(usersWithData[0].hand[h])
+					let cardXStart = (h*cardWidth/2.5) - ((this.usersWithData[0].hand.length+ 1) * cardWidth/2.5)/2 + this.canvas.width/2 + (isFirst ? 0 : cardWidth/2);
+					let cardYStart = this.usersWithData[0].radius * .95 - (cardWidth*1.7) + this.canvas.height/2;
+					if (KeyData.mouseIn(cardXStart,cardYStart,(isFirst ? cardWidth : cardWidth/2),cardHeight) && this.isCardValid(this.usersWithData[0].hand[h])) {
+						this.userPlayCard(this.usersWithData[0].hand[h])
 					}
 				}
 				//if hovering over visible cards
-				for (let c = 0;c < usersWithData[0].visibleCards.length;c++) {
-					let cardXStart = c*(cardWidth * 1.05) - (usersWithData[0].visibleCards.length*cardWidth)/2 + canvas.width/2;
-					let cardYStart = usersWithData[0].radius * .95 - (cardWidth*3.2) + canvas.height/2;
-					if (KeyData.mouseIn(cardXStart,cardYStart,cardWidth,cardHeight) && isCardValid(usersWithData[0].visibleCards[c])) {
-						userPlayCard(usersWithData[0].visibleCards[c]);
+				for (let c = 0;c < this.usersWithData[0].visibleCards.length;c++) {
+					let cardXStart = c*(cardWidth * 1.05) - (this.usersWithData[0].visibleCards.length*cardWidth)/2 + this.canvas.width/2;
+					let cardYStart = this.usersWithData[0].radius * .95 - (cardWidth*3.2) + this.canvas.height/2;
+					if (KeyData.mouseIn(cardXStart,cardYStart,cardWidth,cardHeight) && this.isCardValid(this.usersWithData[0].visibleCards[c])) {
+						this.userPlayCard(this.usersWithData[0].visibleCards[c]);
 					}
 				}
 				//if hovering over deck of cards (extra cards)
-				let extraCardX = canvas.width/2 - backImage.width/2;
-				let extraCardY = canvas.height/2 - backImage.height/2;
-				if (KeyData.mouseIn(extraCardX,extraCardY,cardWidth,cardHeight + extraCardsSize)) {
-					userDrawCard(randomCard().name);
+				let extraCardX = this.canvas.width/2 - backImage.width/2;
+				let extraCardY = this.canvas.height/2 - backImage.height/2;
+				if (KeyData.mouseIn(extraCardX,extraCardY,cardWidth,cardHeight + this.extraCardsSize)) {
+					this.userDrawCard(randomCard().name);
 				}
 				return;
 			}
-			guiManager.onClick(e);
+			this.guiManager.onClick(e);
 		}
 	}
 	userPlayCard(card) {
 		let cardData = getCard(card);
-
-		let visibleCardReplaceGui = new Gui(0, 0, canvas.width, canvas.height,false);
+		let visibleCardReplaceGui = new Gui(0, 0, this.canvas.width, this.canvas.height,false);
 		visibleCardReplaceGui.backgroundColor = "#00000000";
 		visibleCardReplaceGui.borderColor = "#00000000";
 		visibleCardReplaceGui.easeIn = false;
@@ -159,17 +151,17 @@ class SethHead extends Game {
 			ctx.fillText(TEXT,0,visibleCardReplaceMeasurements.actualBoundingBoxAscent + 5);
 		}
 		visibleCardReplaceGui.addElement(visibleCardReplaceTextElement);
-		let handCardsBox = new GuiElement(-((usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + canvas.width/2,usersWithData[0].radius * .95 - (cardWidth*1.7) + canvas.height/2,cardWidth + (usersWithData[0].hand.length - 1)*(cardWidth/2.5),cardHeight);
+		let handCardsBox = new GuiElement(-((this.usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + this.canvas.width/2,this.usersWithData[0].radius * .95 - (cardWidth*1.7) + this.canvas.height/2,cardWidth + (this.usersWithData[0].hand.length - 1)*(cardWidth/2.5),cardHeight);
 		handCardsBox.draw = (ctx) => {
 			ctx.strokeStyle = "green";
 			ctx.lineWidth = 5;
 			ctx.beginPath();
 			ctx.roundRect(0,0,handCardsBox.width,handCardsBox.height,25);
 			ctx.stroke();
-			for (let h = 0;h < usersWithData[0].hand.length;h++) {
+			for (let h = 0;h < this.usersWithData[0].hand.length;h++) {
 				let isFirst = h == 0;
 				let cardXStart = (h*backImage.width/2.5) + (isFirst ? 0 :cardWidth/2);
-				if (KeyData.mouseIn(cardXStart - ((usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + ctx.canvas.width/2,handCardsBox.y,isFirst ? cardWidth : cardWidth/2,cardHeight)) {
+				if (KeyData.mouseIn(cardXStart - ((this.usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + ctx.canvas.width/2,handCardsBox.y,isFirst ? cardWidth : cardWidth/2,cardHeight)) {
 					ctx.globalCompositeOperation = 'source-over';
 					ctx.strokeStyle = "rgba(201,188,6,1)";
 					ctx.lineWidth = 4;
@@ -180,20 +172,20 @@ class SethHead extends Game {
 			}
 		}
 		handCardsBox.onClick = (e) => {
-			for (let h = 0;h < usersWithData[0].hand.length;h++) {
+			for (let h = 0;h < this.usersWithData[0].hand.length;h++) {
 				let isFirst = h == 0;
 				let cardXStart = (h*backImage.width/2.5) + (isFirst ? 0 :cardWidth/2);
-				if (KeyData.mouseIn(cardXStart - ((usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + canvas.width/2 ,handCardsBox.y,(isFirst ? cardWidth : cardWidth/2),cardHeight)) {
-					console.log(usersWithData[0].hand[h])
+				if (KeyData.mouseIn(cardXStart - ((this.usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + this.canvas.width/2 ,handCardsBox.y,(isFirst ? cardWidth : cardWidth/2),cardHeight)) {
+					console.log(this.usersWithData[0].hand[h])
 				}
 			}
-			guiManager.cancelGui(visibleCardReplaceGui);
+			this.guiManager.cancelGui(visibleCardReplaceGui);
 		}
 		visibleCardReplaceGui.addElement(handCardsBox);
 
 		if (cardData.value === "JACK" || cardData.value === "JOKER") {
 			let chosenSuit;
-			let chooseSuitGui = new Gui(canvas.width/2 - 250, canvas.height/2 - 250, 500, 500);
+			let chooseSuitGui = new Gui(this.canvas.width/2 - 250, this.canvas.height/2 - 250, 500, 500);
 
 			let chooseSuitTextElement = new GuiElement(chooseSuitGui.width/2,0);
 			chooseSuitTextElement.draw = (ctx) => {
@@ -213,7 +205,7 @@ class SethHead extends Game {
 					let suitElement = new GuiElement(chooseSuitGui.width*(x*2+1)/4 - suitWidth/2,chooseSuitGui.height*(y*2+1)/4 - suitHeight/2.5,175,175);
 					suitElement.onClick = (e) => {
 						chosenSuit = suit;
-						guiManager.cancelGui(chooseSuitGui);
+						this.guiManager.cancelGui(chooseSuitGui);
 					}
 					suitElement.draw = (ctx) => {
 						data.image.width = suitElement.width;
@@ -233,17 +225,17 @@ class SethHead extends Game {
 			}
 			chooseSuitGui.onEnd = () => {
 				if (chosenSuit !== undefined) {
-					if (usersWithData[0].visibleCards.findIndex(c => c==card) != -1 && usersWithData[0].handSize > 0) {
-						guiManager.addGui(visibleCardReplaceGui);
+					if (this.usersWithData[0].visibleCards.findIndex(c => c==card) != -1 && this.usersWithData[0].handSize > 0) {
+						this.guiManager.addGui(visibleCardReplaceGui);
 					}
 				}
 			}
 			chooseSuitGui.addElement(chooseSuitTextElement);
-			guiManager.addGui(chooseSuitGui);
-		} else if (usersWithData[0].visibleCards.findIndex(c => c==card) != -1 && usersWithData[0].handSize > 0 && !guiManager.isGuiPresent) {
-			guiManager.addGui(visibleCardReplaceGui);
+			this.guiManager.addGui(chooseSuitGui);
+		} else if (this.usersWithData[0].visibleCards.findIndex(c => c==card) != -1 && this.usersWithData[0].handSize > 0 && !this.guiManager.isGuiPresent) {
+			this.guiManager.addGui(visibleCardReplaceGui);
 		} else {
-			playCard(usersWithData[0],card);
+			this.playCard(this.usersWithData[0],card);
 		}
 	}
 	playCard(userToPlay, card) {
@@ -253,7 +245,7 @@ class SethHead extends Game {
 			userToPlay.handSize--;
 		}
 		if (userToPlay.user === user) {
-			usersWithData[0].hand.remove(card);
+			this.usersWithData[0].hand.remove(card);
 		}
 
 		let playCardAnimation = new Animation(1000);
@@ -277,16 +269,16 @@ class SethHead extends Game {
 									-cardImage.height/2,cardImage.width,cardImage.height);
 		}
 		playCardAnimation.onEnd = () => {
-			topPileCard = card;
+			this.topPileCard= card;
 			let cardData = getCard(card);
 		}
-		animationManager.addAnimation(playCardAnimation,true);
+		this.animationManager.addAnimation(playCardAnimation,true);
 	}
 	//called when the client draws a card
 	userDrawCard(card) {
-		let canCardBePlayed = isCardValid(card);
+		let canCardBePlayed = this.isCardValid(card);
 		if (canCardBePlayed) {
-			let playOrKeepGui = new Gui(canvas.width/2 - 200, canvas.height/2 - 300, 400, 500,false);
+			let playOrKeepGui = new Gui(this.canvas.width/2 - 200, this.canvas.height/2 - 300, 400, 500,false);
 
 			let titleElement = new GuiElement(playOrKeepGui.width/2,0);
 			titleElement.draw = (ctx) => {
@@ -317,7 +309,7 @@ class SethHead extends Game {
 
 			let topCardElement = new GuiElement(playOrKeepGui.width * 7/8,playOrKeepGui.height/2 + cardHeight/2,cardWidth,cardHeight);
 			topCardElement.draw = (ctx) => {
-				let cardImage = getCard(topPileCard).image;
+				let cardImage = getCard(this.topPileCard).image;
 				cardImage.width = cardWidth;
 				cardImage.height = cardHeight;
 				ctx.drawImage(cardImage,-cardImage.width,-cardImage.height,topCardElement.width,topCardElement.height);
@@ -347,8 +339,8 @@ class SethHead extends Game {
 				ctx.fillText(TEXT,keepHandButton.width/2,keepHandButton.height/2);
 			}
 			keepHandButton.onClick = (e) => {
-				drawCard(usersWithData[0], card);
-				guiManager.cancelGui(playOrKeepGui);
+				drawCard(this.usersWithData[0], card);
+				this.guiManager.cancelGui(playOrKeepGui);
 			}
 			playOrKeepGui.addElement(keepHandButton);
 
@@ -368,16 +360,16 @@ class SethHead extends Game {
 				ctx.fillText(TEXT,playCardButton.width/2,playCardButton.height/2);
 			}
 			playCardButton.onClick = (e) => {
-				usersWithData[0].hand.push(card);
-				usersWithData[0].handSize++;
-				playCard(usersWithData[0], card);
-				guiManager.cancelGui(playOrKeepGui);
+				this.usersWithData[0].hand.push(card);
+				this.usersWithData[0].handSize++;
+				playCard(this.usersWithData[0], card);
+				this.guiManager.cancelGui(playOrKeepGui);
 			}
 			playOrKeepGui.addElement(playCardButton);
 
-			guiManager.addGui(playOrKeepGui);
+			this.guiManager.addGui(playOrKeepGui);
 		} else {
-			drawCard(usersWithData[0], card);
+			drawCard(this.usersWithData[0], card);
 		}
 	}
 	drawCard(userToDraw, card) {
@@ -395,13 +387,13 @@ class SethHead extends Game {
 			if (userToDraw.visibleCards.length >= 3) {
 				userToDraw.handSize++;
 				if (userToDraw.user === user) {
-					usersWithData[0].hand.push(card);
+					this.usersWithData[0].hand.push(card);
 				}
 			} else {
 				userToDraw.visibleCards.push(card);
 			}
 		}
-		animationManager.addAnimation(drawCardAnimation,true);
+		this.animationManager.addAnimation(drawCardAnimation,true);
 	}
 
 	initAnimations() {
@@ -411,7 +403,7 @@ class SethHead extends Game {
 			ctx.font = "30px Arial sans-serif";
 			ctx.fillText("Mouse X: " + KeyData.mouseX + "\nMouse Y: " + KeyData.mouseY, 200,20);
 		}
-		animationManager.addAnimation(coordinatesAnimation);
+		this.animationManager.addAnimation(coordinatesAnimation);
 		backImage.width = cardWidth;
 		backImage.height = cardHeight;
 		let usernameAnimation = new Animation();
@@ -419,7 +411,7 @@ class SethHead extends Game {
 			ctx.textAlign = "center";
 			ctx.font = "30px Arial sans-serif";
 			ctx.imageSmoothingEnabled = false;
-			for (let u of usersWithData) {
+			for (let u of this.usersWithData) {
 				ctx.save();
 				ctx.translate(ctx.canvas.width/2,ctx.canvas.height/2);
 				ctx.rotate(u.rotation);
@@ -428,7 +420,7 @@ class SethHead extends Game {
 				ctx.restore();
 			}
 		}
-		animationManager.addAnimation(usernameAnimation);
+		this.animationManager.addAnimation(usernameAnimation);
 		let extraCardSpinAnimation = new Animation(1000);
 		extraCardSpinAnimation.draw = (ctx, timestamp) => {
 			let imageX = ctx.canvas.width - backImage.width/2 - extraCardSpinAnimation.age;
@@ -439,21 +431,21 @@ class SethHead extends Game {
 			for (let i = 0; i < 54;i++) {
 				ctx.drawImage(backImage,imageX,ctx.canvas.height/2-backImage.height/2+i,backImage.width,backImage.height);
 			}
-			if (!stillDealing) {
-				animationManager.cancelAnimation(extraCardSpinAnimation);
+			if (!this.stillDealing) {
+				this.animationManager.cancelAnimation(extraCardSpinAnimation);
 			}
 		}
 		extraCardSpinAnimation.onEnd = () => {
 			let dealAnimation = new Animation();
 			dealAnimation.draw = (ctx, timestamp) => {
 				ctx.globalCompositeOperation = 'destination-over';
-				for (let i = 0; i < extraCardsSize;i++) {
+				for (let i = 0; i < this.extraCardsSize;i++) {
 					ctx.drawImage(backImage,ctx.canvas.width/2 - backImage.width/2,ctx.canvas.height/2-backImage.height/2+i,backImage.width,backImage.height);
 				}
 				const TIME_TO_DEAL = 500;
 				let cardsDealt = Math.floor(dealAnimation.age / TIME_TO_DEAL);
 				let largestCardAmount = 0;
-				for (let u of usersWithData) {
+				for (let u of this.usersWithData) {
 					largestCardAmount = Math.max(largestCardAmount, u.handSize + u.visibleCards.length);
 					if (u.handSize + u.visibleCards.length > cardsDealt) {
 						ctx.save();
@@ -470,7 +462,7 @@ class SethHead extends Game {
 						if (u.user != user) {
 							ctx.drawImage(backImage,-(h*backImage.width/2) + ((u.handSize+ 1) * backImage.width/2)/2 - backImage.width,u.radius * .95 - (backImage.width*1.7),backImage.width,backImage.height);
 						} else {
-							let card = getCard(usersWithData[0].hand[h]);
+							let card = getCard(this.usersWithData[0].hand[h]);
 							let cardImage = card.image;
 							cardImage.width = cardWidth;
 							cardImage.height = cardHeight;
@@ -488,10 +480,10 @@ class SethHead extends Game {
 						}
 					}
 					if (cardsDealt > largestCardAmount) {
-						stillDealing = false;
+						this.stillDealing = false;
 					}
-					if (!stillDealing) {
-						animationManager.cancelAnimation(dealAnimation);
+					if (!this.stillDealing) {
+						this.animationManager.cancelAnimation(dealAnimation);
 					}
 					ctx.restore();
 				}
@@ -514,11 +506,11 @@ class SethHead extends Game {
 				let extraCardAnimation = new Animation();
 				extraCardAnimation.draw = (ctx, timestamp) => {
 					ctx.globalCompositeOperation = 'destination-over';
-					for (let i = 0; i < extraCardsSize;i++) {
+					for (let i = 0; i < this.extraCardsSize;i++) {
 						ctx.drawImage(backImage,ctx.canvas.width/2 - backImage.width/2,ctx.canvas.height/2-backImage.height/2+i,backImage.width,backImage.height);
 					}
 				}
-				animationManager.addAnimation(extraCardAnimation);
+				this.animationManager.addAnimation(extraCardAnimation);
 				let cardFlipAnimation = new Animation(1000);
 				cardFlipAnimation.draw = (ctx, timestamp) => {
 					//where card starts at
@@ -529,7 +521,7 @@ class SethHead extends Game {
 					if (cardFlipAnimation.age < cardFlipAnimation.length/2) {
 						image = backImage;
 					} else {
-						image = getCard(topPileCard).image;
+						image = getCard(this.topPileCard).image;
 					}
 					image.width = cardWidth;
 					image.height = cardHeight;
@@ -542,35 +534,35 @@ class SethHead extends Game {
 				cardFlipAnimation.onEnd = () => {
 					let topCardAnimation = new Animation();
 					topCardAnimation.draw = (ctx, timestamp) => {
-						let topPileCardImage = getCard(topPileCard).image;
+						let topPileCardImage = getCard(this.topPileCard).image;
 						topPileCardImage.width = cardWidth;
 						topPileCardImage.height = cardHeight;
 						ctx.globalCompositeOperation = 'destination-over';
 						ctx.drawImage(topPileCardImage,ctx.canvas.width/2 - topPileCardImage.width*2,ctx.canvas.height/2 - topPileCardImage.height/2,topPileCardImage.width,topPileCardImage.height);
 					}
-					animationManager.addAnimation(topCardAnimation);
+					this.animationManager.addAnimation(topCardAnimation);
 
 					let currentSuitAnimation = new Animation();
 					currentSuitAnimation.draw = (ctx, timestamp) => {
-						let currentSuitImage = Suit[currentSuit].image;
+						let currentSuitImage = Suit[this.currentSuit].image;
 						currentSuitImage.width = 50;
 						currentSuitImage.height = 50;
 						ctx.globalCompositeOperation = 'destination-over';
 						ctx.drawImage(currentSuitImage,ctx.canvas.width/2 - cardWidth*2 + cardWidth/4,ctx.canvas.height/2 - cardHeight/2 - currentSuitImage.height - 5,currentSuitImage.width,currentSuitImage.height);
 					}
-					animationManager.addAnimation(currentSuitAnimation);
+					this.animationManager.addAnimation(currentSuitAnimation);
 				}
-				animationManager.addAnimation(cardFlipAnimation);
+				this.animationManager.addAnimation(cardFlipAnimation);
 
 				let cardHoverAnimation = new Animation();
 				cardHoverAnimation.draw = (ctx, timestamp) => {
-					if (!guiManager.isGuiPresent) {
+					if (!this.guiManager.isGuiPresent) {
 						//if hovering over card in hand then draw outline
-						for (let h = 0;h < usersWithData[0].hand.length;h++) {
+						for (let h = 0;h < this.usersWithData[0].hand.length;h++) {
 							let isFirst = h == 0;
-							let cardXStart = (h*backImage.width/2.5) - ((usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + ctx.canvas.width/2 + (isFirst ? 0 :cardWidth/2);
-							let cardYStart = usersWithData[0].radius * .95 - (cardWidth*1.7) + ctx.canvas.height/2;
-							if (KeyData.mouseIn(cardXStart,cardYStart,isFirst ? cardWidth : cardWidth/2,cardHeight) && isCardValid(usersWithData[0].hand[h])) {
+							let cardXStart = (h*backImage.width/2.5) - ((this.usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + ctx.canvas.width/2 + (isFirst ? 0 :cardWidth/2);
+							let cardYStart = this.usersWithData[0].radius * .95 - (cardWidth*1.7) + ctx.canvas.height/2;
+							if (KeyData.mouseIn(cardXStart,cardYStart,isFirst ? cardWidth : cardWidth/2,cardHeight) && this.isCardValid(this.usersWithData[0].hand[h])) {
 								ctx.globalCompositeOperation = 'destination-over';
 								ctx.strokeStyle = "rgba(201,188,6,1)";
 								ctx.lineWidth = 4;
@@ -580,10 +572,10 @@ class SethHead extends Game {
 							}
 						}
 						//if hovering over visible cards then draw outline
-						for (let c = 0;c < usersWithData[0].visibleCards.length;c++) {
-							let cardXStart = c*(cardWidth * 1.05) - (usersWithData[0].visibleCards.length*cardWidth)/2 + ctx.canvas.width/2;
-							let cardYStart = usersWithData[0].radius * .95 - (cardWidth*3.2) + ctx.canvas.height/2;
-							if (KeyData.mouseIn(cardXStart,cardYStart,cardWidth,cardHeight) && isCardValid(usersWithData[0].visibleCards[c])) {
+						for (let c = 0;c < this.usersWithData[0].visibleCards.length;c++) {
+							let cardXStart = c*(cardWidth * 1.05) - (this.usersWithData[0].visibleCards.length*cardWidth)/2 + ctx.canvas.width/2;
+							let cardYStart = this.usersWithData[0].radius * .95 - (cardWidth*3.2) + ctx.canvas.height/2;
+							if (KeyData.mouseIn(cardXStart,cardYStart,cardWidth,cardHeight) && this.isCardValid(this.usersWithData[0].visibleCards[c])) {
 								ctx.globalCompositeOperation = 'destination-over';
 								ctx.strokeStyle = "rgba(201,188,6,1)";
 								ctx.lineWidth = 4;
@@ -595,21 +587,21 @@ class SethHead extends Game {
 						//if hovering over deck of cards (extra cards), then show outline
 						let extraCardX = ctx.canvas.width/2 - backImage.width/2;
 						let extraCardY = ctx.canvas.height/2 - backImage.height/2;
-						if (KeyData.mouseIn(extraCardX,extraCardY,cardWidth,cardHeight + extraCardsSize)) {
+						if (KeyData.mouseIn(extraCardX,extraCardY,cardWidth,cardHeight + this.extraCardsSize)) {
 							ctx.globalCompositeOperation = 'destination-over';
 							ctx.strokeStyle = "rgba(201,188,6,1)";
 							ctx.lineWidth = 4;
 							ctx.beginPath();
-							ctx.roundRect(extraCardX,extraCardY,cardWidth,cardHeight + extraCardsSize,5);
+							ctx.roundRect(extraCardX,extraCardY,cardWidth,cardHeight + this.extraCardsSize,5);
 							ctx.stroke();
 						}
 					}
 				};
-				animationManager.addAnimation(cardHoverAnimation);
+				this.animationManager.addAnimation(cardHoverAnimation);
 
 				let cardsInHandAnimation = new Animation();
 				cardsInHandAnimation.draw = (ctx, timestamp) => {
-					for (let u of usersWithData) {
+					for (let u of this.usersWithData) {
 						ctx.save();
 						ctx.translate(ctx.canvas.width/2,ctx.canvas.height/2);
 						ctx.rotate(u.rotation);
@@ -619,12 +611,12 @@ class SethHead extends Game {
 								ctx.globalCompositeOperation = 'destination-over';
 								ctx.drawImage(backImage,-(h*backImage.width/2) + ((u.handSize+ 1) * backImage.width/2)/2 - backImage.width,u.radius * .95 - (backImage.width*1.7),backImage.width,backImage.height);
 							} else {
-								let card = getCard(usersWithData[0].hand[h]);
+								let card = getCard(this.usersWithData[0].hand[h]);
 								let cardImage = card.image;
 								cardImage.width = cardWidth;
 								cardImage.height = cardHeight;
 								ctx.globalCompositeOperation = 'destination-over';
-								if (!isCardValid(usersWithData[0].hand[h])) {
+								if (!this.isCardValid(this.usersWithData[0].hand[h])) {
 									ctx.fillStyle = "#72717277";
 									ctx.beginPath();
 									ctx.roundRect((h*backImage.width/1) - ((u.handSize+ 1) * backImage.width/2.5)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height,20);
@@ -638,7 +630,7 @@ class SethHead extends Game {
 							let cardImage = card.image;
 							cardImage.width = cardWidth;
 							cardImage.height = cardHeight;
-							if (!isCardValid(usersWithData[0].visibleCards[c]) && u.user === user) {
+							if (!this.isCardValid(this.usersWithData[0].visibleCards[c]) && u.user === user) {
 								ctx.fillStyle = "#72717277";
 								ctx.globalCompositeOperation = 'destination-over';
 								ctx.beginPath();
@@ -650,22 +642,30 @@ class SethHead extends Game {
 						ctx.restore();
 					}
 				}
-				animationManager.addAnimation(cardsInHandAnimation);
+				this.animationManager.addAnimation(cardsInHandAnimation);
 			}
-			animationManager.addAnimation(dealAnimation);
+			this.animationManager.addAnimation(dealAnimation);
 		}
-		animationManager.addAnimation(extraCardSpinAnimation);
+		this.animationManager.addAnimation(extraCardSpinAnimation);
 	}
 	//Used to check if card is valid to play with the top pile card
 	//the card has to match either suit or value of the top pile card
 	//jokers and jacks are wild cards so they always valid to play
 	isCardValid(card) {
 		let cardData = getCard(card);
-		let topCardData = getCard(topPileCard);
+		let topCardData = getCard(this.topPileCard);
 		//if card is valid for play then they could either play or keep the card they just drawed
-		return cardData.suit === currentSuit || cardData.value === topCardData.value
+		return cardData.suit === this.currentSuit || cardData.value === topCardData.value
 			|| cardData.value === "JACK" || cardData.value === "JOKER";
 	}
 }
 
 let sethHead = new SethHead();
+getGameData({
+			"extraCardsSize":39,
+			"topPileCard":"S1",
+			"currentSuit":"SPADES",
+			"handsSize":{"f5e66f67-202d-4384-ac92-992afa72a5fd":3,"f5e66f67-202d-4384-ac92-992afa72a5fe":2,"f5e66f67-202d-4384-ac92-992afa72a5ff":1},
+			"visibleCards":{"e370c9d9-13a4-4442-990d-7fb36f6eec0b":["S10","H3","DJ"],"f5e66f67-202d-4384-ac92-992afa72a5fd":["SK","H7"],"f5e66f67-202d-4384-ac92-992afa72a5fe":["RJ"],"f5e66f67-202d-4384-ac92-992afa72a5ff":[]},
+			"hand":["S7","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","S6","SJ"],
+			"playerOnTurn":"e370c9d9-13a4-4442-990d-7fb36f6eec0b"});
