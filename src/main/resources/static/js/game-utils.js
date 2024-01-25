@@ -235,6 +235,7 @@ class GuiManager {
 			this.guis.push(gui);
 		}
 		this.animationManager.addAnimation(gui);
+		return gui.id;
 	}
 	cancelGui(gui) {
 		this.guis.remove(gui);

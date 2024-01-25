@@ -1,27 +1,43 @@
-let canvas;
-let animationManager;
-let guiManager;
-function create() {
-    canvas = document.createElement("canvas");
-    canvas.addEventListener('mousedown', (e) => onCanvasClick(e));
-    canvas.addEventListener('mousemove', (e) => onCanvasHover(e));
-    canvas.height = document.documentElement.clientHeight * window.devicePixelRatio;
-    if (document.documentElement.clientWidth <= 600) {
-        canvas.width = document.documentElement.clientWidth;
-    } else {
-        canvas.width = document.documentElement.clientWidth;
-    }
-	canvas.width *= window.devicePixelRatio;
+class Game {
+	constructor() {
+		this.canvas = document.createElement("canvas");
+		this.animationManager = new AnimationManager(this.canvas);
+		this.guiManager = new GuiManager(this.animationManager);
+		this.forceLandscape = false;
+		this.canvas.addEventListener('mousedown', (e) => this.onCanvasClick(e));
+		this.canvas.addEventListener('mousemove', (e) => this.onCanvasHover(e));
+		addEventListener("orientationchange", (e) => this.onOrientationChange(e));
 
-    document.body.appendChild(canvas);
+		this.canvas.height = document.documentElement.clientHeight;
+		if (document.documentElement.clientWidth <= 600) {
+			this.canvas.width = document.documentElement.clientWidth;
+		} else {
+			this.canvas.width = document.documentElement.clientWidth;
+		}
 
-	animationManager = new AnimationManager(canvas);
-	guiManager = new GuiManager(animationManager);
-}
-function onCanvasHover(e) {
-	let x = e.layerX;
-    let y = e.layerY;
-	
-	KeyData.mouseX = x;
-	KeyData.mouseY = y;
+		document.body.appendChild(this.canvas);
+	}
+	onCanvasHover(e) {
+		let x = e.layerX;
+		let y = e.layerY;
+
+		KeyData.mouseX = x;
+		KeyData.mouseY = y;
+	}
+	forceLandscape(bool) {
+		this.forceLandscape = bool;
+		if (bool) {
+			this.onOrientationChange(null);
+		}
+	}
+	onOrientationChange(e) {
+		console.log(screen.orientation.type.match(/\w+/)[0]);
+		let rotateGui = new Gui(0, 0, this.canvas.width, this.canvas.height,false);
+		rotateGui.easeIn = false;
+		if (this.forceLandscape && screen.orientation.type.match(/\w+/)[0] != "landscape") {
+			this.rotateGuiId = this.guiManager.addGui(rotateGui,true);
+		} else {
+			this.guiManager.cancelGui(rotateGui);
+		}
+	}
 }

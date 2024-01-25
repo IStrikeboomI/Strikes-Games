@@ -62,7 +62,7 @@ class SethHead extends Game {
 		this.currentSuit;
 		//timestamp of previous animation frame
 		this.lastTimestamp = 0;
-		this.forceLandscape = true;
+		super.forceLandscape(true);
 		this.stillDealing = true;
 		//add client first
 		//using polar coordinates to display cards because its much easier and looks nicer
