@@ -4,6 +4,7 @@ class Game {
 		this.animationManager = new AnimationManager(this.canvas);
 		this.guiManager = new GuiManager(this.animationManager);
 		this.forceLandscape = false;
+		this.animationTimestamp;
 		this.canvas.addEventListener('mousedown', (e) => this.onCanvasClick(e));
 		this.canvas.addEventListener('mousemove', (e) => this.onCanvasHover(e));
 		addEventListener("orientationchange", (e) => this.onOrientationChange(e));
@@ -16,6 +17,16 @@ class Game {
 		}
 
 		document.body.appendChild(this.canvas);
+	}
+	drawCanvas(siteTimestamp) {
+		if (this.animationTimestamp === undefined) {
+			this.animationTimestamp = siteTimestamp;
+		}
+		let timestamp = siteTimestamp - this.animationTimestamp || 0;
+		this.canvas.getContext("2d").clearRect(0,0,this.canvas.width,this.canvas.height);
+		this.animationManager.drawAll(timestamp, timestamp -  this.lastTimestamp);
+		this.lastTimestamp = timestamp;
+		window.requestAnimationFrame(this.drawCanvas.bind(this));
 	}
 	onCanvasHover(e) {
 		let x = e.layerX;

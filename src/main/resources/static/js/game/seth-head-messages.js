@@ -14,7 +14,7 @@ function getGameData(message) {
     }
     player.hand = message.hand;
     player.visibleCards = message.visibleCards[user.separationId];
-    window.requestAnimationFrame(sethHead.drawCanvas);
+    window.requestAnimationFrame(sethHead.drawCanvas.bind(sethHead));
 }
 function makeMove(message) {
 

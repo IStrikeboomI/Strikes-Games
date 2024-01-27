@@ -58,7 +58,6 @@ class SethHead extends Game {
 		this.extraCardsSize;
 		this.topPileCard;
 		this.currentSuit;
-		this.animationTimestamp;
 		this.currentSuit;
 		//timestamp of previous animation frame
 		this.lastTimestamp = 0;
@@ -88,16 +87,6 @@ class SethHead extends Game {
 			this.usersWithData.push(userWithData);
 		}
 		this.initAnimations();
-	}
-	drawCanvas(siteTimestamp) {
-		if (sethHead.animationTimestamp === undefined) {
-			sethHead.animationTimestamp = siteTimestamp;
-		}
-		let timestamp = siteTimestamp - sethHead.animationTimestamp || 0;
-		sethHead.canvas.getContext("2d").clearRect(0,0,sethHead.canvas.width,sethHead.canvas.height);
-		sethHead.animationManager.drawAll(timestamp, timestamp - sethHead.lastTimestamp);
-		sethHead.lastTimestamp = timestamp;
-		window.requestAnimationFrame(sethHead.drawCanvas);
 	}
 	onCanvasClick(e) {
 		let x = e.layerX;
