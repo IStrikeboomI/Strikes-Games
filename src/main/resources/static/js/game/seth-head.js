@@ -47,8 +47,8 @@ var lobby = {
   ],
   "private": false
 };
-let cardWidth = 100;
-let cardHeight = 140;
+let cardWidth = 50;
+let cardHeight = 70;
 class SethHead extends Game {
 	constructor() {
 		super();
@@ -258,7 +258,7 @@ class SethHead extends Game {
 									-cardImage.height/2,cardImage.width,cardImage.height);
 		}
 		playCardAnimation.onEnd = () => {
-			this.topPileCard= card;
+			this.topPileCard = card;
 			let cardData = getCard(card);
 		}
 		this.animationManager.addAnimation(playCardAnimation,true);
@@ -280,7 +280,7 @@ class SethHead extends Game {
 			}
 			playOrKeepGui.addElement(titleElement);
 
-			let cardElement = new GuiElement(cardWidth*1.5,cardHeight * 1.75,cardWidth*1.5,cardHeight*1.5);
+			let cardElement = new GuiElement(playOrKeepGui.width/3,playOrKeepGui.height/2,cardWidth*1.5,cardHeight*1.5);
 			cardElement.draw = (ctx) => {
 				let cardImage = getCard(card).image;
 				cardImage.width = cardWidth;
@@ -328,7 +328,7 @@ class SethHead extends Game {
 				ctx.fillText(TEXT,keepHandButton.width/2,keepHandButton.height/2);
 			}
 			keepHandButton.onClick = (e) => {
-				drawCard(this.usersWithData[0], card);
+				this.drawCard(this.usersWithData[0], card);
 				this.guiManager.cancelGui(playOrKeepGui);
 			}
 			playOrKeepGui.addElement(keepHandButton);
@@ -351,14 +351,14 @@ class SethHead extends Game {
 			playCardButton.onClick = (e) => {
 				this.usersWithData[0].hand.push(card);
 				this.usersWithData[0].handSize++;
-				playCard(this.usersWithData[0], card);
+				this.playCard(this.usersWithData[0], card);
 				this.guiManager.cancelGui(playOrKeepGui);
 			}
 			playOrKeepGui.addElement(playCardButton);
 
 			this.guiManager.addGui(playOrKeepGui);
 		} else {
-			drawCard(this.usersWithData[0], card);
+			this.drawCard(this.usersWithData[0], card);
 		}
 	}
 	drawCard(userToDraw, card) {
@@ -534,8 +534,8 @@ class SethHead extends Game {
 					let currentSuitAnimation = new Animation();
 					currentSuitAnimation.draw = (ctx, timestamp) => {
 						let currentSuitImage = Suit[this.currentSuit].image;
-						currentSuitImage.width = 50;
-						currentSuitImage.height = 50;
+						currentSuitImage.width = cardWidth/2;
+						currentSuitImage.height = cardWidth/2;
 						ctx.globalCompositeOperation = 'destination-over';
 						ctx.drawImage(currentSuitImage,ctx.canvas.width/2 - cardWidth*2 + cardWidth/4,ctx.canvas.height/2 - cardHeight/2 - currentSuitImage.height - 5,currentSuitImage.width,currentSuitImage.height);
 					}

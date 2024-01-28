@@ -7,7 +7,6 @@ class Game {
 		this.animationTimestamp;
 		this.canvas.addEventListener('mousedown', (e) => this.onCanvasClick(e));
 		this.canvas.addEventListener('mousemove', (e) => this.onCanvasHover(e));
-		addEventListener("orientationchange", (e) => this.onOrientationChange(e));
 
 		this.canvas.height = document.documentElement.clientHeight;
 		if (document.documentElement.clientWidth <= 600) {
@@ -36,19 +35,6 @@ class Game {
 		KeyData.mouseY = y;
 	}
 	forceLandscape(bool) {
-		this.forceLandscape = bool;
-		if (bool) {
-			this.onOrientationChange(null);
-		}
-	}
-	onOrientationChange(e) {
-		console.log(screen.orientation.type.match(/\w+/)[0]);
-		let rotateGui = new Gui(0, 0, this.canvas.width, this.canvas.height,false);
-		rotateGui.easeIn = false;
-		if (this.forceLandscape && screen.orientation.type.match(/\w+/)[0] != "landscape") {
-			this.rotateGuiId = this.guiManager.addGui(rotateGui,true);
-		} else {
-			this.guiManager.cancelGui(rotateGui);
-		}
+		screen.orientation.lock("landscape");
 	}
 }
