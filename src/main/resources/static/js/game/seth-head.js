@@ -47,11 +47,11 @@ var lobby = {
   ],
   "private": false
 };
-let cardWidth = 50;
-let cardHeight = 70;
 class SethHead extends Game {
 	constructor() {
 		super();
+		this.cardWidth = 100 * (this.canvas.width/1920);
+		this.cardHeight = 140 * (this.canvas.height/935);
 		//stores users along with additional data like where they are on ctx.canvas and what their cards are
 		//location of where users are as follows, bottom is always the client then the user order is top, right, then left
 		this.usersWithData = [];
@@ -86,6 +86,14 @@ class SethHead extends Game {
 			userWithData.onTurn = false;
 			this.usersWithData.push(userWithData);
 		}
+		getCard("S1").image.onload =() => {
+			let cardImageTest = new Animation();
+			cardImageTest.draw = (ctx,timestamp) => {
+				let image = getCard("S1").image;
+				ctx.drawImage(image,0,0,50,70);
+			}
+			this.animationManager.addAnimation(cardImageTest);
+		};
 		this.initAnimations();
 	}
 	onCanvasClick(e) {
@@ -99,24 +107,24 @@ class SethHead extends Game {
 				//if hovering over card in hand
 				for (let h = 0;h < this.usersWithData[0].hand.length;h++) {
 					let isFirst = h == 0;
-					let cardXStart = (h*cardWidth/2.5) - ((this.usersWithData[0].hand.length+ 1) * cardWidth/2.5)/2 + this.canvas.width/2 + (isFirst ? 0 : cardWidth/2);
-					let cardYStart = this.usersWithData[0].radius * .95 - (cardWidth*1.7) + this.canvas.height/2;
-					if (KeyData.mouseIn(cardXStart,cardYStart,(isFirst ? cardWidth : cardWidth/2),cardHeight) && this.isCardValid(this.usersWithData[0].hand[h])) {
+					let cardXStart = (h*this.cardWidth/2.5) - ((this.usersWithData[0].hand.length+ 1) * this.cardWidth/2.5)/2 + this.canvas.width/2 + (isFirst ? 0 : this.cardWidth/2);
+					let cardYStart = this.usersWithData[0].radius * .95 - (this.cardWidth*1.7) + this.canvas.height/2;
+					if (KeyData.mouseIn(cardXStart,cardYStart,(isFirst ? this.cardWidth : this.cardWidth/2),this.cardHeight) && this.isCardValid(this.usersWithData[0].hand[h])) {
 						this.userPlayCard(this.usersWithData[0].hand[h])
 					}
 				}
 				//if hovering over visible cards
 				for (let c = 0;c < this.usersWithData[0].visibleCards.length;c++) {
-					let cardXStart = c*(cardWidth * 1.05) - (this.usersWithData[0].visibleCards.length*cardWidth)/2 + this.canvas.width/2;
-					let cardYStart = this.usersWithData[0].radius * .95 - (cardWidth*3.2) + this.canvas.height/2;
-					if (KeyData.mouseIn(cardXStart,cardYStart,cardWidth,cardHeight) && this.isCardValid(this.usersWithData[0].visibleCards[c])) {
+					let cardXStart = c*(this.cardWidth * 1.05) - (this.usersWithData[0].visibleCards.length*this.cardWidth)/2 + this.canvas.width/2;
+					let cardYStart = this.usersWithData[0].radius * .95 - (this.cardWidth*3.2) + this.canvas.height/2;
+					if (KeyData.mouseIn(cardXStart,cardYStart,this.cardWidth,this.cardHeight) && this.isCardValid(this.usersWithData[0].visibleCards[c])) {
 						this.userPlayCard(this.usersWithData[0].visibleCards[c]);
 					}
 				}
 				//if hovering over deck of cards (extra cards)
 				let extraCardX = this.canvas.width/2 - backImage.width/2;
 				let extraCardY = this.canvas.height/2 - backImage.height/2;
-				if (KeyData.mouseIn(extraCardX,extraCardY,cardWidth,cardHeight + this.extraCardsSize)) {
+				if (KeyData.mouseIn(extraCardX,extraCardY,this.cardWidth,this.cardHeight + this.extraCardsSize)) {
 					this.userDrawCard(randomCard().name);
 				}
 				return;
@@ -140,7 +148,7 @@ class SethHead extends Game {
 			ctx.fillText(TEXT,0,visibleCardReplaceMeasurements.actualBoundingBoxAscent + 5);
 		}
 		visibleCardReplaceGui.addElement(visibleCardReplaceTextElement);
-		let handCardsBox = new GuiElement(-((this.usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + this.canvas.width/2,this.usersWithData[0].radius * .95 - (cardWidth*1.7) + this.canvas.height/2,cardWidth + (this.usersWithData[0].hand.length - 1)*(cardWidth/2.5),cardHeight);
+		let handCardsBox = new GuiElement(-((this.usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + this.canvas.width/2,this.usersWithData[0].radius * .95 - (this.cardWidth*1.7) + this.canvas.height/2,this.cardWidth + (this.usersWithData[0].hand.length - 1)*(this.cardWidth/2.5),this.cardHeight);
 		handCardsBox.draw = (ctx) => {
 			ctx.strokeStyle = "green";
 			ctx.lineWidth = 5;
@@ -149,13 +157,13 @@ class SethHead extends Game {
 			ctx.stroke();
 			for (let h = 0;h < this.usersWithData[0].hand.length;h++) {
 				let isFirst = h == 0;
-				let cardXStart = (h*backImage.width/2.5) + (isFirst ? 0 :cardWidth/2);
-				if (KeyData.mouseIn(cardXStart - ((this.usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + ctx.canvas.width/2,handCardsBox.y,isFirst ? cardWidth : cardWidth/2,cardHeight)) {
+				let cardXStart = (h*backImage.width/2.5) + (isFirst ? 0 :this.cardWidth/2);
+				if (KeyData.mouseIn(cardXStart - ((this.usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + ctx.canvas.width/2,handCardsBox.y,isFirst ? this.cardWidth : this.cardWidth/2,this.cardHeight)) {
 					ctx.globalCompositeOperation = 'source-over';
 					ctx.strokeStyle = "rgba(201,188,6,1)";
 					ctx.lineWidth = 4;
 					ctx.beginPath();
-					ctx.roundRect(cardXStart,0,isFirst ? cardWidth : cardWidth/2,cardHeight,5);
+					ctx.roundRect(cardXStart,0,isFirst ? this.cardWidth : this.cardWidth/2,this.cardHeight,5);
 					ctx.stroke();
 				}
 			}
@@ -163,8 +171,8 @@ class SethHead extends Game {
 		handCardsBox.onClick = (e) => {
 			for (let h = 0;h < this.usersWithData[0].hand.length;h++) {
 				let isFirst = h == 0;
-				let cardXStart = (h*backImage.width/2.5) + (isFirst ? 0 :cardWidth/2);
-				if (KeyData.mouseIn(cardXStart - ((this.usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + this.canvas.width/2 ,handCardsBox.y,(isFirst ? cardWidth : cardWidth/2),cardHeight)) {
+				let cardXStart = (h*backImage.width/2.5) + (isFirst ? 0 :this.cardWidth/2);
+				if (KeyData.mouseIn(cardXStart - ((this.usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + this.canvas.width/2 ,handCardsBox.y,(isFirst ? this.cardWidth : this.cardWidth/2),this.cardHeight)) {
 					console.log(this.usersWithData[0].hand[h])
 				}
 			}
@@ -241,18 +249,18 @@ class SethHead extends Game {
 		playCardAnimation.draw = (ctx, timestamp) => {
 			ctx.globalCompositeOperation = "source-over";
 			let cardImage = getCard(card).image;
-			cardImage.width = cardWidth;
-			cardImage.height = cardHeight;
+			cardImage.width = this.cardWidth;
+			cardImage.height = this.cardHeight;
 
 			//where card ends up
-			const CARD_DESTINATION_X = ctx.canvas.width/2 - cardWidth*2;
-			const CARD_DESTINATION_Y = ctx.canvas.height/2 - cardHeight/2;
+			const CARD_DESTINATION_X = ctx.canvas.width/2 - this.cardWidth*2;
+			const CARD_DESTINATION_Y = ctx.canvas.height/2 - this.cardHeight/2;
 
 			let card_source_x = (-Math.sin(userToPlay.rotation) * userToPlay.radius) * .75 + ctx.canvas.width/2 - cardImage.width/2;
 			let card_source_y = (Math.cos(userToPlay.rotation) * userToPlay.radius) * .75 + ctx.canvas.height/2 - cardImage.height/2;
 
-			ctx.translate(card_source_x + ((CARD_DESTINATION_X-card_source_x)/playCardAnimation.length)*playCardAnimation.age + cardWidth/2,
-						  card_source_y + ((CARD_DESTINATION_Y-card_source_y)/playCardAnimation.length)*playCardAnimation.age + cardHeight/2);
+			ctx.translate(card_source_x + ((CARD_DESTINATION_X-card_source_x)/playCardAnimation.length)*playCardAnimation.age + this.cardWidth/2,
+						  card_source_y + ((CARD_DESTINATION_Y-card_source_y)/playCardAnimation.length)*playCardAnimation.age + this.cardHeight/2);
 			ctx.rotate((userToPlay.rotation/playCardAnimation.length) * (playCardAnimation.length - playCardAnimation.age));
 			ctx.drawImage(cardImage,-cardImage.width/2,
 									-cardImage.height/2,cardImage.width,cardImage.height);
@@ -280,11 +288,11 @@ class SethHead extends Game {
 			}
 			playOrKeepGui.addElement(titleElement);
 
-			let cardElement = new GuiElement(playOrKeepGui.width/3,playOrKeepGui.height/2,cardWidth*1.5,cardHeight*1.5);
+			let cardElement = new GuiElement(playOrKeepGui.width/3,playOrKeepGui.height/2,this.cardWidth*1.5,this.cardHeight*1.5);
 			cardElement.draw = (ctx) => {
 				let cardImage = getCard(card).image;
-				cardImage.width = cardWidth;
-				cardImage.height = cardHeight;
+				cardImage.width = this.cardWidth;
+				cardImage.height = this.cardHeight;
 				ctx.drawImage(cardImage,-cardImage.width,-cardImage.height,cardElement.width,cardElement.height);
 
 				const TEXT = "Drawn Card:";
@@ -296,11 +304,11 @@ class SethHead extends Game {
 			}
 			playOrKeepGui.addElement(cardElement);
 
-			let topCardElement = new GuiElement(playOrKeepGui.width * 7/8,playOrKeepGui.height/2 + cardHeight/2,cardWidth,cardHeight);
+			let topCardElement = new GuiElement(playOrKeepGui.width * 7/8,playOrKeepGui.height/2 + this.cardHeight/2,this.cardWidth,this.cardHeight);
 			topCardElement.draw = (ctx) => {
 				let cardImage = getCard(this.topPileCard).image;
-				cardImage.width = cardWidth;
-				cardImage.height = cardHeight;
+				cardImage.width = this.cardWidth;
+				cardImage.height = this.cardHeight;
 				ctx.drawImage(cardImage,-cardImage.width,-cardImage.height,topCardElement.width,topCardElement.height);
 
 				const TEXT = "Top Card:";
@@ -367,8 +375,8 @@ class SethHead extends Game {
 			ctx.translate(ctx.canvas.width/2,ctx.canvas.height/2);
 			ctx.rotate(userToDraw.rotation);
 			let cardImage = getCard(card).image;
-			cardImage.width = cardWidth;
-			cardImage.height = cardHeight;
+			cardImage.width = this.cardWidth;
+			cardImage.height = this.cardHeight;
 			ctx.drawImage(cardImage,-backImage.width/2, userToDraw.radius * (drawCardAnimation.age / drawCardAnimation.length),cardImage.width,cardImage.height);
 			ctx.restore();
 		}
@@ -393,13 +401,12 @@ class SethHead extends Game {
 			ctx.fillText("Mouse X: " + KeyData.mouseX + "\nMouse Y: " + KeyData.mouseY, 200,20);
 		}
 		this.animationManager.addAnimation(coordinatesAnimation);
-		backImage.width = cardWidth;
-		backImage.height = cardHeight;
+		backImage.width = this.cardWidth;
+		backImage.height = this.cardHeight;
 		let usernameAnimation = new Animation();
 		usernameAnimation.draw = (ctx, timestamp) => {
 			ctx.textAlign = "center";
 			ctx.font = "30px Arial sans-serif";
-			ctx.imageSmoothingEnabled = false;
 			for (let u of this.usersWithData) {
 				ctx.save();
 				ctx.translate(ctx.canvas.width/2,ctx.canvas.height/2);
@@ -453,8 +460,8 @@ class SethHead extends Game {
 						} else {
 							let card = getCard(this.usersWithData[0].hand[h]);
 							let cardImage = card.image;
-							cardImage.width = cardWidth;
-							cardImage.height = cardHeight;
+							cardImage.width = this.cardWidth;
+							cardImage.height = this.cardHeight;
 							ctx.drawImage(cardImage,(h*backImage.width/2.5) - ((Math.min(cardsDealt,u.handSize)+ 1) * backImage.width/2.5)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height);
 						}
 					}
@@ -463,8 +470,8 @@ class SethHead extends Game {
 						for (let c = 0; c < Math.min(cardsDealt - u.handSize, u.visibleCards.length); c++) {
 							let card = getCard(u.visibleCards[c]);
 							let cardImage = card.image;
-							cardImage.width = cardWidth;
-							cardImage.height = cardHeight;
+							cardImage.width = this.cardWidth;
+							cardImage.height = this.cardHeight;
 							ctx.drawImage(cardImage,c*(cardImage.width * 1.05) - (u.visibleCards.length*cardImage.width)/2,u.radius * .95 - (cardImage.width*3.2),cardImage.width,cardImage.height);
 						}
 					}
@@ -503,17 +510,17 @@ class SethHead extends Game {
 				let cardFlipAnimation = new Animation(1000);
 				cardFlipAnimation.draw = (ctx, timestamp) => {
 					//where card starts at
-					const CARD_SOURCE = ctx.canvas.width/2 - cardWidth/2;
+					const CARD_SOURCE = ctx.canvas.width/2 - this.cardWidth/2;
 					//where card ends up
-					const CARD_DESTINATION = ctx.canvas.width/2 - cardWidth*2;
+					const CARD_DESTINATION = ctx.canvas.width/2 - this.cardWidth*2;
 					let image;
 					if (cardFlipAnimation.age < cardFlipAnimation.length/2) {
 						image = backImage;
 					} else {
 						image = getCard(this.topPileCard).image;
 					}
-					image.width = cardWidth;
-					image.height = cardHeight;
+					image.width = this.cardWidth;
+					image.height = this.cardHeight;
 					ctx.save();
 					//ctx.translate(ctx.canvas.width/2 - image.width/2,ctx.canvas.height/2 - image.width/2);
 					//ctx.setTransform(new DOMMatrix().rotate(0,(timestamp/TIME_TO_FLIP) * 100));
@@ -524,20 +531,20 @@ class SethHead extends Game {
 					let topCardAnimation = new Animation();
 					topCardAnimation.draw = (ctx, timestamp) => {
 						let topPileCardImage = getCard(this.topPileCard).image;
-						topPileCardImage.width = cardWidth;
-						topPileCardImage.height = cardHeight;
+						topPileCardImage.width = this.cardWidth;
+						topPileCardImage.height = this.cardHeight;
 						ctx.globalCompositeOperation = 'destination-over';
-						ctx.drawImage(topPileCardImage,ctx.canvas.width/2 - topPileCardImage.width*2,ctx.canvas.height/2 - topPileCardImage.height/2,topPileCardImage.width,topPileCardImage.height);
+						ctx.drawImage(topPileCardImage,parseInt(ctx.canvas.width/2 - topPileCardImage.width*2) + .5,parseInt(ctx.canvas.height/2 - topPileCardImage.height/2) + .5,topPileCardImage.width,topPileCardImage.height);
 					}
 					this.animationManager.addAnimation(topCardAnimation);
 
 					let currentSuitAnimation = new Animation();
 					currentSuitAnimation.draw = (ctx, timestamp) => {
 						let currentSuitImage = Suit[this.currentSuit].image;
-						currentSuitImage.width = cardWidth/2;
-						currentSuitImage.height = cardWidth/2;
+						currentSuitImage.width = this.cardWidth/2;
+						currentSuitImage.height = this.cardWidth/2;
 						ctx.globalCompositeOperation = 'destination-over';
-						ctx.drawImage(currentSuitImage,ctx.canvas.width/2 - cardWidth*2 + cardWidth/4,ctx.canvas.height/2 - cardHeight/2 - currentSuitImage.height - 5,currentSuitImage.width,currentSuitImage.height);
+						ctx.drawImage(currentSuitImage,ctx.canvas.width/2 - this.cardWidth*2 + this.cardWidth/4,ctx.canvas.height/2 - this.cardHeight/2 - currentSuitImage.height - 5,currentSuitImage.width,currentSuitImage.height);
 					}
 					this.animationManager.addAnimation(currentSuitAnimation);
 				}
@@ -549,39 +556,39 @@ class SethHead extends Game {
 						//if hovering over card in hand then draw outline
 						for (let h = 0;h < this.usersWithData[0].hand.length;h++) {
 							let isFirst = h == 0;
-							let cardXStart = (h*backImage.width/2.5) - ((this.usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + ctx.canvas.width/2 + (isFirst ? 0 :cardWidth/2);
-							let cardYStart = this.usersWithData[0].radius * .95 - (cardWidth*1.7) + ctx.canvas.height/2;
-							if (KeyData.mouseIn(cardXStart,cardYStart,isFirst ? cardWidth : cardWidth/2,cardHeight) && this.isCardValid(this.usersWithData[0].hand[h])) {
+							let cardXStart = (h*backImage.width/2.5) - ((this.usersWithData[0].hand.length+ 1) * backImage.width/2.5)/2 + ctx.canvas.width/2 + (isFirst ? 0 :this.cardWidth/2);
+							let cardYStart = this.usersWithData[0].radius * .95 - (this.cardWidth*1.7) + ctx.canvas.height/2;
+							if (KeyData.mouseIn(cardXStart,cardYStart,isFirst ? this.cardWidth : this.cardWidth/2,this.cardHeight) && this.isCardValid(this.usersWithData[0].hand[h])) {
 								ctx.globalCompositeOperation = 'destination-over';
 								ctx.strokeStyle = "rgba(201,188,6,1)";
 								ctx.lineWidth = 4;
 								ctx.beginPath();
-								ctx.roundRect(cardXStart,cardYStart,isFirst ? cardWidth : cardWidth/2,cardHeight,5);
+								ctx.roundRect(cardXStart,cardYStart,isFirst ? this.cardWidth : this.cardWidth/2,this.cardHeight,5);
 								ctx.stroke();
 							}
 						}
 						//if hovering over visible cards then draw outline
 						for (let c = 0;c < this.usersWithData[0].visibleCards.length;c++) {
-							let cardXStart = c*(cardWidth * 1.05) - (this.usersWithData[0].visibleCards.length*cardWidth)/2 + ctx.canvas.width/2;
-							let cardYStart = this.usersWithData[0].radius * .95 - (cardWidth*3.2) + ctx.canvas.height/2;
-							if (KeyData.mouseIn(cardXStart,cardYStart,cardWidth,cardHeight) && this.isCardValid(this.usersWithData[0].visibleCards[c])) {
+							let cardXStart = c*(this.cardWidth * 1.05) - (this.usersWithData[0].visibleCards.length*this.cardWidth)/2 + ctx.canvas.width/2;
+							let cardYStart = this.usersWithData[0].radius * .95 - (this.cardWidth*3.2) + ctx.canvas.height/2;
+							if (KeyData.mouseIn(cardXStart,cardYStart,this.cardWidth,this.cardHeight) && this.isCardValid(this.usersWithData[0].visibleCards[c])) {
 								ctx.globalCompositeOperation = 'destination-over';
 								ctx.strokeStyle = "rgba(201,188,6,1)";
 								ctx.lineWidth = 4;
 								ctx.beginPath();
-								ctx.roundRect(cardXStart,cardYStart,cardWidth,cardHeight,5);
+								ctx.roundRect(cardXStart,cardYStart,this.cardWidth,this.cardHeight,5);
 								ctx.stroke();
 							}
 						}
 						//if hovering over deck of cards (extra cards), then show outline
 						let extraCardX = ctx.canvas.width/2 - backImage.width/2;
 						let extraCardY = ctx.canvas.height/2 - backImage.height/2;
-						if (KeyData.mouseIn(extraCardX,extraCardY,cardWidth,cardHeight + this.extraCardsSize)) {
+						if (KeyData.mouseIn(extraCardX,extraCardY,this.cardWidth,this.cardHeight + this.extraCardsSize)) {
 							ctx.globalCompositeOperation = 'destination-over';
 							ctx.strokeStyle = "rgba(201,188,6,1)";
 							ctx.lineWidth = 4;
 							ctx.beginPath();
-							ctx.roundRect(extraCardX,extraCardY,cardWidth,cardHeight + this.extraCardsSize,5);
+							ctx.roundRect(extraCardX,extraCardY,this.cardWidth,this.cardHeight + this.extraCardsSize,5);
 							ctx.stroke();
 						}
 					}
@@ -602,8 +609,8 @@ class SethHead extends Game {
 							} else {
 								let card = getCard(this.usersWithData[0].hand[h]);
 								let cardImage = card.image;
-								cardImage.width = cardWidth;
-								cardImage.height = cardHeight;
+								cardImage.width = this.cardWidth;
+								cardImage.height = this.cardHeight;
 								ctx.globalCompositeOperation = 'destination-over';
 								if (!this.isCardValid(this.usersWithData[0].hand[h])) {
 									ctx.fillStyle = "#72717277";
@@ -611,14 +618,14 @@ class SethHead extends Game {
 									ctx.roundRect((h*backImage.width/1) - ((u.handSize+ 1) * backImage.width/2.5)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height,20);
 									ctx.fill();
 								}
-								ctx.drawImage(cardImage,(h*backImage.width/2.5) - ((u.handSize+ 1) * backImage.width/2.5)/2,u.radius * .95 - (cardImage.width*1.7),cardImage.width,cardImage.height);
+								ctx.drawImage(cardImage,parseInt((h*backImage.width/2.5) - ((u.handSize+ 1) * backImage.width/2.5)/2),parseInt(u.radius * .95 - (cardImage.width*1.7)),cardImage.width,cardImage.height);
 							}
 						}
 						for (let c = 0; c < u.visibleCards.length; c++) {
 							let card = getCard(u.visibleCards[c]);
 							let cardImage = card.image;
-							cardImage.width = cardWidth;
-							cardImage.height = cardHeight;
+							cardImage.width = this.cardWidth;
+							cardImage.height = this.cardHeight;
 							if (!this.isCardValid(this.usersWithData[0].visibleCards[c]) && u.user === user) {
 								ctx.fillStyle = "#72717277";
 								ctx.globalCompositeOperation = 'destination-over';
