@@ -15,17 +15,31 @@ public class DrawCardMessage extends GameMessageHandler<SethHead> {
 
     @Override
     public boolean handle(SethHead game, User player) {
-        game.addCard(game.draw(),player);
+        if (game.playerOnTurn.equals(player)) {
+            game.drawnCard = game.draw();
+            if (game.isCardValid(game.drawnCard)) {
+
+            } else {
+                game.addCard(game.drawnCard, player);
+                game.cycleTurn();
+                game.drawnCard = null;
+            }
+            return true;
+        }
         return false;
     }
 
     @Override
     public ClientBoundGameMessage dispatch(SethHead game, User player) {
-        return new ClientBoundGameMessage(messageName, getData());
+        return new ClientBoundGameMessage(messageName, Map.of("card",game.drawnCard));
     }
 
     @Override
     public List<User> dispatchTo(SethHead game) {
+        if (game.drawnCard != null) {
+            return List.of(game.playerOnTurn);
+        }
         return super.dispatchTo(game);
     }
+
 }

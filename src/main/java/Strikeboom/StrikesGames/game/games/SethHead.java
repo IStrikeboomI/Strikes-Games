@@ -27,6 +27,9 @@ public class SethHead extends TurnBasedGame {
             //At least three cards which are visible to all players, needs to be replenished from the player's hand when used
             visibleCards;
     public Card.Suit currentSuit;
+    //When the user draws a card then there's a message if they want to keep or play
+    //If null then no card being drawn currently
+    public Card drawnCard;
     public SethHead(Lobby lobby, SimpMessagingTemplate template) {
         super(lobby,template);
         extraCards = Deck.standard54Deck().shuffle();
