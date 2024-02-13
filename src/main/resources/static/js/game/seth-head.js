@@ -86,14 +86,6 @@ class SethHead extends Game {
 			userWithData.onTurn = false;
 			this.usersWithData.push(userWithData);
 		}
-		getCard("S1").image.onload =() => {
-			let cardImageTest = new Animation();
-			cardImageTest.draw = (ctx,timestamp) => {
-				let image = getCard("S1").image;
-				ctx.drawImage(image,0,0,50,70);
-			}
-			this.animationManager.addAnimation(cardImageTest);
-		};
 		this.initAnimations();
 	}
 	onCanvasClick(e) {
